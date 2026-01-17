@@ -12,8 +12,8 @@ Requirements for rock-solid dual-monitor student view.
 - [x] **WIN-01**: Student window launches reliably from a button click without popup blocker issues
 - [x] **WIN-02**: Teacher view and student view are perfectly synchronized (same slide index, same bullet reveal count)
 - [x] **WIN-03**: Student window displays only slide content (no teleprompter, no teacher controls visible)
-- [ ] **WIN-04**: On Chromium browsers (Chrome, Edge, Arc, Opera, Brave), auto-detect secondary monitor and position student window there
-- [ ] **WIN-05**: On non-Chromium browsers (Firefox, Safari), provide clear instructions for manually dragging window to projector
+- [x] **WIN-04**: On Chromium browsers (Chrome, Edge, Arc, Opera, Brave), auto-detect secondary monitor and position student window there
+- [x] **WIN-05**: On non-Chromium browsers (Firefox, Safari), provide clear instructions for manually dragging window to projector
 
 ### Presentation Enhancements
 
@@ -54,8 +54,8 @@ Which phases cover which requirements.
 | WIN-01 | Phase 1 | Complete |
 | WIN-02 | Phase 1 | Complete |
 | WIN-03 | Phase 1 | Complete |
-| WIN-04 | Phase 2 | Pending |
-| WIN-05 | Phase 2 | Pending |
+| WIN-04 | Phase 2 | Complete |
+| WIN-05 | Phase 2 | Complete |
 | PRES-01 | Phase 3 | Pending |
 | PRES-02 | Phase 3 | Pending |
 | RES-01 | Phase 3 | Pending |
@@ -69,4 +69,4 @@ Which phases cover which requirements.
 
 ---
 *Requirements defined: 2026-01-18*
-*Last updated: 2026-01-18 — Phase 1 requirements complete (WIN-01, WIN-02, WIN-03)*
+*Last updated: 2026-01-18 — Phase 2 requirements complete (WIN-04, WIN-05)*

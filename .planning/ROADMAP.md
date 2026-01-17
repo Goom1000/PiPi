@@ -13,7 +13,7 @@ This milestone delivers rock-solid dual-monitor presentation functionality where
 Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Foundation** - Reliable dual-window launch with BroadcastChannel sync
-- [ ] **Phase 2: Display Targeting** - Automatic projector placement for Chromium, fallback for others
+- [x] **Phase 2: Display Targeting** - Automatic projector placement for Chromium, fallback for others
 - [ ] **Phase 3: Resilience & Polish** - Recovery features and presenter conveniences
 
 ## Phase Details
@@ -44,8 +44,8 @@ Plans:
 **Plans**: 2 plans
 
 Plans:
-- [ ] 02-01-PLAN.md — Window Management API types and useWindowManagement hook
-- [ ] 02-02-PLAN.md — PermissionExplainer, ManualPlacementGuide components, PresentationView integration
+- [x] 02-01-PLAN.md — Window Management API types and useWindowManagement hook
+- [x] 02-02-PLAN.md — PermissionExplainer, ManualPlacementGuide components, PresentationView integration
 
 ### Phase 3: Resilience & Polish
 **Goal**: Presentation survives interruptions and supports presenter remotes
@@ -71,9 +71,9 @@ Phases execute in numeric order: 1 -> 2 -> 3
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundation | 2/2 | Complete | 2026-01-18 |
-| 2. Display Targeting | 0/2 | Planned | - |
+| 2. Display Targeting | 2/2 | Complete | 2026-01-18 |
 | 3. Resilience & Polish | 0/TBD | Not started | - |
 
 ---
 *Roadmap created: 2026-01-18*
-*Last updated: 2026-01-18 — Phase 2 planned*
+*Last updated: 2026-01-18 — Phase 2 complete*
