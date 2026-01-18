@@ -50,11 +50,12 @@ Plans:
   2. User can switch providers in settings without losing their current presentation
   3. API errors display user-friendly messages explaining what went wrong
   4. Rate limit and quota errors include specific guidance (wait/retry or check billing)
-**Plans**: TBD
+**Plans**: 3 plans
 
 Plans:
-- [ ] 02-01: TBD
-- [ ] 02-02: TBD
+- [ ] 02-01-PLAN.md - Provider abstraction layer (interface, error types, factory)
+- [ ] 02-02-PLAN.md - Claude provider implementation
+- [ ] 02-03-PLAN.md - Wire provider to app (settings integration, error modal, loading states)
 
 ### Phase 3: Disabled AI State
 **Goal**: App is fully usable without API key, with clear path to enable AI features
@@ -106,11 +107,11 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Settings & API Key UI | 2/2 | Complete | 2026-01-19 |
-| 2. Multi-Provider AI | 0/? | Not started | - |
+| 2. Multi-Provider AI | 0/3 | Not started | - |
 | 3. Disabled AI State | 0/? | Not started | - |
 | 4. Save/Load System | 0/? | Not started | - |
 | 5. GitHub Pages Deployment | 0/? | Not started | - |
 
 ---
 *Roadmap created: 2026-01-19*
-*Last updated: 2026-01-19 - Phase 1 complete*
+*Last updated: 2026-01-19 - Phase 2 planned (3 plans)*
