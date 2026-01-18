@@ -100,13 +100,13 @@ Deferred to future release.
 | SAVE-06 | 4 | Pending |
 | SAVE-07 | 4 | Pending |
 | SAVE-08 | 4 | Pending |
-| SETT-01 | 1 | Pending |
-| SETT-02 | 1 | Pending |
-| SETT-03 | 1 | Pending |
-| SETT-04 | 1 | Pending |
-| SETT-05 | 1 | Pending |
-| SETT-06 | 1 | Pending |
-| SETT-07 | 1 | Pending |
+| SETT-01 | 1 | Complete |
+| SETT-02 | 1 | Complete |
+| SETT-03 | 1 | Complete |
+| SETT-04 | 1 | Complete |
+| SETT-05 | 1 | Complete |
+| SETT-06 | 1 | Complete |
+| SETT-07 | 1 | Complete |
 | PROV-01 | 2 | Pending |
 | PROV-02 | 2 | Pending |
 | PROV-03 | 2 | Pending |
@@ -119,9 +119,9 @@ Deferred to future release.
 | DISB-03 | 3 | Pending |
 | DISB-04 | 3 | Pending |
 | DISB-05 | 3 | Pending |
-| INST-01 | 1 | Pending |
-| INST-02 | 1 | Pending |
-| INST-03 | 1 | Pending |
+| INST-01 | 1 | Complete |
+| INST-02 | 1 | Complete |
+| INST-03 | 1 | Complete |
 | DEPL-01 | 5 | Pending |
 | DEPL-02 | 5 | Pending |
 | DEPL-03 | 5 | Pending |
@@ -133,4 +133,4 @@ Deferred to future release.
 
 ---
 *Requirements defined: 2026-01-19*
-*Last updated: 2026-01-19 after roadmap creation*
+*Last updated: 2026-01-19 — Phase 1 requirements complete*

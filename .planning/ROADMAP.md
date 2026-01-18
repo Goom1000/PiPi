@@ -17,7 +17,7 @@ Transform PiPi from a personal tool into a shareable application colleagues can 
 - Integer phases (1, 2, 3): Planned milestone work
 - Decimal phases (2.1, 2.2): Urgent insertions (marked with INSERTED)
 
-- [ ] **Phase 1: Settings & API Key UI** - User can configure AI provider and API key
+- [x] **Phase 1: Settings & API Key UI** - User can configure AI provider and API key
 - [ ] **Phase 2: Multi-Provider AI** - App works with Gemini, Claude, or OpenAI
 - [ ] **Phase 3: Disabled AI State** - Graceful degradation when no API key configured
 - [ ] **Phase 4: Save/Load System** - Export and import presentations as .pipi files
@@ -38,8 +38,8 @@ Transform PiPi from a personal tool into a shareable application colleagues can 
 **Plans**: 2 plans
 
 Plans:
-- [ ] 01-01-PLAN.md - Settings infrastructure (types, useSettings hook, API validation)
-- [ ] 01-02-PLAN.md - SettingsModal UI and header integration
+- [x] 01-01-PLAN.md - Settings infrastructure (types, useSettings hook, API validation)
+- [x] 01-02-PLAN.md - SettingsModal UI and header integration
 
 ### Phase 2: Multi-Provider AI
 **Goal**: AI features work with user's chosen provider and handle errors gracefully
@@ -105,7 +105,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Settings & API Key UI | 0/2 | Planned | - |
+| 1. Settings & API Key UI | 2/2 | Complete | 2026-01-19 |
 | 2. Multi-Provider AI | 0/? | Not started | - |
 | 3. Disabled AI State | 0/? | Not started | - |
 | 4. Save/Load System | 0/? | Not started | - |
@@ -113,4 +113,4 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5
 
 ---
 *Roadmap created: 2026-01-19*
-*Last updated: 2026-01-19 - Phase 1 planned*
+*Last updated: 2026-01-19 - Phase 1 complete*
