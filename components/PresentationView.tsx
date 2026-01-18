@@ -472,7 +472,7 @@ const PresentationView: React.FC<PresentationViewProps> = ({ slides, onExit, stu
                    }
                  }}
                  disabled={isLoading || isConnected}
-                 className={`px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-colors border ${
+                 className={`px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-colors border flex items-center ${
                    isLoading
                      ? 'bg-slate-700 text-slate-400 border-slate-600 cursor-wait'
                      : isConnected
@@ -480,6 +480,19 @@ const PresentationView: React.FC<PresentationViewProps> = ({ slides, onExit, stu
                        : 'bg-slate-700 text-slate-300 hover:bg-slate-600 border-slate-600'
                  }`}
                >
+                 {permissionState === 'denied' && !isLoading && !isConnected && (
+                   <svg
+                     className="w-4 h-4 text-amber-400 mr-1"
+                     fill="currentColor"
+                     viewBox="0 0 20 20"
+                   >
+                     <path
+                       fillRule="evenodd"
+                       d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
+                       clipRule="evenodd"
+                     />
+                   </svg>
+                 )}
                  {getLaunchButtonLabel()}
                </button>
                {/* Permission Explainer - shown before first launch on Chromium multi-screen */}
