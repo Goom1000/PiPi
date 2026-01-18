@@ -4,7 +4,20 @@
 
 A presentation tool for teachers that transforms PDF lesson plans into interactive slideshows with AI-generated content, a teleprompter script for the teacher, and progressive bullet reveal. Teachers upload their existing lesson plans, select student age/grade level, and the AI creates an engaging presentation with speaker notes that guide the teacher through natural, conversational delivery.
 
-**v1.0 shipped:** Dual-monitor presentation mode where students see only slides on a projector while teachers see slides plus teleprompter on their laptop — works like PowerPoint Presenter View.
+**v1.2 shipped:** Dual-monitor presentation mode with permission UX polish — auto-projector placement on Chromium, draggable/resizable preview window, and reliable permission handling.
+
+## Current Milestone: v2.0 Shareable Presentations
+
+**Goal:** Enable colleagues to use presentations you create by deploying to GitHub Pages with save/load functionality and multi-provider API support.
+
+**Target features:**
+- Save presentation (slides + source PDF) to downloadable `.pipi` file
+- Load presentation from file — each teacher enters their own class list
+- Multi-provider AI support (Google Gemini, Anthropic Claude, OpenAI) — user picks one
+- API key stored locally in browser, never transmitted to any server
+- AI features visible but disabled when no key configured
+- Setup instructions with cost information for each provider
+- GitHub Pages deployment for free public hosting
 
 ## Shipped Milestones
 
@@ -65,7 +78,13 @@ Students see only the presentation; teachers see the presentation plus a telepro
 
 ### Active
 
-(None — ready for /gsd:new-milestone)
+- [ ] Save presentation to downloadable .pipi file (slides + source PDF)
+- [ ] Load presentation from .pipi file
+- [ ] Multi-provider AI support (Gemini, Claude, OpenAI)
+- [ ] API key settings UI with local storage
+- [ ] AI features disabled state when no API key
+- [ ] Provider setup instructions with cost information
+- [ ] GitHub Pages deployment configuration
 
 ### Deferred (v1.3+)
 
@@ -75,11 +94,13 @@ Students see only the presentation; teachers see the presentation plus a telepro
 ### Out of Scope
 
 - Real-time student device sync (each student on their own device) — high complexity, not needed for classroom projector setup
-- Cloud storage/authentication — local-first for now
+- Cloud storage/authentication — file-based sharing is sufficient for team of 5
 - Mobile app — web-first
 - Annotation tools / laser pointer — scope creep, PiPi is teleprompter-focused
 - Slide transitions / animations — not core to teleprompter value
 - Video embedding — storage/bandwidth concerns
+- User accounts / login system — colleagues load shared files, no auth needed
+- Desktop installer (Electron/Tauri) — GitHub Pages simpler, free, auto-updates
 
 ## Context
 
@@ -146,4 +167,4 @@ v1.0 delivered rock-solid dual-monitor presentation:
 | Browser detection order | Check Edg/ before Chrome/ (Edge UA includes Chrome) | ✓ Good — v1.2 |
 
 ---
-*Last updated: 2026-01-18 after v1.2 milestone*
+*Last updated: 2026-01-19 after v2.0 milestone start*
