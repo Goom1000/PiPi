@@ -10,24 +10,24 @@ See: .planning/PROJECT.md (updated 2026-01-18)
 ## Current Position
 
 Phase: 1 of 2 (Drag, Resize & Float)
-Plan: Not started
-Status: Ready to plan
-Last activity: 2026-01-18 — Roadmap created for v1.1
+Plan: 1 of 1 complete
+Status: Phase complete
+Last activity: 2026-01-18 — Completed 01-01-PLAN.md
 
-Progress: [          ] 0%
+Progress: [=====     ] 50%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 0 (v1.1)
-- Average duration: -
-- Total execution time: -
+- Total plans completed: 1 (v1.1)
+- Average duration: 8min
+- Total execution time: 8min
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| - | - | - | - |
+| 01-drag-resize-float | 1/1 | 8min | 8min |
 
 *Updated after each plan completion*
 
@@ -41,7 +41,13 @@ Progress: [          ] 0%
 ### Decisions
 
 Decisions are logged in PROJECT.md Key Decisions table.
-No new decisions yet for v1.1.
+
+**v1.1 Decisions:**
+- react-rnd for combined drag+resize with aspect ratio lock
+- 20px edge magnetism threshold for snapping to viewport edges
+- Portal rendering for z-index isolation (z-index 9999)
+- Corner-only resize handles that appear on hover
+- 80% opacity during drag with 150ms transition
 
 ### Pending Todos
 
@@ -53,10 +59,10 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-01-18
-Stopped at: Roadmap created for v1.1
+Last session: 2026-01-18T02:10:03Z
+Stopped at: Completed 01-01-PLAN.md (Phase 1 complete)
 Resume file: None
 
 ---
 *State initialized: 2026-01-18*
-*Last updated: 2026-01-18 — v1.1 roadmap created*
+*Last updated: 2026-01-18 — Completed Phase 1 Plan 1*
