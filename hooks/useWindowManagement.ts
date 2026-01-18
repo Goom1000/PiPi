@@ -32,27 +32,6 @@ export interface UseWindowManagementResult {
 
 /**
  * Hook that encapsulates Window Management API logic.
- *
- * Key behaviors:
- * - Detects multi-screen setup without requiring permission (screen.isExtended)
- * - Tracks permission state via navigator.permissions.query
- * - Provides cached secondary screen coordinates when permission granted
- * - Listens for screen configuration changes (monitor connect/disconnect)
- *
- * @example
- * ```tsx
- * const { hasMultipleScreens, secondaryScreen, requestPermission } = useWindowManagement();
- *
- * // Show permission UI if multiple screens detected
- * if (hasMultipleScreens && !secondaryScreen) {
- *   await requestPermission();
- * }
- *
- * // Use cached coordinates in synchronous window.open
- * if (secondaryScreen) {
- *   window.open(url, 'student', `left=${secondaryScreen.left},...`);
- * }
- * ```
  */
 function useWindowManagement(): UseWindowManagementResult {
   // API support check (cached at mount - doesn't change during session)
@@ -71,50 +50,40 @@ function useWindowManagement(): UseWindowManagementResult {
   // Loading state - true until initial permission check completes
   const [isLoading, setIsLoading] = useState(true);
 
-  // Track component mount state to avoid state updates after unmount
-  const mountedRef = useRef(true);
-
   // Store ScreenDetails reference for event listener cleanup
   const screenDetailsRef = useRef<ScreenDetails | null>(null);
 
   // Initial detection: check screen.isExtended (no permission needed)
   useEffect(() => {
-    // Reset mounted state on each effect run (handles Strict Mode double-invoke)
-    mountedRef.current = true;
-
     if (!isSupported) {
       setPermissionState('unavailable');
       setIsLoading(false);
       return;
     }
 
-    const checkExtended = () => {
-      if (!mountedRef.current) return;
+    const extended = (window.screen as Screen).isExtended === true;
+    setHasMultipleScreens(extended);
 
-      const extended = (window.screen as Screen).isExtended === true;
-      setHasMultipleScreens(extended);
-
-      if (!extended) {
-        setPermissionState('unavailable');
-        setSecondaryScreen(null);
-        setIsLoading(false);
-      }
-    };
-
-    checkExtended();
+    if (!extended) {
+      setPermissionState('unavailable');
+      setSecondaryScreen(null);
+      setIsLoading(false);
+    }
 
     // Fallback timeout: ensure isLoading becomes false within 5 seconds
-    // This handles edge cases where permission query or other async operations hang
     const fallbackTimeout = setTimeout(() => {
-      if (mountedRef.current) {
-        setIsLoading(false);
-      }
+      setIsLoading(false);
     }, 5000);
 
     // Listen for screen configuration changes (monitor plug/unplug)
-    // Note: 'change' event on screen is Chromium-specific, not in standard typings
-    // Cast through unknown because Screen doesn't extend EventTarget in lib.dom.d.ts
-    const screenChangeHandler = () => checkExtended();
+    const screenChangeHandler = () => {
+      const nowExtended = (window.screen as Screen).isExtended === true;
+      setHasMultipleScreens(nowExtended);
+      if (!nowExtended) {
+        setPermissionState('unavailable');
+        setSecondaryScreen(null);
+      }
+    };
     const screenWithEvents = window.screen as unknown as EventTarget;
     screenWithEvents.addEventListener('change', screenChangeHandler);
 
@@ -128,17 +97,13 @@ function useWindowManagement(): UseWindowManagementResult {
   useEffect(() => {
     if (!isSupported || !hasMultipleScreens) return;
 
-    // Reset mounted state on each effect run (handles Strict Mode double-invoke)
-    mountedRef.current = true;
-
-    let permissionStatus: PermissionStatus | null = null;
-    let timeoutId: ReturnType<typeof setTimeout> | null = null;
+    let cancelled = false;
 
     const checkPermission = async () => {
       try {
         // Race permission query against timeout - some browsers hang on this query
         const timeoutPromise = new Promise<'timeout'>((resolve) => {
-          timeoutId = setTimeout(() => resolve('timeout'), 3000);
+          setTimeout(() => resolve('timeout'), 3000);
         });
 
         const result = await Promise.race([
@@ -148,31 +113,25 @@ function useWindowManagement(): UseWindowManagementResult {
           timeoutPromise
         ]);
 
-        if (!mountedRef.current) return;
+        if (cancelled) return;
 
         if (result === 'timeout') {
-          // Query hung - assume prompt state, let getScreenDetails trigger actual prompt
           setPermissionState('prompt');
           setIsLoading(false);
           return;
         }
 
-        permissionStatus = result;
-        setPermissionState(permissionStatus.state as 'prompt' | 'granted' | 'denied');
+        setPermissionState(result.state as 'prompt' | 'granted' | 'denied');
         setIsLoading(false);
 
-        // Listen for permission changes (user grants/denies in browser settings)
-        const handlePermissionChange = () => {
-          if (mountedRef.current && permissionStatus) {
-            setPermissionState(permissionStatus.state as 'prompt' | 'granted' | 'denied');
+        // Listen for permission changes
+        result.addEventListener('change', () => {
+          if (!cancelled) {
+            setPermissionState(result.state as 'prompt' | 'granted' | 'denied');
           }
-        };
-
-        permissionStatus.addEventListener('change', handlePermissionChange);
+        });
       } catch {
-        // Permission query not supported in this browser
-        // Will prompt when getScreenDetails is called
-        if (mountedRef.current) {
+        if (!cancelled) {
           setPermissionState('prompt');
           setIsLoading(false);
         }
@@ -182,9 +141,7 @@ function useWindowManagement(): UseWindowManagementResult {
     checkPermission();
 
     return () => {
-      if (timeoutId) clearTimeout(timeoutId);
-      // Note: permissionStatus.removeEventListener would need to be tracked
-      // but the status object is recreated on each query anyway
+      cancelled = true;
     };
   }, [isSupported, hasMultipleScreens]);
 
@@ -195,14 +152,13 @@ function useWindowManagement(): UseWindowManagementResult {
       return;
     }
 
-    // Reset mounted state on each effect run (handles Strict Mode double-invoke)
-    mountedRef.current = true;
+    let cancelled = false;
 
     const fetchScreenDetails = async () => {
       try {
         const details = await window.getScreenDetails!();
 
-        if (!mountedRef.current) return;
+        if (cancelled) return;
 
         screenDetailsRef.current = details;
 
@@ -216,18 +172,18 @@ function useWindowManagement(): UseWindowManagementResult {
             height: secondary.availHeight,
             label: secondary.label || 'External Display'
           });
+        } else {
+          setSecondaryScreen(null);
         }
 
-        // Listen for screen changes (monitor connect/disconnect while app running)
-        const handleScreensChange = async () => {
-          if (!mountedRef.current) return;
-
+        // Listen for screen changes
+        details.addEventListener('screenschange', async () => {
+          if (cancelled) return;
           try {
             const updated = await window.getScreenDetails!();
+            if (cancelled) return;
+
             const newSecondary = updated.screens.find(s => !s.isPrimary);
-
-            if (!mountedRef.current) return;
-
             if (newSecondary) {
               setSecondaryScreen({
                 left: newSecondary.availLeft,
@@ -240,56 +196,32 @@ function useWindowManagement(): UseWindowManagementResult {
               setSecondaryScreen(null);
             }
           } catch {
-            // Permission may have been revoked
-            if (mountedRef.current) {
-              setPermissionState('denied');
-            }
+            setPermissionState('denied');
           }
-        };
-
-        details.addEventListener('screenschange', handleScreensChange);
+        });
       } catch {
-        // Permission denied or error
-        if (mountedRef.current) {
-          setPermissionState('denied');
-        }
+        setPermissionState('denied');
       }
     };
 
     fetchScreenDetails();
 
     return () => {
-      // Clean up screenschange listener if we have a reference
-      if (screenDetailsRef.current) {
-        // Note: We don't have the handler reference here, but the
-        // ScreenDetails object will be garbage collected anyway
-        screenDetailsRef.current = null;
-      }
+      cancelled = true;
+      screenDetailsRef.current = null;
     };
   }, [permissionState]);
 
-  // Cleanup on unmount
-  useEffect(() => {
-    return () => {
-      mountedRef.current = false;
-    };
-  }, []);
-
-  // Request permission function (stable reference via useCallback)
+  // Request permission function
   const requestPermission = useCallback(async (): Promise<boolean> => {
     if (!isSupported || !hasMultipleScreens) {
       return false;
     }
 
     try {
-      // Calling getScreenDetails() triggers the permission prompt if needed
       const details = await window.getScreenDetails!();
-
-      // No mountedRef check here - user-triggered actions should always complete
-      // (component is clearly mounted if user can click the permission button)
       screenDetailsRef.current = details;
 
-      // Find and cache secondary screen
       const secondary = details.screens.find(s => !s.isPrimary);
       if (secondary) {
         setSecondaryScreen({
@@ -304,7 +236,6 @@ function useWindowManagement(): UseWindowManagementResult {
       setPermissionState('granted');
       return true;
     } catch {
-      // User-triggered action - always update state
       setPermissionState('denied');
       return false;
     }
