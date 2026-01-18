@@ -6,16 +6,16 @@ A presentation tool for teachers that transforms PDF lesson plans into interacti
 
 **v1.0 shipped:** Dual-monitor presentation mode where students see only slides on a projector while teachers see slides plus teleprompter on their laptop — works like PowerPoint Presenter View.
 
-## Current Milestone: v1.1 Draggable Preview Window
+## Recent Milestone: v1.1 Draggable Preview Window (Shipped 2026-01-18)
 
-**Goal:** Make the next slide preview window draggable, resizable, and add snap-to-grid for neat positioning.
+**Delivered:** Fully interactive floating preview window with drag, resize, snap-to-grid, and session persistence.
 
-**Target features:**
+**Features shipped:**
 - Draggable preview window (click center to move anywhere on screen)
-- Resizable preview window (drag corners to adjust size)
-- Snap-to-grid toggle button on the window itself
-- Position/size persistence (remembers settings between sessions)
-- Preview floats over presentation area (teacher-only layer, never visible to students)
+- Resizable preview window (drag corners to adjust size, aspect ratio locked)
+- Snap-to-grid toggle button with 50px invisible grid
+- Position/size persistence (localStorage per presentation)
+- Preview floats above all UI via portal rendering (z-index 9999)
 
 ## Core Value
 
@@ -45,13 +45,14 @@ Students see only the presentation; teachers see the presentation plus a telepro
 - ✓ Window recovery (button re-enables on close) — v1.0
 - ✓ Connection status indicator — v1.0
 - ✓ Session persistence (survives refresh) — v1.0
+- ✓ Draggable preview window — v1.1
+- ✓ Resizable preview window (corner drag with aspect ratio lock) — v1.1
+- ✓ Snap-to-grid toggle (50px invisible grid) — v1.1
+- ✓ Preview position/size/snap persistence (localStorage) — v1.1
+- ✓ Preview floats above all UI (portal, z-index 9999) — v1.1
 
 ### Active
 
-- [ ] Draggable preview window — move anywhere on teacher screen
-- [ ] Resizable preview window — drag corners to adjust
-- [ ] Snap-to-grid toggle — button on window for neat alignment
-- [ ] Preview position/size persistence — remembers settings
 - [ ] Elapsed time display showing presentation duration (PRES-03)
 - [ ] Fullscreen recovery (auto re-enter if exited) (PRES-04)
 
@@ -68,9 +69,16 @@ Students see only the presentation; teachers see the presentation plus a telepro
 
 ### Current State
 
-Shipped v1.0 with 3,803 LOC TypeScript.
-Tech stack: React 19, Vite, Gemini API, Tailwind CSS.
+Shipped v1.1 with 4,361 LOC TypeScript.
+Tech stack: React 19, Vite, Gemini API, Tailwind CSS, react-rnd.
 Client-side only (no backend).
+
+v1.1 delivered interactive preview window:
+- react-rnd for drag/resize with aspect ratio lock
+- Portal-based floating UI for z-index isolation
+- Edge magnetism snaps preview to viewport edges
+- Per-presentation localStorage persistence
+- Invisible snap-to-grid (50px) with toggle button
 
 v1.0 delivered rock-solid dual-monitor presentation:
 - BroadcastChannel cross-window sync
@@ -103,6 +111,12 @@ v1.0 delivered rock-solid dual-monitor presentation:
 | Heartbeat for connection | Detect closed windows reliably | ✓ Good — survives refresh |
 | Window Management API | Auto projector placement | ✓ Good — works on Chromium |
 | Escape closes student | Safer than exiting presentation | ✓ Good — prevents accidents |
+| react-rnd for drag+resize | Only library combining drag + resize with aspect ratio lock | ✓ Good — v1.1 |
+| 20px edge magnetism | Snap preview to viewport edges for neat positioning | ✓ Good — v1.1 |
+| Portal rendering | Float above all UI via document.body portal (z-index 9999) | ✓ Good — v1.1 |
+| Corner-only resize handles | Clean appearance, handles appear on hover | ✓ Good — v1.1 |
+| Per-presentation storage key | Uses first slide ID for storage key uniqueness | ✓ Good — v1.1 |
+| 50px invisible grid | Precision snapping without visual clutter | ✓ Good — v1.1 |
 
 ---
-*Last updated: 2026-01-18 after v1.1 milestone started*
+*Last updated: 2026-01-18 after v1.1 milestone complete*
