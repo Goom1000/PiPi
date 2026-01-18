@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-01-19)
 ## Current Position
 
 Phase: 4 of 5 (Save/Load System)
-Plan: 1/3 complete
+Plan: 2/3 complete
 Status: In progress
-Last activity: 2026-01-19 — Completed 04-01-PLAN.md
+Last activity: 2026-01-19 — Completed 04-02-PLAN.md
 
-Progress: [███████░░░] 70%
+Progress: [████████░░] 80%
 
 ## Performance Metrics
 
@@ -25,12 +25,12 @@ Progress: [███████░░░] 70%
 - v2.0 Phase 1: 2 plans complete
 - v2.0 Phase 2: 3 plans complete
 - v2.0 Phase 3: 2 plans complete
-- v2.0 Phase 4: 1 plan complete
+- v2.0 Phase 4: 2 plans complete
 
 **Project Totals:**
 - Milestones shipped: 3 (v1.0, v1.1, v1.2)
 - Total phases: 8 (v1.0: 3, v1.1: 2, v1.2: 2, v2.0: 1)
-- Total plans: 20 (14 prior + 6 v2.0)
+- Total plans: 21 (14 prior + 7 v2.0)
 - Total LOC: ~5,400 TypeScript
 
 ## Completed Milestones
@@ -73,6 +73,9 @@ Decisions are logged in PROJECT.md Key Decisions table.
 - JSON pretty-print for human-readable .pipi files
 - 100ms delay before URL.revokeObjectURL (Firefox compatibility)
 - User-friendly error messages for toast display
+- Toast variants via getVariantClasses helper with undefined fallback
+- Auto-save uses 30s interval with useRef throttling (no lodash)
+- Separate localStorage keys for auto-save data and timestamp
 
 ### Pending Todos
 
@@ -85,10 +88,10 @@ None.
 ## Session Continuity
 
 Last session: 2026-01-19
-Stopped at: Completed 04-01-PLAN.md
+Stopped at: Completed 04-02-PLAN.md
 Resume file: None
-Next: 04-02-PLAN.md (Auto-save system)
+Next: 04-03-PLAN.md (Drag-drop and integration)
 
 ---
 *State initialized: 2026-01-18*
-*Last updated: 2026-01-19 — Completed 04-01-PLAN.md*
+*Last updated: 2026-01-19 — Completed 04-02-PLAN.md*
