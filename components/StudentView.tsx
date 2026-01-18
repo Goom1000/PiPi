@@ -31,7 +31,17 @@ const StudentView: React.FC = () => {
       setSlides(lastMessage.payload.slides);
       setConnected(true);
     }
-  }, [lastMessage]);
+
+    // Respond to heartbeat from teacher view
+    if (lastMessage.type === 'HEARTBEAT') {
+      postMessage({ type: 'HEARTBEAT_ACK', timestamp: lastMessage.timestamp });
+    }
+
+    // Handle remote close command from teacher
+    if (lastMessage.type === 'CLOSE_STUDENT') {
+      window.close();
+    }
+  }, [lastMessage, postMessage]);
 
   const currentSlide = slides[currentIndex];
 
