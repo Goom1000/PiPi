@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useRef } from 'react';
+import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { Slide, PresentationMessage, BROADCAST_CHANNEL_NAME } from '../types';
 import Button from './Button';
@@ -6,8 +6,12 @@ import { MarkdownText, SlideContentRenderer } from './SlideRenderers';
 import { generateQuickQuestion, generateImpromptuQuiz, QuizQuestion } from '../services/geminiService';
 import useBroadcastSync from '../hooks/useBroadcastSync';
 import useWindowManagement from '../hooks/useWindowManagement';
+import useKeyboardNavigation from '../hooks/useKeyboardNavigation';
 import PermissionExplainer from './PermissionExplainer';
 import ManualPlacementGuide from './ManualPlacementGuide';
+import ConnectionStatus from './ConnectionStatus';
+import NextSlidePreview from './NextSlidePreview';
+import { useToast, ToastContainer } from './Toast';
 
 // --- QUIZ GAME MODAL COMPONENT ---
 const QuizOverlay: React.FC<{ 
@@ -196,10 +200,10 @@ interface PresentationViewProps {
 const PresentationView: React.FC<PresentationViewProps> = ({ slides, onExit, studentNames, initialSlideIndex = 0 }) => {
   const [currentIndex, setCurrentIndex] = useState(initialSlideIndex);
   const [visibleBullets, setVisibleBullets] = useState(0);
-  const [isStudentWindowOpen, setIsStudentWindowOpen] = useState(false);
   const [showFullScript, setShowFullScript] = useState(false);
   const [layoutMode, setLayoutMode] = useState<'row' | 'col'>('row');
-  
+  const [showPreview, setShowPreview] = useState(false);
+
   // Game/Quiz State
   const [isQuizModalOpen, setIsQuizModalOpen] = useState(false);
 
@@ -207,9 +211,15 @@ const PresentationView: React.FC<PresentationViewProps> = ({ slides, onExit, stu
   const [quickQuestion, setQuickQuestion] = useState<{text: string, level: string} | null>(null);
   const [isGeneratingQuestion, setIsGeneratingQuestion] = useState(false);
 
-  // BroadcastChannel sync
-  const { lastMessage, postMessage } = useBroadcastSync<PresentationMessage>(BROADCAST_CHANNEL_NAME);
+  // BroadcastChannel sync with heartbeat enabled for connection monitoring
+  const { lastMessage, postMessage, isConnected } = useBroadcastSync<PresentationMessage>(
+    BROADCAST_CHANNEL_NAME,
+    { enableHeartbeat: true }
+  );
   const [popupBlocked, setPopupBlocked] = useState(false);
+
+  // Toast notifications for reconnection feedback
+  const { toasts, addToast, removeToast } = useToast();
 
   // Window Management for display targeting
   const {
@@ -254,6 +264,26 @@ const PresentationView: React.FC<PresentationViewProps> = ({ slides, onExit, stu
       payload: { currentIndex, visibleBullets, slides }
     });
   }, [currentIndex, visibleBullets, slides, postMessage]);
+
+  // Detect reconnection scenario and show toast
+  // prevConnectedRef tracks previous isConnected state to detect transitions
+  const prevConnectedRef = useRef<boolean | null>(null);
+  useEffect(() => {
+    // Show toast only when transitioning from disconnected to connected
+    // (not on initial connection - prevConnectedRef starts as null)
+    if (prevConnectedRef.current === false && isConnected) {
+      addToast('Reconnected to student view', 3000);
+    }
+    prevConnectedRef.current = isConnected;
+  }, [isConnected, addToast]);
+
+  // Calculate next slide for preview
+  const nextSlide = slides[currentIndex + 1] || null;
+
+  // Close student window via broadcast
+  const handleCloseStudent = useCallback(() => {
+    postMessage({ type: 'CLOSE_STUDENT' });
+  }, [postMessage]);
 
   const handleGenerateQuestion = async (level: 'Grade C' | 'Grade B' | 'Grade A') => {
       setIsGeneratingQuestion(true);
@@ -365,15 +395,13 @@ const PresentationView: React.FC<PresentationViewProps> = ({ slides, onExit, stu
     }
   };
 
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'ArrowRight' || e.key === 'Space') { e.preventDefault(); handleNext(); }
-      if (e.key === 'ArrowLeft') { e.preventDefault(); handlePrev(); }
-      if (e.key === 'Escape') onExit();
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [currentIndex, visibleBullets, slides.length, totalBullets]);
+  // Keyboard navigation with presenter remote support
+  // Note: Escape closes student window (not exits presentation) per CONTEXT.md
+  useKeyboardNavigation({
+    onNext: handleNext,
+    onPrev: handlePrev,
+    onEscape: handleCloseStudent,
+  });
 
   return (
     <div className="fixed inset-0 bg-slate-900 z-50 flex flex-col text-white font-poppins h-screen w-screen overflow-hidden">
@@ -385,8 +413,15 @@ const PresentationView: React.FC<PresentationViewProps> = ({ slides, onExit, stu
               <h1 className="font-poppins font-semibold text-sm truncate tracking-tight">{currentSlide.title}</h1>
           </div>
           <div className="flex items-center gap-2">
+               {/* Next Slide Preview Toggle */}
+               <NextSlidePreview
+                 nextSlide={nextSlide}
+                 isVisible={showPreview}
+                 onToggle={() => setShowPreview(prev => !prev)}
+               />
+
                {/* QUIZ BUTTON */}
-               <button 
+               <button
                    onClick={() => setIsQuizModalOpen(true)}
                    className="px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-colors border bg-indigo-600 border-indigo-500 hover:bg-indigo-500 text-white shadow-lg shadow-indigo-500/30 flex items-center gap-2"
                >
@@ -396,6 +431,10 @@ const PresentationView: React.FC<PresentationViewProps> = ({ slides, onExit, stu
                <Button variant="ghost-dim" onClick={() => setLayoutMode(prev => prev === 'row' ? 'col' : 'row')} className="!px-3 !py-1 text-xs">
                    {layoutMode === 'row' ? 'Layout: Side' : 'Layout: Stack'}
                </Button>
+
+               {/* Connection Status */}
+               <ConnectionStatus isConnected={isConnected} />
+
                <button
                  onClick={() => {
                    // MUST be synchronous - no async/await before window.open
@@ -414,24 +453,23 @@ const PresentationView: React.FC<PresentationViewProps> = ({ slides, onExit, stu
                    // Check if popup was blocked
                    if (!studentWindow || studentWindow.closed || typeof studentWindow.closed === 'undefined') {
                      setPopupBlocked(true);
-                     setIsStudentWindowOpen(false);
                    } else {
                      setPopupBlocked(false);
-                     setIsStudentWindowOpen(true);
                      // Note: We don't need to track the window reference for communication
                      // BroadcastChannel handles all sync - the window is fire-and-forget
+                     // Connection state is now derived from heartbeat acknowledgments
                    }
                  }}
-                 disabled={isStudentWindowOpen}
+                 disabled={isConnected}
                  className={`px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-colors border ${
-                   isStudentWindowOpen
+                   isConnected
                      ? 'bg-green-900/40 text-green-400 border-green-500/50 shadow-[0_0_10px_rgba(34,197,94,0.2)] cursor-not-allowed'
                      : 'bg-slate-700 text-slate-300 hover:bg-slate-600 border-slate-600'
                  }`}
                >
                  {secondaryScreen
                    ? `Launch on ${secondaryScreen.label}`
-                   : isStudentWindowOpen
+                   : isConnected
                      ? 'Student Active'
                      : 'Launch Student'}
                </button>
@@ -447,7 +485,7 @@ const PresentationView: React.FC<PresentationViewProps> = ({ slides, onExit, stu
                )}
 
                {/* Manual Guide - shown for non-Chromium OR permission denied (but NOT when popup blocked) */}
-               {hasMultipleScreens && (!isSupported || permissionState === 'denied') && !isStudentWindowOpen && !popupBlocked && (
+               {hasMultipleScreens && (!isSupported || permissionState === 'denied') && !isConnected && !popupBlocked && (
                  <ManualPlacementGuide
                    studentUrl={`${window.location.origin}${window.location.pathname}#/student`}
                  />
@@ -488,7 +526,7 @@ const PresentationView: React.FC<PresentationViewProps> = ({ slides, onExit, stu
                    </div>
                  </div>
                )}
-               <Button variant="danger" onClick={onExit} className="!py-1.5 !px-3 !text-xs">Exit</Button>
+               <Button variant="danger" onClick={onExit} title="Exit presentation" className="!py-1.5 !px-3 !text-xs">Exit</Button>
           </div>
       </div>
 
@@ -544,7 +582,7 @@ const PresentationView: React.FC<PresentationViewProps> = ({ slides, onExit, stu
                </div>
                
                <div className="p-5 bg-slate-800 border-t border-slate-700 shrink-0 shadow-[0_-4px_10px_rgba(0,0,0,0.2)]">
-                   <button onClick={handleNext} className="w-full py-5 rounded-2xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xl shadow-lg active:scale-[0.98] transition-all flex items-center justify-center gap-3 group">
+                   <button onClick={handleNext} title="Next (Right Arrow, Page Down, or Space)" className="w-full py-5 rounded-2xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xl shadow-lg active:scale-[0.98] transition-all flex items-center justify-center gap-3 group">
                         {visibleBullets < totalBullets ? (
                           <><span>Reveal Point</span><span className="group-hover:translate-x-1 transition-transform">✨</span></>
                         ) : (
@@ -594,7 +632,7 @@ const PresentationView: React.FC<PresentationViewProps> = ({ slides, onExit, stu
                    )}
 
                    <div className="flex justify-between mt-4 border-t border-slate-700/50 pt-3">
-                       <button onClick={handlePrev} className="text-slate-400 hover:text-white text-xs font-medium px-3 py-1 bg-slate-700/50 rounded-lg transition-colors border border-transparent hover:border-slate-600">← Back</button>
+                       <button onClick={handlePrev} title="Previous (Left Arrow or Page Up)" className="text-slate-400 hover:text-white text-xs font-medium px-3 py-1 bg-slate-700/50 rounded-lg transition-colors border border-transparent hover:border-slate-600">← Back</button>
                        <span className="text-[11px] font-medium text-slate-500 max-w-[180px] truncate text-right py-1">
                            {visibleBullets < totalBullets ? 'Next: ' + currentSlide.content[visibleBullets] : 'Ready for next slide'}
                        </span>
@@ -602,6 +640,9 @@ const PresentationView: React.FC<PresentationViewProps> = ({ slides, onExit, stu
                </div>
           </div>
       </div>
+
+      {/* Toast notifications for reconnection feedback */}
+      <ToastContainer toasts={toasts} removeToast={removeToast} />
     </div>
   );
 };
