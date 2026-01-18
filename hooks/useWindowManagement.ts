@@ -26,6 +26,8 @@ export interface UseWindowManagementResult {
   secondaryScreen: ScreenTarget | null;
   /** Request window-management permission, returns true if granted */
   requestPermission: () => Promise<boolean>;
+  /** True until initial permission check completes */
+  isLoading: boolean;
 }
 
 /**
@@ -66,6 +68,9 @@ function useWindowManagement(): UseWindowManagementResult {
   // Cached screen coordinates
   const [secondaryScreen, setSecondaryScreen] = useState<ScreenTarget | null>(null);
 
+  // Loading state - true until initial permission check completes
+  const [isLoading, setIsLoading] = useState(true);
+
   // Track component mount state to avoid state updates after unmount
   const mountedRef = useRef(true);
 
@@ -76,6 +81,7 @@ function useWindowManagement(): UseWindowManagementResult {
   useEffect(() => {
     if (!isSupported) {
       setPermissionState('unavailable');
+      setIsLoading(false);
       return;
     }
 
@@ -88,6 +94,7 @@ function useWindowManagement(): UseWindowManagementResult {
       if (!extended) {
         setPermissionState('unavailable');
         setSecondaryScreen(null);
+        setIsLoading(false);
       }
     };
 
@@ -120,6 +127,7 @@ function useWindowManagement(): UseWindowManagementResult {
         if (!mountedRef.current) return;
 
         setPermissionState(permissionStatus.state as 'prompt' | 'granted' | 'denied');
+        setIsLoading(false);
 
         // Listen for permission changes (user grants/denies in browser settings)
         const handlePermissionChange = () => {
@@ -134,6 +142,7 @@ function useWindowManagement(): UseWindowManagementResult {
         // Will prompt when getScreenDetails is called
         if (mountedRef.current) {
           setPermissionState('prompt');
+          setIsLoading(false);
         }
       }
     };
@@ -271,7 +280,8 @@ function useWindowManagement(): UseWindowManagementResult {
     hasMultipleScreens,
     permissionState,
     secondaryScreen,
-    requestPermission
+    requestPermission,
+    isLoading
   };
 }
 
