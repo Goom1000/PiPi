@@ -67,10 +67,11 @@ Plans:
   1. AI features (generate slides, generate quiz) appear grayed out with lock icon when no API key
   2. Clicking disabled AI feature shows modal pointing to Settings panel
   3. User can create, edit, and present slides without any API key configured
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 03-01: TBD
+- [ ] 03-01-PLAN.md - EnableAIModal component, SettingsModal auto-focus, App.tsx integration
+- [ ] 03-02-PLAN.md - Disabled state for SlideCard, ResourceHub, and PresentationView
 
 ### Phase 4: Save/Load System
 **Goal**: User can export presentations to files and load them back
@@ -110,10 +111,10 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5
 |-------|----------------|--------|-----------|
 | 1. Settings & API Key UI | 2/2 | Complete | 2026-01-19 |
 | 2. Multi-Provider AI | 3/3 | Complete | 2026-01-19 |
-| 3. Disabled AI State | 0/? | Not started | - |
+| 3. Disabled AI State | 0/2 | Planned | - |
 | 4. Save/Load System | 0/? | Not started | - |
 | 5. GitHub Pages Deployment | 0/? | Not started | - |
 
 ---
 *Roadmap created: 2026-01-19*
-*Last updated: 2026-01-19 - Phase 2 complete (OpenAI removed entirely, Gemini+Claude working)*
+*Last updated: 2026-01-19 - Phase 3 planned (2 plans in 2 waves)*
