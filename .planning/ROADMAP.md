@@ -19,10 +19,10 @@ This milestone fixes the race condition in Window Management API permission dete
   1. Launch button shows "Checking displays..." during initial permission query
   2. No permission-related UI appears until async check completes
   3. PermissionExplainer only appears when state is definitively 'prompt'
-**Plans**: TBD
+**Plans**: 1 plan
 
 Plans:
-- [ ] 01-01: Hook loading state
+- [ ] 01-01-PLAN.md - Add isLoading state to hook and update consumer
 
 ### Phase 2: Permission UX
 **Goal**: Teacher always knows the current auto-placement capability and can act on it
@@ -45,7 +45,7 @@ Plans:
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Permission State Loading | 0/1 | Not started | - |
+| 1. Permission State Loading | 0/1 | Planned | - |
 | 2. Permission UX | 0/4 | Not started | - |
 
 ---
