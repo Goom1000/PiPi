@@ -6,7 +6,19 @@ A presentation tool for teachers that transforms PDF lesson plans into interacti
 
 **v1.0 shipped:** Dual-monitor presentation mode where students see only slides on a projector while teachers see slides plus teleprompter on their laptop — works like PowerPoint Presenter View.
 
-## Recent Milestone: v1.1 Draggable Preview Window (Shipped 2026-01-18)
+## Current Milestone: v1.2 Permission Flow Fix
+
+**Goal:** Make auto-projector placement reliable and obvious in the classroom.
+
+**Problem discovered:** Window Management API works but permission flow has a race condition — the "Auto-Place on Projector" popup doesn't appear reliably, leaving teachers confused about why the student window doesn't auto-place on the SmartBoard.
+
+**Target features:**
+- Fix permission detection race condition
+- Make auto-placement status obvious (inline on button, not dismissible popup)
+- Clear feedback: "Launch on SmartBoard" vs "Launch Student (manual placement)"
+- Reliable permission request flow
+
+## Previous Milestone: v1.1 Draggable Preview Window (Shipped 2026-01-18)
 
 **Delivered:** Fully interactive floating preview window with drag, resize, snap-to-grid, and session persistence.
 
@@ -52,6 +64,13 @@ Students see only the presentation; teachers see the presentation plus a telepro
 - ✓ Preview floats above all UI (portal, z-index 9999) — v1.1
 
 ### Active
+
+- [ ] Fix permission detection race condition (PERM-01)
+- [ ] Make auto-placement status visible on launch button (PERM-02)
+- [ ] Add reliable permission request trigger (PERM-03)
+- [ ] Clear feedback for manual vs auto placement (PERM-04)
+
+### Deferred (v1.3+)
 
 - [ ] Elapsed time display showing presentation duration (PRES-03)
 - [ ] Fullscreen recovery (auto re-enter if exited) (PRES-04)
@@ -119,4 +138,4 @@ v1.0 delivered rock-solid dual-monitor presentation:
 | 50px invisible grid | Precision snapping without visual clutter | ✓ Good — v1.1 |
 
 ---
-*Last updated: 2026-01-18 after v1.1 milestone complete*
+*Last updated: 2026-01-18 after v1.2 milestone start*
