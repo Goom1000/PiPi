@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-01-19)
 ## Current Position
 
 Phase: 2 of 5 (Multi-Provider AI)
-Plan: 2 of 4 complete
+Plan: 3 of 4 complete
 Status: In progress
-Last activity: 2026-01-19 — Completed 02-02-PLAN.md (Claude Provider Implementation)
+Last activity: 2026-01-19 — Completed 02-03-PLAN.md (Gemini Service Refactoring & App Integration)
 
-Progress: [█████░░░░░] 50%
+Progress: [███████░░░] 75%
 
 ## Performance Metrics
 
@@ -23,7 +23,7 @@ Progress: [█████░░░░░] 50%
 - v1.1: 3 plans, 8 hours
 - v1.2: 5 plans, 1 day
 - v2.0 Phase 1: 2 plans complete
-- v2.0 Phase 2: 2 plans complete
+- v2.0 Phase 2: 3 plans complete
 
 **Project Totals:**
 - Milestones shipped: 3 (v1.0, v1.1, v1.2)
@@ -52,10 +52,12 @@ Decisions are logged in PROJECT.md Key Decisions table.
 **v2.0 Phase 2 Decisions:**
 - Strategy pattern with factory for provider abstraction
 - AIProviderError class with error codes for unified error handling
-- OpenAI throws immediately (CORS blocked in browser)
-- Claude uses claude-sonnet-4-5-20250929 model for text generation
+- OpenAI removed from UI (CORS blocked in browser, confusing for users)
+- Claude uses claude-sonnet-4-20250514 model for text generation
 - Claude image methods return undefined (graceful degradation)
 - JSON extraction handles optional markdown code block wrapping
+- Settings sync on modal close ensures app state matches localStorage
+- Provider passed as prop to child components with onError callback
 
 ### Pending Todos
 
@@ -68,10 +70,10 @@ None.
 ## Session Continuity
 
 Last session: 2026-01-19
-Stopped at: Completed 02-02-PLAN.md
+Stopped at: Completed 02-03-PLAN.md
 Resume file: None
-Next: 02-03-PLAN.md (Gemini Service Refactoring)
+Next: 02-04-PLAN.md (End-to-end testing and polish)
 
 ---
 *State initialized: 2026-01-18*
-*Last updated: 2026-01-19 — Completed 02-02 Claude Provider Implementation*
+*Last updated: 2026-01-19 — Completed 02-03 Gemini Service Refactoring & App Integration*
