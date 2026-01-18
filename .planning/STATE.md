@@ -2,19 +2,19 @@
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-01-18)
+See: .planning/PROJECT.md (updated 2026-01-19)
 
-**Core value:** Students see only slides; teachers see slides + teleprompter
-**Current focus:** Ready for /gsd:new-milestone
+**Core value:** Colleagues can use presentations you create, with optional AI features via their own API keys
+**Current focus:** Phase 1 - Settings & API Key UI
 
 ## Current Position
 
-Phase: None active
-Plan: None
-Status: Ready to plan next milestone
-Last activity: 2026-01-18 — v1.2 milestone complete
+Phase: 1 of 5 (Settings & API Key UI)
+Plan: None (phase not yet planned)
+Status: Ready to plan
+Last activity: 2026-01-19 — Roadmap created for v2.0
 
-Progress: [==========] 100% (v1.2 complete)
+Progress: [░░░░░░░░░░] 0%
 
 ## Performance Metrics
 
@@ -32,11 +32,8 @@ Progress: [==========] 100% (v1.2 complete)
 ## Completed Milestones
 
 - v1.2 Permission Flow Fix (2026-01-18) - 2 phases, 5 plans
-  See: .planning/milestones/v1.2-ROADMAP.md
 - v1.1 Draggable Preview Window (2026-01-18) - 2 phases, 3 plans
-  See: .planning/milestones/v1.1-ROADMAP.md
 - v1.0 Dual-Monitor Student View (2026-01-18) - 3 phases, 6 plans
-  See: .planning/milestones/v1.0-ROADMAP.md
 
 ## Accumulated Context
 
@@ -54,10 +51,10 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-01-18
-Stopped at: v1.2 milestone archived
+Last session: 2026-01-19
+Stopped at: v2.0 roadmap created
 Resume file: None
 
 ---
 *State initialized: 2026-01-18*
-*Last updated: 2026-01-18 - v1.2 milestone archived*
+*Last updated: 2026-01-19 - v2.0 roadmap created*
