@@ -469,6 +469,13 @@ const PresentationView: React.FC<PresentationViewProps> = ({ slides, onExit, stu
                      // Note: We don't need to track the window reference for communication
                      // BroadcastChannel handles all sync - the window is fire-and-forget
                      // Connection state is now derived from heartbeat acknowledgments
+
+                     // Show placement feedback toast (5 seconds per PERM-04)
+                     if (secondaryScreen) {
+                       addToast('Opened on External Display', 5000);
+                     } else {
+                       addToast('Opened on this screen', 5000);
+                     }
                    }
                  }}
                  disabled={isLoading || isConnected}
