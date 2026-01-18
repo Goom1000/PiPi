@@ -10,23 +10,23 @@ See: .planning/PROJECT.md (updated 2026-01-18)
 ## Current Position
 
 Phase: 2 of 2 (Permission UX)
-Plan: 1 of 3 in current phase
+Plan: 2 of 3 in current phase
 Status: In progress
-Last activity: 2026-01-18 - Completed 02-01-PLAN.md (Button Label and Launch Feedback)
+Last activity: 2026-01-18 - Completed 02-02-PLAN.md (Inline Permission Link)
 
-Progress: [====------] 40% (v1.2 overall: 2/5 plans)
+Progress: [=====-----] 60% (v1.2 overall: 3/5 plans)
 
 ## Performance Metrics
 
 **Velocity:**
 - v1.0: 6 plans, 1 day
 - v1.1: 3 plans, 8 hours
-- v1.2: 2 plans, 5 minutes (Phase 1 + Plan 1 of Phase 2)
+- v1.2: 3 plans, 7 minutes (Phase 1 + Plans 1-2 of Phase 2)
 
 **Project Totals:**
 - Milestones shipped: 2
 - Total phases: 6 (v1.0: 3, v1.1: 2, v1.2: 2 in progress)
-- Total plans: 11
+- Total plans: 12
 - Total LOC: ~4,400 TypeScript
 
 ## Completed Milestones
@@ -47,6 +47,8 @@ Decisions are logged in PROJECT.md Key Decisions table.
 - friendly-label: Use 'External Display' instead of raw device names like 'DELL U2718Q'
 - warning-icon-style: Amber-400 subtle warning triangle for denied state, not text change
 - toast-messages: 'Opened on External Display' vs 'Opened on this screen' (5-second duration)
+- inline-link-style: Subtle blue underlined text link for permission requests, not a button or popup
+- removed-popup: PermissionExplainer component no longer used (file kept for cleanup later)
 
 ### Pending Todos
 
@@ -59,9 +61,9 @@ None.
 ## Session Continuity
 
 Last session: 2026-01-18
-Stopped at: Completed 02-permission-ux/02-01-PLAN.md
+Stopped at: Completed 02-permission-ux/02-02-PLAN.md
 Resume file: None
 
 ---
 *State initialized: 2026-01-18*
-*Last updated: 2026-01-18 - Phase 2 Plan 1 complete*
+*Last updated: 2026-01-18 - Phase 2 Plan 2 complete*
