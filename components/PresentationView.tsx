@@ -220,7 +220,7 @@ const PresentationView: React.FC<PresentationViewProps> = ({ slides, onExit, stu
   const [showRecoveryModal, setShowRecoveryModal] = useState(false);
 
   // Toast notifications for reconnection feedback
-  const { toasts, addToast, removeToast } = useToast();
+  const { toasts, removeToast } = useToast();
 
   // Window Management for display targeting
   const {
@@ -267,17 +267,11 @@ const PresentationView: React.FC<PresentationViewProps> = ({ slides, onExit, stu
     });
   }, [currentIndex, visibleBullets, slides, postMessage]);
 
-  // Detect reconnection scenario and show toast
-  // prevConnectedRef tracks previous isConnected state to detect transitions
+  // Track connection state for potential future use
   const prevConnectedRef = useRef<boolean | null>(null);
   useEffect(() => {
-    // Show toast only when transitioning from disconnected to connected
-    // (not on initial connection - prevConnectedRef starts as null)
-    if (prevConnectedRef.current === false && isConnected) {
-      addToast('Reconnected to student view', 3000);
-    }
     prevConnectedRef.current = isConnected;
-  }, [isConnected, addToast]);
+  }, [isConnected]);
 
   // Calculate next slide for preview
   const nextSlide = slides[currentIndex + 1] || null;
@@ -445,13 +439,25 @@ const PresentationView: React.FC<PresentationViewProps> = ({ slides, onExit, stu
                    const url = `${window.location.origin}${window.location.pathname}#/student`;
 
                    // Use pre-cached coordinates from hook (no async!)
-                   let features = 'width=1280,height=720';
+                   // popup=yes forces a new window instead of a tab
+                   let features = 'popup=yes,width=1280,height=720';
                    if (secondaryScreen) {
-                     features = `left=${secondaryScreen.left},top=${secondaryScreen.top},` +
+                     features = `popup=yes,left=${secondaryScreen.left},top=${secondaryScreen.top},` +
                                 `width=${secondaryScreen.width},height=${secondaryScreen.height}`;
                    }
 
                    const studentWindow = window.open(url, 'pipi-student', features);
+
+                   // Fallback: explicitly move window to target screen
+                   // Some browsers ignore position in window.open features
+                   if (studentWindow && secondaryScreen) {
+                     try {
+                       studentWindow.moveTo(secondaryScreen.left, secondaryScreen.top);
+                       studentWindow.resizeTo(secondaryScreen.width, secondaryScreen.height);
+                     } catch {
+                       // moveTo may fail in some browsers - position from features is primary
+                     }
+                   }
 
                    // Check if popup was blocked
                    if (!studentWindow || studentWindow.closed || typeof studentWindow.closed === 'undefined') {
@@ -462,13 +468,7 @@ const PresentationView: React.FC<PresentationViewProps> = ({ slides, onExit, stu
                      // BroadcastChannel handles all sync - the window is fire-and-forget
                      // Connection state is now derived from heartbeat acknowledgments
 
-                     // Show placement feedback toast (5 seconds per PERM-04)
-                     if (secondaryScreen) {
-                       addToast('Opened on External Display', 5000);
-                     } else {
-                       addToast('Opened on this screen', 5000);
-                     }
-                   }
+                    }
                  }}
                  disabled={isLoading || isConnected}
                  className={`px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-colors border flex items-center ${
