@@ -83,11 +83,12 @@ Plans:
   3. App shows success/error toast after save/load operations
   4. App warns before saving if presentation exceeds 50MB
   5. App auto-saves to localStorage and recovers after browser crash
-**Plans**: TBD
+**Plans**: 3 plans
 
 Plans:
-- [ ] 04-01: TBD
-- [ ] 04-02: TBD
+- [ ] 04-01-PLAN.md - File format types and save/load services
+- [ ] 04-02-PLAN.md - Toast variants and auto-save with recovery
+- [ ] 04-03-PLAN.md - UI integration (header buttons, drag-drop, wiring)
 
 ### Phase 5: GitHub Pages Deployment
 **Goal**: App accessible via public URL that colleagues can visit
@@ -112,9 +113,9 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5
 | 1. Settings & API Key UI | 2/2 | Complete | 2026-01-19 |
 | 2. Multi-Provider AI | 3/3 | Complete | 2026-01-19 |
 | 3. Disabled AI State | 2/2 | Complete | 2026-01-19 |
-| 4. Save/Load System | 0/? | Not started | - |
+| 4. Save/Load System | 0/3 | In Progress | - |
 | 5. GitHub Pages Deployment | 0/? | Not started | - |
 
 ---
 *Roadmap created: 2026-01-19*
-*Last updated: 2026-01-19 - Phase 3 complete (Disabled AI State)*
+*Last updated: 2026-01-19 - Phase 4 planned (Save/Load System)*
