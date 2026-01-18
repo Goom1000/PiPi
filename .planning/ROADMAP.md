@@ -7,7 +7,7 @@ This milestone fixes the race condition in Window Management API permission dete
 ## Phases
 
 - [x] **Phase 1: Permission State Loading** - Add loading state to useWindowManagement hook
-- [ ] **Phase 2: Permission UX** - Update UI to reflect permission state with clear feedback
+- [x] **Phase 2: Permission UX** - Update UI to reflect permission state with clear feedback
 
 ## Phase Details
 
@@ -36,17 +36,17 @@ Plans:
 **Plans**: 4 plans
 
 Plans:
-- [ ] 02-01-PLAN.md - Button labels + warning icon + launch toast
-- [ ] 02-02-PLAN.md - Inline permission request link (replaces PermissionExplainer popup)
-- [ ] 02-03-PLAN.md - Denied recovery UI with browser-specific modal
-- [ ] 02-04-PLAN.md - Human verification of all permission UX
+- [x] 02-01-PLAN.md - Button labels + warning icon + launch toast
+- [x] 02-02-PLAN.md - Inline permission request link (replaces PermissionExplainer popup)
+- [x] 02-03-PLAN.md - Denied recovery UI with browser-specific modal
+- [x] 02-04-PLAN.md - Human verification of all permission UX
 
 ## Progress
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Permission State Loading | 1/1 | Complete | 2026-01-18 |
-| 2. Permission UX | 0/4 | Planned | - |
+| 2. Permission UX | 4/4 | Complete | 2026-01-18 |
 
 ---
 *Roadmap created: 2026-01-18*

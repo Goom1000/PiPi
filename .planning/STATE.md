@@ -10,9 +10,9 @@ See: .planning/PROJECT.md (updated 2026-01-18)
 ## Current Position
 
 Phase: 2 of 2 (Permission UX)
-Plan: 3 of 3 in current phase
-Status: Phase complete
-Last activity: 2026-01-18 - Completed 02-03-PLAN.md (Permission Recovery)
+Plan: 4 of 4 in current phase
+Status: Milestone complete
+Last activity: 2026-01-18 - Completed 02-04-PLAN.md (Human Verification)
 
 Progress: [==========] 100% (v1.2 overall: 5/5 plans)
 
@@ -53,6 +53,8 @@ Decisions are logged in PROJECT.md Key Decisions table.
 - removed-popup: PermissionExplainer component no longer used (file kept for cleanup later)
 - browser-detection-order: Check Edg/ before Chrome/ (Edge UA includes 'Chrome')
 - recovery-trigger: Amber-colored link for visibility on denied state
+- toasts-removed: Placement toasts removed during human verification (blocked UI buttons)
+- arc-browser-limitation: Arc opens popups as tabs, so auto-placement doesn't work in Arc (Chrome works)
 
 ### Pending Todos
 
@@ -70,4 +72,4 @@ Resume file: None
 
 ---
 *State initialized: 2026-01-18*
-*Last updated: 2026-01-18 - v1.2 milestone complete (Phase 2 Plan 3)*
+*Last updated: 2026-01-18 - v1.2 milestone complete (Phase 2 Plan 4 - Human Verification)*
