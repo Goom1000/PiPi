@@ -95,6 +95,11 @@ function App() {
     setShowSettings(true);
   }, []);
 
+  // Handler for child components to request AI enablement
+  const handleRequestAI = useCallback((featureName: string) => {
+    setEnableAIModal({ featureName });
+  }, []);
+
   const [appState, setAppState] = useState<AppState>(AppState.INPUT);
   const [lessonText, setLessonText] = useState('');
   const [slides, setSlides] = useState<Slide[]>([]);
@@ -224,7 +229,7 @@ function App() {
 
   const handleReviseSlide = async (id: string, instruction: string) => {
     if (!provider) {
-      setErrorModal({ title: 'AI Not Configured', message: 'Please configure your AI provider in Settings.' });
+      setEnableAIModal({ featureName: 'refine this slide with AI' });
       return;
     }
     const target = slides.find(s => s.id === id);
@@ -647,7 +652,7 @@ function App() {
                                  onDelete={handleDeleteSlide}
                                  onRegenerateImage={async (id, p) => {
                                     if (!provider) {
-                                      setErrorModal({ title: 'AI Not Configured', message: 'Please configure your AI provider in Settings.' });
+                                      setEnableAIModal({ featureName: 'regenerate this image' });
                                       return;
                                     }
                                     handleUpdateSlide(id, {isGeneratingImage: true});
@@ -656,6 +661,8 @@ function App() {
                                  }}
                                  onRevise={handleReviseSlide}
                                  onInsertAfter={() => handleInsertBlankSlide(activeSlideIndex)}
+                                 isAIAvailable={provider !== null}
+                                 onRequestAI={handleRequestAI}
                                />
                                <div className="mt-6 flex justify-between items-center text-slate-400 dark:text-slate-600 px-4">
                                    <div className="text-[10px] font-bold uppercase tracking-widest flex gap-4">
