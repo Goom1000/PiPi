@@ -49,7 +49,8 @@ export interface LessonPlan {
 }
 
 // AI Provider configuration for multi-provider support
-export type AIProvider = 'gemini' | 'openai' | 'claude';
+// Note: OpenAI removed - doesn't support browser CORS
+export type AIProvider = 'gemini' | 'claude';
 
 export interface Settings {
   provider: AIProvider;

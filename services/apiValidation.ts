@@ -12,16 +12,13 @@ export interface ValidationResult {
  * Endpoint configuration for each AI provider.
  * Uses lightweight list-models endpoints that are free/cheap
  * and only require valid authentication.
+ * Note: OpenAI removed - doesn't support browser CORS
  */
 const VALIDATION_ENDPOINTS: Record<AIProvider, { url: string; headers: HeadersInit }> = {
   gemini: {
     // API key in URL (Google's pattern)
     url: '', // Will be constructed with key
     headers: {},
-  },
-  openai: {
-    url: 'https://api.openai.com/v1/models',
-    headers: {}, // Authorization header added dynamically
   },
   claude: {
     url: 'https://api.anthropic.com/v1/models',
@@ -59,20 +56,14 @@ export async function validateApiKey(
         headers = {};
         break;
 
-      case 'openai':
-        // OpenAI uses Bearer token in Authorization header
-        url = VALIDATION_ENDPOINTS.openai.url;
-        headers = {
-          Authorization: `Bearer ${apiKey}`,
-        };
-        break;
-
       case 'claude':
         // Claude uses x-api-key header with anthropic-version
+        // MUST include browser CORS header for direct browser access
         url = VALIDATION_ENDPOINTS.claude.url;
         headers = {
           'x-api-key': apiKey,
           'anthropic-version': '2023-06-01',
+          'anthropic-dangerous-direct-browser-access': 'true',
         };
         break;
 

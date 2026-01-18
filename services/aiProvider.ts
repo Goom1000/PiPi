@@ -2,7 +2,6 @@ import { Slide, LessonResource, AIProvider } from '../types';
 import { QuizQuestion } from './geminiService';
 import { GeminiProvider } from './providers/geminiProvider';
 import { ClaudeProvider } from './providers/claudeProvider';
-import { OpenAIProvider } from './providers/openaiProvider';
 
 // Error codes for unified error handling across all providers
 export type AIErrorCode =
@@ -69,6 +68,7 @@ export interface AIProviderInterface {
 }
 
 // Factory function to create the appropriate provider instance
+// Note: OpenAI removed - doesn't support browser CORS
 export function createAIProvider(config: {
   provider: AIProvider;
   apiKey: string;
@@ -78,11 +78,6 @@ export function createAIProvider(config: {
       return new GeminiProvider(config.apiKey);
     case 'claude':
       return new ClaudeProvider(config.apiKey);
-    case 'openai':
-      throw new AIProviderError(
-        USER_ERROR_MESSAGES.PROVIDER_NOT_SUPPORTED,
-        'PROVIDER_NOT_SUPPORTED'
-      );
     default:
       throw new AIProviderError(
         USER_ERROR_MESSAGES.UNKNOWN_ERROR,

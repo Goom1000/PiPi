@@ -14,6 +14,7 @@ type TestStatus =
   | { state: 'error'; message: string };
 
 // Setup instructions per provider
+// Note: OpenAI removed - doesn't support browser CORS
 const PROVIDER_INSTRUCTIONS: Record<AIProvider, { steps: string[]; cost: string; buttonText: string; url: string }> = {
   gemini: {
     steps: [
@@ -24,16 +25,6 @@ const PROVIDER_INSTRUCTIONS: Record<AIProvider, { steps: string[]; cost: string;
     cost: 'Free tier (15 req/min), paid ~$0.075/1M tokens',
     buttonText: 'Open Google AI Studio',
     url: 'https://aistudio.google.com/app/apikey',
-  },
-  openai: {
-    steps: [
-      'Go to platform.openai.com',
-      'Navigate to API Keys',
-      'Create new secret key',
-    ],
-    cost: '~$0.15/1M tokens, requires $5 credit',
-    buttonText: 'Open OpenAI Dashboard',
-    url: 'https://platform.openai.com/api-keys',
   },
   claude: {
     steps: [
@@ -69,8 +60,6 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ onClose }) => {
   // Provider switch warning state
   const [pendingProvider, setPendingProvider] = useState<AIProvider | null>(null);
 
-  // OpenAI warning state
-  const [showOpenAIWarning, setShowOpenAIWarning] = useState(false);
 
   // Load initial values when modal opens
   useEffect(() => {
@@ -84,12 +73,6 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ onClose }) => {
 
   // Intercept provider change to show warning if key exists
   const handleProviderChange = (newProvider: AIProvider) => {
-    // Block OpenAI selection with warning
-    if (newProvider === 'openai') {
-      setShowOpenAIWarning(true);
-      return;
-    }
-
     if (newProvider !== provider && apiKey) {
       // User has existing key - show warning modal
       setPendingProvider(newProvider);
@@ -196,7 +179,6 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ onClose }) => {
               className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 text-slate-700 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-amber-500 transition-colors"
             >
               <option value="gemini">Gemini</option>
-              <option value="openai">OpenAI</option>
               <option value="claude">Claude</option>
             </select>
           </div>
@@ -376,12 +358,10 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ onClose }) => {
           <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[60]">
             <div className="bg-white dark:bg-slate-800 rounded-2xl p-6 max-w-md mx-4 shadow-2xl">
               <h3 className="text-lg font-bold text-slate-800 dark:text-white mb-2">
-                Switch to {pendingProvider === 'gemini' ? 'Gemini' :
-                           pendingProvider === 'claude' ? 'Claude' : 'OpenAI'}?
+                Switch to {pendingProvider === 'gemini' ? 'Gemini' : 'Claude'}?
               </h3>
               <p className="text-slate-600 dark:text-slate-300 mb-4">
-                Switching providers will clear your current API key. You'll need to enter a new key for {pendingProvider === 'gemini' ? 'Google' :
-                           pendingProvider === 'claude' ? 'Anthropic' : 'OpenAI'}.
+                Switching providers will clear your current API key. You'll need to enter a new key for {pendingProvider === 'gemini' ? 'Google' : 'Anthropic'}.
               </p>
               <p className="text-sm text-amber-600 dark:text-amber-400 mb-6">
                 Note: Different AI providers may generate slightly different content for the same lesson.
@@ -404,37 +384,6 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ onClose }) => {
           </div>
         )}
 
-        {/* OpenAI Not Supported Warning Modal */}
-        {showOpenAIWarning && (
-          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[60]">
-            <div className="bg-white dark:bg-slate-800 rounded-2xl p-6 max-w-md mx-4 shadow-2xl">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="p-2 bg-amber-100 dark:bg-amber-900/30 rounded-full">
-                  <svg className="w-6 h-6 text-amber-600 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                  </svg>
-                </div>
-                <h3 className="text-lg font-bold text-slate-800 dark:text-white">
-                  OpenAI Not Available
-                </h3>
-              </div>
-              <p className="text-slate-600 dark:text-slate-300 mb-4">
-                OpenAI doesn't allow direct browser requests due to CORS restrictions. This is a security limitation on OpenAI's side.
-              </p>
-              <p className="text-sm text-slate-500 dark:text-slate-400 mb-6">
-                Please use <strong>Gemini</strong> or <strong>Claude</strong> instead. Both work directly in the browser.
-              </p>
-              <div className="flex justify-end">
-                <button
-                  onClick={() => setShowOpenAIWarning(false)}
-                  className="px-4 py-2 bg-indigo-600 dark:bg-amber-500 text-white dark:text-slate-900 rounded-lg font-medium hover:opacity-90"
-                >
-                  Got it
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
       </div>
     </div>
   );
