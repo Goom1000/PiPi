@@ -195,6 +195,9 @@ function useWindowManagement(): UseWindowManagementResult {
       return;
     }
 
+    // Reset mounted state on each effect run (handles Strict Mode double-invoke)
+    mountedRef.current = true;
+
     const fetchScreenDetails = async () => {
       try {
         const details = await window.getScreenDetails!();
