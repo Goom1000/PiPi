@@ -58,7 +58,7 @@ async function callClaude(
         'anthropic-dangerous-direct-browser-access': 'true',  // REQUIRED for browser
       },
       body: JSON.stringify({
-        model: 'claude-3-5-sonnet-20241022',
+        model: 'claude-sonnet-4-20250514',
         max_tokens: maxTokens,
         system: systemPrompt,
         messages,
