@@ -1,7 +1,6 @@
 import React, { useState, useRef, useCallback } from 'react';
 import { Rnd, RndResizeCallback, RndDragCallback } from 'react-rnd';
 import { useViewportBounds } from '../hooks/useViewportBounds';
-import GridOverlay from './GridOverlay';
 
 export interface Position {
   x: number;
@@ -204,11 +203,7 @@ const FloatingWindow: React.FC<FloatingWindowProps> = ({
   };
 
   return (
-    <>
-      {/* Grid overlay - shows during drag when snap is enabled */}
-      <GridOverlay gridSize={GRID_SIZE} visible={isDragging && !!snapEnabled} />
-
-      <Rnd
+    <Rnd
         ref={rndRef}
         // Use default for uncontrolled mode, position/size for controlled mode
         default={{
@@ -289,7 +284,6 @@ const FloatingWindow: React.FC<FloatingWindowProps> = ({
           )}
         </div>
       </Rnd>
-    </>
   );
 };
 
