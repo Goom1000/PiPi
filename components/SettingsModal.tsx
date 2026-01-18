@@ -107,6 +107,13 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ onClose }) => {
 
   // Save handler
   const handleSave = () => {
+    // Save directly to localStorage before closing to avoid race condition
+    // (useEffect won't run if component unmounts immediately)
+    try {
+      window.localStorage.setItem('pipi-settings', JSON.stringify({ provider, apiKey }));
+    } catch (e) {
+      console.warn('Failed to save settings:', e);
+    }
     updateSettings({ provider, apiKey });
     onClose();
   };
