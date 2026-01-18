@@ -1,5 +1,32 @@
 # Project Milestones: PiPi
 
+## v1.2 Permission Flow Fix (Shipped: 2026-01-18)
+
+**Delivered:** Fixed permission detection race condition and improved permission UX with dynamic button labels, inline permission requests, and browser-specific recovery guidance.
+
+**Phases completed:** 1-2 (5 plans total)
+
+**Key accomplishments:**
+
+- Fixed race condition with isLoading state pattern (loading gates all permission UI)
+- Dynamic button labels reflect auto-placement capability ("Launch → External Display")
+- Inline permission request link replaces popup-based PermissionExplainer
+- Browser-specific recovery modal (Chrome/Edge instructions for denied permissions)
+- Warning icon for denied state with recovery guidance
+
+**Stats:**
+
+- 11 files created/modified
+- 4,499 lines of TypeScript (project total)
+- 2 phases, 5 plans
+- Same day (2026-01-18)
+
+**Git range:** `cf7c6a6` → `599ffaf`
+
+**What's next:** TBD with /gsd:new-milestone
+
+---
+
 ## v1.1 Draggable Preview Window (Shipped: 2026-01-18)
 
 **Delivered:** Fully interactive floating preview window with drag, resize, snap-to-grid, and session persistence.

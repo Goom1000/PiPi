@@ -5,29 +5,29 @@
 See: .planning/PROJECT.md (updated 2026-01-18)
 
 **Core value:** Students see only slides; teachers see slides + teleprompter
-**Current focus:** v1.2 Permission Flow Fix - Phase 2 complete
+**Current focus:** Ready for /gsd:new-milestone
 
 ## Current Position
 
-Phase: 2 of 2 (Permission UX)
-Plan: 4 of 4 in current phase
-Status: Milestone complete
-Last activity: 2026-01-18 - Completed 02-04-PLAN.md (Human Verification)
+Phase: None active
+Plan: None
+Status: Ready to plan next milestone
+Last activity: 2026-01-18 — v1.2 milestone complete
 
-Progress: [==========] 100% (v1.2 overall: 5/5 plans)
+Progress: [==========] 100% (v1.2 complete)
 
 ## Performance Metrics
 
 **Velocity:**
 - v1.0: 6 plans, 1 day
 - v1.1: 3 plans, 8 hours
-- v1.2: 5 plans, 9 minutes (Phase 1 + Phase 2)
+- v1.2: 5 plans, 1 day
 
 **Project Totals:**
-- Milestones shipped: 3
+- Milestones shipped: 3 (v1.0, v1.1, v1.2)
 - Total phases: 7 (v1.0: 3, v1.1: 2, v1.2: 2)
 - Total plans: 14
-- Total LOC: ~4,400 TypeScript
+- Total LOC: ~4,500 TypeScript
 
 ## Completed Milestones
 
@@ -44,18 +44,6 @@ Progress: [==========] 100% (v1.2 overall: 5/5 plans)
 
 Decisions are logged in PROJECT.md Key Decisions table.
 
-**v1.2 Decisions:**
-- loading-state-pattern: isLoading starts true, becomes false only after permission query resolves (safe default prevents race condition)
-- friendly-label: Use 'External Display' instead of raw device names like 'DELL U2718Q'
-- warning-icon-style: Amber-400 subtle warning triangle for denied state, not text change
-- toast-messages: 'Opened on External Display' vs 'Opened on this screen' (5-second duration)
-- inline-link-style: Subtle blue underlined text link for permission requests, not a button or popup
-- removed-popup: PermissionExplainer component no longer used (file kept for cleanup later)
-- browser-detection-order: Check Edg/ before Chrome/ (Edge UA includes 'Chrome')
-- recovery-trigger: Amber-colored link for visibility on denied state
-- toasts-removed: Placement toasts removed during human verification (blocked UI buttons)
-- arc-browser-limitation: Arc opens popups as tabs, so auto-placement doesn't work in Arc (Chrome works)
-
 ### Pending Todos
 
 3 pending - see `.planning/todos/pending/`
@@ -67,9 +55,9 @@ None.
 ## Session Continuity
 
 Last session: 2026-01-18
-Stopped at: Completed v1.2 Permission Flow Fix milestone
+Stopped at: v1.2 milestone archived
 Resume file: None
 
 ---
 *State initialized: 2026-01-18*
-*Last updated: 2026-01-18 - v1.2 milestone complete (Phase 2 Plan 4 - Human Verification)*
+*Last updated: 2026-01-18 - v1.2 milestone archived*

@@ -6,19 +6,15 @@ A presentation tool for teachers that transforms PDF lesson plans into interacti
 
 **v1.0 shipped:** Dual-monitor presentation mode where students see only slides on a projector while teachers see slides plus teleprompter on their laptop — works like PowerPoint Presenter View.
 
-## Current Milestone: v1.2 Permission Flow Fix
+## Shipped Milestones
 
-**Goal:** Make auto-projector placement reliable and obvious in the classroom.
+### v1.2 Permission Flow Fix (Shipped 2026-01-18)
 
-**Problem discovered:** Window Management API works but permission flow has a race condition — the "Auto-Place on Projector" popup doesn't appear reliably, leaving teachers confused about why the student window doesn't auto-place on the SmartBoard.
+**Delivered:** Fixed permission detection race condition and improved permission UX with dynamic button labels, inline permission requests, and browser-specific recovery guidance.
 
-**Target features:**
-- Fix permission detection race condition
-- Make auto-placement status obvious (inline on button, not dismissible popup)
-- Clear feedback: "Launch on SmartBoard" vs "Launch Student (manual placement)"
-- Reliable permission request flow
+Auto-projector placement is now reliable and obvious in the classroom.
 
-## Previous Milestone: v1.1 Draggable Preview Window (Shipped 2026-01-18)
+### v1.1 Draggable Preview Window (Shipped 2026-01-18)
 
 **Delivered:** Fully interactive floating preview window with drag, resize, snap-to-grid, and session persistence.
 
@@ -62,13 +58,14 @@ Students see only the presentation; teachers see the presentation plus a telepro
 - ✓ Snap-to-grid toggle (50px invisible grid) — v1.1
 - ✓ Preview position/size/snap persistence (localStorage) — v1.1
 - ✓ Preview floats above all UI (portal, z-index 9999) — v1.1
+- ✓ Permission state loading gates UI (race condition fixed) — v1.2
+- ✓ Dynamic button labels for auto-placement status — v1.2
+- ✓ Inline permission request link — v1.2
+- ✓ Browser-specific recovery guidance for denied permissions — v1.2
 
 ### Active
 
-- [ ] Fix permission detection race condition (PERM-01)
-- [ ] Make auto-placement status visible on launch button (PERM-02)
-- [ ] Add reliable permission request trigger (PERM-03)
-- [ ] Clear feedback for manual vs auto placement (PERM-04)
+(None — ready for /gsd:new-milestone)
 
 ### Deferred (v1.3+)
 
@@ -88,9 +85,16 @@ Students see only the presentation; teachers see the presentation plus a telepro
 
 ### Current State
 
-Shipped v1.1 with 4,361 LOC TypeScript.
+Shipped v1.2 with 4,499 LOC TypeScript.
 Tech stack: React 19, Vite, Gemini API, Tailwind CSS, react-rnd.
 Client-side only (no backend).
+
+v1.2 delivered permission UX improvements:
+- isLoading state pattern prevents race condition
+- Dynamic button labels ("Launch → External Display")
+- Inline permission request link
+- Browser-specific recovery modal (Chrome/Edge)
+- Warning icon for denied state
 
 v1.1 delivered interactive preview window:
 - react-rnd for drag/resize with aspect ratio lock
@@ -136,6 +140,10 @@ v1.0 delivered rock-solid dual-monitor presentation:
 | Corner-only resize handles | Clean appearance, handles appear on hover | ✓ Good — v1.1 |
 | Per-presentation storage key | Uses first slide ID for storage key uniqueness | ✓ Good — v1.1 |
 | 50px invisible grid | Precision snapping without visual clutter | ✓ Good — v1.1 |
+| isLoading state pattern | Safe default prevents race condition | ✓ Good — v1.2 |
+| Friendly display label | "External Display" instead of raw device name | ✓ Good — v1.2 |
+| Inline permission link | Simpler than popup-based explainer | ✓ Good — v1.2 |
+| Browser detection order | Check Edg/ before Chrome/ (Edge UA includes Chrome) | ✓ Good — v1.2 |
 
 ---
-*Last updated: 2026-01-18 after v1.2 milestone start*
+*Last updated: 2026-01-18 after v1.2 milestone*
