@@ -41,18 +41,19 @@ Plans:
   3. Button visual clearly indicates current snap state (on vs off)
   4. After page refresh, preview appears in same position and size as before
   5. Snap toggle state persists across sessions (remembers on/off preference)
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 02-01: TBD
+- [ ] 02-01-PLAN.md — Persistence infrastructure (hook + controlled FloatingWindow)
+- [ ] 02-02-PLAN.md — Snap toggle UI and grid overlay
 
 ## Progress
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Drag, Resize & Float | 1/1 | ✓ Complete | 2026-01-18 |
-| 2. Snap-to-Grid & Persistence | 0/? | Not started | - |
+| 2. Snap-to-Grid & Persistence | 0/2 | Planned | - |
 
 ---
 *Roadmap created: 2026-01-18*
-*Last updated: 2026-01-18 — Phase 1 complete*
+*Last updated: 2026-01-18 — Phase 2 planned*
