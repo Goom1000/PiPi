@@ -1,6 +1,7 @@
 import React, { useState, useRef, useCallback } from 'react';
 import { Rnd, RndResizeCallback, RndDragCallback } from 'react-rnd';
 import { useViewportBounds } from '../hooks/useViewportBounds';
+import GridOverlay from './GridOverlay';
 
 export interface Position {
   x: number;
@@ -35,6 +36,9 @@ interface FloatingWindowProps {
 
 // Edge magnetism threshold in pixels
 const MAGNET_THRESHOLD = 20;
+
+// Grid size for snap-to-grid functionality (50px per CONTEXT.md decision)
+const GRID_SIZE = 50;
 
 /**
  * Apply edge magnetism - snap to viewport edges when within threshold
@@ -200,54 +204,92 @@ const FloatingWindow: React.FC<FloatingWindowProps> = ({
   };
 
   return (
-    <Rnd
-      ref={rndRef}
-      // Use default for uncontrolled mode, position/size for controlled mode
-      default={{
-        x: defaultPosition.x,
-        y: defaultPosition.y,
-        width: defaultSize.width,
-        height: defaultSize.height,
-      }}
-      // Controlled mode: pass position/size directly
-      position={isControlled ? position : undefined}
-      size={isControlled ? size : undefined}
-      minWidth={minWidth}
-      minHeight={minHeight}
-      lockAspectRatio={aspectRatio}
-      bounds="window"
-      enableResizing={{
-        top: false,
-        right: false,
-        bottom: false,
-        left: false,
-        topRight: true,
-        bottomRight: true,
-        bottomLeft: true,
-        topLeft: true,
-      }}
-      resizeHandleComponent={resizeHandleComponent}
-      resizeHandleStyles={{
-        topRight: { cursor: 'nesw-resize', right: -6, top: -6 },
-        bottomRight: { cursor: 'nwse-resize', right: -6, bottom: -6 },
-        bottomLeft: { cursor: 'nesw-resize', left: -6, bottom: -6 },
-        topLeft: { cursor: 'nwse-resize', left: -6, top: -6 },
-      }}
-      onDragStart={handleDragStart}
-      onDragStop={handleDragStop}
-      onResizeStop={handleResizeStop}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-      style={{
-        cursor: 'move',
-        opacity: isDragging ? 0.8 : 1,
-        transition: isDragging ? 'none' : 'opacity 150ms ease',
-        zIndex,
-      }}
-      className="rounded-lg border-2 border-indigo-500 overflow-hidden"
-    >
-      <div className="w-full h-full">{children}</div>
-    </Rnd>
+    <>
+      {/* Grid overlay - shows during drag when snap is enabled */}
+      <GridOverlay gridSize={GRID_SIZE} visible={isDragging && !!snapEnabled} />
+
+      <Rnd
+        ref={rndRef}
+        // Use default for uncontrolled mode, position/size for controlled mode
+        default={{
+          x: defaultPosition.x,
+          y: defaultPosition.y,
+          width: defaultSize.width,
+          height: defaultSize.height,
+        }}
+        // Controlled mode: pass position/size directly
+        position={isControlled ? position : undefined}
+        size={isControlled ? size : undefined}
+        minWidth={minWidth}
+        minHeight={minHeight}
+        lockAspectRatio={aspectRatio}
+        bounds="window"
+        // Grid snapping: snap to GRID_SIZE when enabled, 1px (free) when disabled
+        dragGrid={snapEnabled ? [GRID_SIZE, GRID_SIZE] : [1, 1]}
+        resizeGrid={snapEnabled ? [GRID_SIZE, GRID_SIZE] : [1, 1]}
+        enableResizing={{
+          top: false,
+          right: false,
+          bottom: false,
+          left: false,
+          topRight: true,
+          bottomRight: true,
+          bottomLeft: true,
+          topLeft: true,
+        }}
+        resizeHandleComponent={resizeHandleComponent}
+        resizeHandleStyles={{
+          topRight: { cursor: 'nesw-resize', right: -6, top: -6 },
+          bottomRight: { cursor: 'nwse-resize', right: -6, bottom: -6 },
+          bottomLeft: { cursor: 'nesw-resize', left: -6, bottom: -6 },
+          topLeft: { cursor: 'nwse-resize', left: -6, top: -6 },
+        }}
+        onDragStart={handleDragStart}
+        onDragStop={handleDragStop}
+        onResizeStop={handleResizeStop}
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+        style={{
+          cursor: 'move',
+          opacity: isDragging ? 0.8 : 1,
+          transition: isDragging ? 'none' : 'opacity 150ms ease',
+          zIndex,
+        }}
+        className="rounded-lg border-2 border-indigo-500 overflow-hidden"
+      >
+        <div className="w-full h-full relative">
+          {children}
+
+          {/* Snap toggle button - always visible, top-right corner */}
+          {onSnapToggle && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();  // Prevent drag start
+                onSnapToggle();
+              }}
+              className={`
+                absolute top-2 right-2 z-10
+                w-6 h-6 rounded
+                flex items-center justify-center
+                transition-colors duration-150
+                ${snapEnabled
+                  ? 'bg-indigo-500 text-white shadow-md'
+                  : 'bg-slate-200 text-slate-500 hover:bg-slate-300'
+                }
+              `}
+              title={snapEnabled ? 'Snap to grid: ON' : 'Snap to grid: OFF'}
+            >
+              {/* Grid icon - 4 squares */}
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                  d="M4 5a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM14 5a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1V5zM4 15a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H5a1 1 0 01-1-1v-4zM14 15a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1v-4z"
+                />
+              </svg>
+            </button>
+          )}
+        </div>
+      </Rnd>
+    </>
   );
 };
 
