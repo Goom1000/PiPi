@@ -117,15 +117,32 @@ function useWindowManagement(): UseWindowManagementResult {
     if (!isSupported || !hasMultipleScreens) return;
 
     let permissionStatus: PermissionStatus | null = null;
+    let timeoutId: ReturnType<typeof setTimeout> | null = null;
 
     const checkPermission = async () => {
       try {
-        permissionStatus = await navigator.permissions.query({
-          name: 'window-management' as PermissionName
+        // Race permission query against timeout - some browsers hang on this query
+        const timeoutPromise = new Promise<'timeout'>((resolve) => {
+          timeoutId = setTimeout(() => resolve('timeout'), 3000);
         });
+
+        const result = await Promise.race([
+          navigator.permissions.query({
+            name: 'window-management' as PermissionName
+          }),
+          timeoutPromise
+        ]);
 
         if (!mountedRef.current) return;
 
+        if (result === 'timeout') {
+          // Query hung - assume prompt state, let getScreenDetails trigger actual prompt
+          setPermissionState('prompt');
+          setIsLoading(false);
+          return;
+        }
+
+        permissionStatus = result;
         setPermissionState(permissionStatus.state as 'prompt' | 'granted' | 'denied');
         setIsLoading(false);
 
@@ -150,6 +167,7 @@ function useWindowManagement(): UseWindowManagementResult {
     checkPermission();
 
     return () => {
+      if (timeoutId) clearTimeout(timeoutId);
       // Note: permissionStatus.removeEventListener would need to be tracked
       // but the status object is recreated on each query anyway
     };
