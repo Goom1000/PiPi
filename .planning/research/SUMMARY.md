@@ -1,355 +1,154 @@
 # Project Research Summary
 
-**Project:** PiPi - AI-powered presentation tool for teachers
-**Domain:** Browser-based dual-monitor presentation system
-**Researched:** 2026-01-18
+**Project:** PiPi v2.0 - Shareable Presentations
+**Domain:** File save/load, multi-provider AI, GitHub Pages deployment
+**Researched:** 2026-01-19
 **Confidence:** HIGH
 
 ## Executive Summary
 
-Building a reliable dual-monitor presentation system in a browser requires solving three problems: (1) launching a second window without triggering popup blockers, (2) synchronizing state between windows, and (3) optionally placing the window on the correct display. The current PiPi implementation's popup issues stem from calling `window.open()` inside a `useEffect` rather than directly in a click handler, causing browsers to block it as an untrusted popup. This is fixable without major architectural changes.
-
-The recommended approach is **progressive enhancement**: build a robust BroadcastChannel-based sync system that works everywhere, then add Window Management API features for Chromium users (~30% of users get automatic display targeting). The student view should be a standalone route (`/student`) that loads its own styles, not an injected portal. This architecture avoids popup blockers entirely when users manually open the URL, and survives window refreshes.
-
-The primary risks are: (1) popup blockers silently breaking the feature if user activation is lost, (2) non-Chromium users cannot auto-target displays so manual positioning is required, and (3) teachers may deny permission prompts without understanding them. Mitigation requires synchronous window opening in click handlers, graceful fallbacks with clear instructions, and permission priming UI before browser prompts.
+Building shareable presentations for a 4-person teaching team requires three independent capabilities: (1) file save/load using JSZip with a `.pipi` archive format, (2) multi-provider AI abstraction supporting Gemini, Claude, and OpenAI with runtime API key management, and (3) GitHub Pages deployment with proper base path configuration. All three can be achieved client-side only with zero backend infrastructure. The primary risks are XSS exposure of API keys (mitigated by warnings and clear-data functionality), memory exhaustion on large presentations (mitigated by size limits), and cryptic error messages for non-technical teachers (mitigated by error translation layer).
 
 ## Key Findings
 
 ### Recommended Stack
 
-No additional packages are needed—all required functionality uses native browser APIs. The stack consists of three complementary technologies that provide full browser coverage through progressive enhancement.
+| Component | Technology | Rationale |
+|-----------|------------|-----------|
+| File format | JSZip + `.pipi` extension | ZIP archives handle JSON + binary images cleanly |
+| AI abstraction | Custom provider layer | Vercel AI SDK pattern, swap providers via factory |
+| API key storage | localStorage + obfuscation | Client-only, user owns keys, no backend needed |
+| Deployment | GitHub Pages + Vite | Free, auto-deploys from git, already have GitHub account |
 
-**Core technologies:**
-- **Window Management API**: Auto-detect displays and position windows — Chromium only (Chrome 111+, Edge 111+), provides the "magic" experience
-- **BroadcastChannel API**: Cross-window state synchronization — 95.8% browser support (Baseline 2022), simple and reliable
-- **window.open() with user gesture**: Universal window creation — 100% browser support, but requires manual positioning as fallback
+**New dependencies:**
+```bash
+npm install jszip file-saver openai @anthropic-ai/sdk
+npm install -D @types/file-saver
+```
 
-**Critical requirement:** `window.open()` MUST be called synchronously within a click handler. The current `useEffect`-based approach loses user activation context and will be blocked by Arc, Safari, and privacy-focused browsers.
+### Table Stakes Features
 
-### Expected Features
+**Save/Load:**
+- Export presentation to downloadable `.pipi` file (JSON + assets in ZIP)
+- Import presentation from file picker
+- Success/failure feedback toasts
+- File size validation before save (warn if > 50MB)
 
-**Must have (table stakes):**
-- Separate teacher/student displays that sync reliably
-- Speaker notes visible to presenter only
-- Current and next slide preview in presenter view
-- Keyboard navigation (arrows, space, Page Up/Down for clickers)
-- Progressive bullet reveal synchronized across windows
-- Timer/clock display in presenter view (MISSING)
-- Graceful exit without losing state
+**API Key Management:**
+- Settings panel with gear icon
+- Masked input with show/hide toggle
+- "Verify key" test connection button
+- Stored locally only, never transmitted
 
-**Should have (competitive):**
-- Auto display detection for Chromium users
-- One-click "Present on [Display Name]" when API available
-- Presenter remote/clicker support (Page Up/Down)
-- Recovery when student window is closed and reopened
+**Disabled AI State:**
+- AI buttons visible but grayed out when no key
+- Lock icon + "Requires API key" tooltip
+- First-click modal explaining setup
+- App fully functional without AI (create, edit, present work)
 
-**Defer (v2+):**
-- Annotation/drawing tools (anti-feature, PowerPoint territory)
-- Video/audio embedding (scope creep)
-- Custom transitions/animations (diminishing returns)
-- Session recording (other tools do this better)
+**Setup Instructions:**
+- Step-by-step wizard with screenshots
+- Cost information upfront ($0.01-0.10 per AI request)
+- Direct links to provider dashboard pages
 
 ### Architecture Approach
 
-The architecture should use a hybrid Portal + BroadcastChannel pattern. React Portal provides automatic state sharing through the component tree during normal operation, while BroadcastChannel provides resilience for reconnection scenarios and works even if the window reference is lost. The student view should be a standalone route (`/student`) that loads its own CSS, eliminating style injection complexity.
+```
+contexts/
+  SettingsContext.tsx      # API keys, preferences, localStorage sync
 
-**Major components:**
-1. **PresentationController** — Owns state (currentIndex, visibleBullets), orchestrates sync via BroadcastChannel
-2. **StudentWindowManager** — Handles window lifecycle, style sync, display detection with graceful fallback
-3. **TeacherView** — Controls, notes, previews in main window
-4. **StudentView** — Pure presentation component, receives state via props/channel
+services/
+  ai/
+    types.ts               # AIProvider interface
+    index.ts               # Factory + singleton
+    providers/
+      gemini.ts            # Existing wrapped
+      anthropic.ts         # Future
+      openai.ts            # Future
+  fileService.ts           # savePiPi(), loadPiPi() with JSZip
+```
+
+**File format (.pipi):**
+```
+presentation.pipi (ZIP)
+├── manifest.json          # Version, metadata
+├── slides.json            # Slide data
+├── settings.json          # Preferences captured at save
+└── assets/
+    └── slide-0-image.jpg  # Binary images
+```
 
 ### Critical Pitfalls
 
-1. **Popup blockers silently block window.open()** — Call `window.open()` synchronously in click handler, never in `useEffect`. Detect `null` return and show instructions.
+| Priority | Pitfall | Impact | Mitigation |
+|----------|---------|--------|------------|
+| 1 | GitHub Pages base path | Blank page on deploy | Set `base: '/repo-name/'` in vite.config.ts |
+| 2 | XSS exposes API keys | Key theft | Security warning modal, clear-data button |
+| 3 | Memory exhaustion | Save fails silently | Size validation, 50MB warning |
+| 4 | Rate limit format differences | Retry loops | Provider-specific error parsers |
+| 5 | Cryptic errors | User abandonment | Error message translation layer |
 
-2. **Window reference lost after open** — Use BroadcastChannel for all communication instead of relying on window references. Implement heartbeat/ping to detect disconnection.
+### Repository Name Issue
 
-3. **Window Management API only works in Chromium** — Feature-detect with `'getScreenDetails' in window`, provide manual positioning fallback for Firefox/Safari with clear "drag to projector" instructions.
-
-4. **Teachers confused by permission prompts** — Show explanation UI ("permission priming") before browser prompt. Provide recovery instructions when permission denied.
-
-5. **Fullscreen exits unexpectedly** — Design student view to look good at any size, not just fullscreen. Add "restore fullscreen" button that appears when fullscreen is lost.
+Current repo "DEV - PiPi" has spaces, which complicates GitHub Pages URLs. Recommend renaming to `pipi` or `lessonlens` for cleaner deployment.
 
 ## Implications for Roadmap
 
-Based on research, suggested phase structure:
+**Suggested phases based on dependencies:**
 
-### Phase 1: Foundation (Popup Fix + Communication)
-**Rationale:** The popup blocker issue is blocking all dual-window functionality. This must be fixed first. BroadcastChannel communication provides the foundation for everything else.
-**Delivers:** Working dual-window with reliable sync
-**Addresses:** Table stakes—separate teacher/student displays, sync between windows
-**Avoids:** Pitfalls 1 (popup blockers), 2 (lost window reference), 11 (BroadcastChannel memory leaks), 12 (style copying fails)
+1. **Settings & API Key Runtime** — Foundation for everything else
+   - SettingsContext + localStorage sync
+   - API key input UI with verification
+   - Remove build-time API key injection
 
-Key tasks:
-- Move `window.open()` into click handler (synchronous)
-- Create `/student` route as standalone view with its own CSS
-- Implement BroadcastChannel sync service with proper cleanup
-- Add popup blocked detection with user-friendly fallback (show URL to open manually)
-- Add heartbeat mechanism for connection status
+2. **Multi-Provider AI Abstraction** — Depends on Phase 1 for keys
+   - Provider interface + factory
+   - Wrap existing Gemini code
+   - Error normalization layer
 
-### Phase 2: Window Management Enhancement
-**Rationale:** After basic dual-window works everywhere, add Chromium-only enhancements for automatic display targeting. Non-Chromium users continue using Phase 1 functionality.
-**Delivers:** Auto-detect projector, one-click display targeting for Chrome/Edge users
-**Uses:** Window Management API with feature detection
-**Avoids:** Pitfall 3 (browser support gap), 4 (permission confusion), 8 (screen position unreliability)
+3. **File Save/Load** — Independent, can parallel with Phase 2
+   - JSZip integration
+   - .pipi format with manifest versioning
+   - Save/load UI with feedback
 
-Key tasks:
-- Add feature detection for Window Management API
-- Create permission priming UI explaining why permission is needed
-- Implement `getScreenDetails()` to find secondary displays
-- Add display picker UI when multiple externals detected
-- Graceful fallback with "drag to projector" instructions
-
-### Phase 3: UX Polish
-**Rationale:** With reliable dual-window working, add quality-of-life features that teachers expect from presentation tools.
-**Delivers:** Timer, clicker support, fullscreen management, next slide preview
-**Addresses:** Missing table stakes (timer), should-haves (clicker, preview)
-**Avoids:** Pitfall 5 (fullscreen exit), 9 (resolution mismatch), 10 (focus stealing)
-
-Key tasks:
-- Add elapsed timer to presenter view header
-- Add Page Up/Down keyboard support for presenter remotes
-- Add next slide visual preview thumbnail
-- Add "restore fullscreen" button when fullscreen exits
-- Design student view responsively for various projector resolutions
-
-### Phase Ordering Rationale
-
-- **Phase 1 before Phase 2:** Window Management API is useless if the basic popup doesn't work. Fix the foundation first.
-- **Phase 2 before Phase 3:** Display targeting improves the core dual-window experience; timer/clicker are conveniences.
-- **BroadcastChannel in Phase 1:** This is the communication backbone. Everything else depends on reliable cross-window sync.
-- **Standalone student route in Phase 1:** Eliminates multiple pitfalls (style copying, popup recovery) and enables manual URL fallback when popups blocked.
-
-### Research Flags
-
-Phases likely needing deeper research during planning:
-- **Phase 1:** BroadcastChannel message protocol design—define message types and state recovery flow before implementation
-- **Phase 2:** Window Management API permission flow—test actual browser behavior for permission priming
-
-Phases with standard patterns (skip research-phase):
-- **Phase 3:** Timer, keyboard shortcuts, fullscreen handling—all well-documented, established patterns
+4. **GitHub Pages Deployment** — Infrastructure, build last
+   - Vite base path config
+   - GitHub Actions workflow
+   - Cache-busting meta tags
 
 ## Confidence Assessment
 
 | Area | Confidence | Notes |
 |------|------------|-------|
-| Stack | HIGH | All APIs verified via MDN, Chrome DevDocs, Can I Use |
-| Features | HIGH | Verified against PowerPoint, Google Slides, reveal.js documentation |
-| Architecture | HIGH | BroadcastChannel well-documented; Portal pattern established; Window Management API has Chrome DevRel examples |
-| Pitfalls | HIGH | Root cause of popup issue identified via MDN User Activation docs; all pitfalls sourced from official documentation |
+| JSZip file format | HIGH | Mature library, well-documented |
+| Multi-provider abstraction | HIGH | Vercel AI SDK pattern proven |
+| localStorage API keys | HIGH | Standard BYOK pattern |
+| GitHub Pages deployment | HIGH | Official Vite documentation |
+| XSS security | MEDIUM | Can't fully prevent, only mitigate |
 
 **Overall confidence:** HIGH
 
-### Gaps to Address
+### Gaps Remaining
 
-- **Safari user activation timing:** Safari has stricter ~1 second window vs Chrome/Firefox ~5 seconds. May need testing on actual Safari to validate timing assumptions.
-- **React 18+ portal quirks:** Some community reports of undocumented behavior with portals to external windows. Monitor during implementation.
-- **CSS-in-JS edge cases:** Current app uses Tailwind CDN which simplifies style handling, but if build tooling changes, style injection may need revisiting.
+1. **Repository rename decision** — Spaces in name cause URL complications
+2. **Claude image generation fallback** — Claude doesn't generate images, need fallback to Gemini
+3. **sessionStorage vs localStorage** — Should keys clear on tab close? UX vs security tradeoff
 
 ## Sources
 
 ### Primary (HIGH confidence)
-- [MDN: Window Management API](https://developer.mozilla.org/en-US/docs/Web/API/Window_Management_API)
-- [MDN: BroadcastChannel API](https://developer.mozilla.org/en-US/docs/Web/API/Broadcast_Channel_API)
-- [MDN: User Activation](https://developer.mozilla.org/en-US/docs/Web/Security/User_activation)
-- [MDN: window.open()](https://developer.mozilla.org/en-US/docs/Web/API/Window/open)
-- [Chrome Developers: Window Management](https://developer.chrome.com/docs/capabilities/web-apis/window-management)
-- [Can I Use: BroadcastChannel](https://caniuse.com/broadcastchannel) — 95.8% global support
-- [Can I Use: window-management](https://caniuse.com/mdn-api_permissions_permission_window-management) — ~30% global support
+- [JSZip Official Documentation](https://stuk.github.io/jszip/)
+- [Vite Static Deploy Guide](https://vite.dev/guide/static-deploy)
+- [OpenAI Error Codes](https://platform.openai.com/docs/guides/error-codes)
+- [Anthropic Rate Limits](https://docs.anthropic.com/en/api/rate-limits)
+- [MDN Blob API](https://developer.mozilla.org/en-US/docs/Web/API/Blob)
 
 ### Secondary (MEDIUM confidence)
-- [Microsoft Support: PowerPoint Presenter View](https://support.microsoft.com/en-us/office/use-presenter-view-in-powerpoint-fe7638e4-76fb-4349-8d81-5eb6679f49d7)
-- [Google Docs Editors Help: Present Slides](https://support.google.com/docs/answer/1696787)
-- [reveal.js: Speaker View](https://revealjs.com/speaker-view/)
-- [web.dev: Permission UX](https://web.dev/push-notifications-permissions-ux/)
-- [React: createPortal](https://react.dev/reference/react-dom/createPortal)
-
-### Tertiary (LOW confidence)
-- Community reports of React 18 portal behavior in external windows — needs validation during implementation
+- [Vercel AI SDK Documentation](https://ai-sdk.dev/docs/introduction)
+- [Carbon Design System - API Key Patterns](https://carbondesignsystem.com/community/patterns/generate-an-api-key/)
+- [Smashing Magazine - Disabled States UX](https://www.smashingmagazine.com/2024/05/hidden-vs-disabled-ux/)
+- [OWASP HTML5 Security Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/HTML5_Security_Cheat_Sheet.html)
 
 ---
-*Research completed: 2026-01-18*
-*Ready for roadmap: yes*
-
----
-
-## v1.2 Permission Flow Fix Research
-
-**Updated:** 2026-01-18
-**Scope:** Fix race condition in Window Management API permission flow
-**Confidence:** HIGH
-
-### Executive Summary
-
-The v1.2 milestone addresses a race condition in the permission flow for the Window Management API. The `useWindowManagement` hook initializes `permissionState` as `'unavailable'`, then runs an async permission query. By the time the query resolves to `'prompt'`, the consumer's useEffect in PresentationView has already run with the stale initial value, causing the `PermissionExplainer` component to never appear.
-
-**The fix is conceptually simple:** distinguish "haven't checked yet" from "checked and not available" by adding explicit loading state. This allows consumers to wait for the definitive permission state before making UI decisions.
-
-**No new dependencies required.** This is a pattern change within the existing React 19 codebase using discriminated unions for state management.
-
-### Key Findings by Dimension
-
-#### From STACK.md (Async Permission State Patterns)
-
-**Recommended pattern: Five-state discriminated union**
-
-```typescript
-type PermissionState =
-  | 'loading'      // Async check in progress
-  | 'prompt'       // Permission available to request
-  | 'granted'      // Permission granted
-  | 'denied'       // Permission denied
-  | 'unavailable'; // API not supported (permanent)
-```
-
-**Why this works:**
-- `'loading'` is immediately distinguishable from `'unavailable'`
-- Consumers can show spinner/nothing during `'loading'`
-- PermissionExplainer only shows when state is definitively `'prompt'`
-- No race condition because initial `'loading'` prevents premature decisions
-
-**Alternatives considered:**
-- `useSyncExternalStore`: MEDIUM confidence, adds complexity for marginal benefit
-- React 19 `use()` hook: NOT recommended, wrong fit for this use case
-- Separate `isLoading` boolean: Works but less explicit than union
-
-#### From FEATURES.md (Permission UX)
-
-**Current anti-patterns identified:**
-| Anti-Feature | Why Bad | PiPi Status |
-|--------------|---------|-------------|
-| Prompt on page load | No context = 88%+ denial | DOING THIS |
-| Permission without user activation | 3x lower accept rates | DOING THIS |
-| Auto-dismissing permission UI | Users miss it if distracted | DOING THIS |
-
-**Recommended flow:**
-1. **Detection (Silent):** Check `screen.isExtended` and permission state on mount, DO NOT show any UI
-2. **Action Initiation (User Click):** When user clicks "Launch Student", show PermissionExplainer if state is `'prompt'`
-3. **Feedback (Post-Action):** Toast confirming where window opened
-
-**Key insight from Chrome data:** 77% of permission prompts shown without user interaction result in only 12% acceptance. Timing matters.
-
-#### From ARCHITECTURE.md (Component Structure)
-
-**Recommended hook interface:**
-```typescript
-export interface UseWindowManagementResult {
-  isSupported: boolean;
-  hasMultipleScreens: boolean;
-  isLoading: boolean;           // NEW: true until async completes
-  permissionState: 'prompt' | 'granted' | 'denied' | null;  // null = not applicable
-  secondaryScreen: ScreenTarget | null;
-  requestPermission: () => Promise<boolean>;
-}
-```
-
-**UI gating strategy:**
-
-| isLoading | permissionState | Launch Button | PermissionExplainer |
-|-----------|-----------------|---------------|---------------------|
-| true | any | Disabled/"Checking..." | Hidden |
-| false | null (single screen) | Enabled, normal | Hidden |
-| false | 'prompt' | Enabled | Visible |
-| false | 'granted' | Enabled, shows screen name | Hidden |
-| false | 'denied' | Enabled | Hidden (show recovery hint) |
-
-**Remove the race-condition useEffect:**
-```typescript
-// REMOVE this useEffect:
-useEffect(() => {
-  if (isSupported && hasMultipleScreens && permissionState === 'prompt') {
-    setShowPermissionExplainer(true);
-  }
-}, [isSupported, hasMultipleScreens, permissionState]);
-
-// REPLACE with direct conditional render:
-{!isLoading && isSupported && hasMultipleScreens && permissionState === 'prompt' && (
-  <PermissionExplainer ... />
-)}
-```
-
-#### From PITFALLS.md (Permission-Specific Risks)
-
-**Top 5 pitfalls for v1.2:**
-
-| Priority | Pitfall | Impact | Mitigation |
-|----------|---------|--------|------------|
-| 1 | Race condition on initial render | Permission UI never appears | Add `isLoading` state, gate UI decisions |
-| 2 | Chrome chip auto-dismisses (12s) | Teacher misses prompt entirely | In-page priming UI before browser prompt |
-| 3 | No feedback on button | User doesn't know feature state | Dynamic button label reflecting permission |
-| 4 | No recovery after dismiss | Feature appears permanently broken | Recovery instructions for denied state |
-| 5 | User gesture required for getScreenDetails() | Silent failure | Call API synchronously in click handler |
-
-**Critical code pattern:**
-```typescript
-// BAD: Called outside click handler
-useEffect(() => {
-  window.getScreenDetails(); // Will defer, not prompt
-}, []);
-
-// GOOD: Synchronous call in click handler
-const handleClick = () => {
-  window.getScreenDetails()
-    .then(details => { /* use details */ })
-    .catch(err => { /* handle denial */ });
-};
-```
-
-### Recommended Implementation Approach
-
-**Phase 1: Hook Changes (useWindowManagement.ts)**
-1. Add `isLoading` state, initialize to `true`
-2. Change `permissionState` initial value from `'unavailable'` to `'loading'` (or use union with null)
-3. Set `isLoading = false` after:
-   - API not supported (immediately)
-   - Single screen detected (immediately)
-   - Permission query completes (after async)
-   - Permission query fails (catch block)
-4. Return `isLoading` in hook result
-
-**Phase 2: Consumer Changes (PresentationView.tsx)**
-1. Destructure `isLoading` from `useWindowManagement()`
-2. Remove the problematic useEffect that sets `showPermissionExplainer`
-3. Replace with direct conditional render gated by `!isLoading`
-4. Optionally disable "Launch Student" button while `isLoading`
-5. Update button text to show loading state: "Checking displays..."
-
-**Phase 3: Optional Enhancements**
-- Track `showPermissionExplainerDismissed` state for "Skip" functionality
-- Add dynamic button label reflecting permission state
-- Add recovery hint link for denied state
-
-### Confidence Assessment
-
-| Area | Confidence | Notes |
-|------|------------|-------|
-| Root cause diagnosis | HIGH | Code paths traced, race condition clearly identified |
-| Discriminated union pattern | HIGH | React official docs, TkDodo, Steve Kinney |
-| Loading state approach | HIGH | Standard async React pattern, MDN verified |
-| Consumer fix | HIGH | Direct conditional render eliminates race |
-
-**Overall v1.2 confidence:** HIGH
-
-### Gaps Remaining
-
-1. **Exact timing of initial `isLoading` flip:** Should happen synchronously for unsupported browsers, need to verify feature detection is sync
-2. **Permission change listener cleanup:** Ensure `status.onchange` is properly cleaned up on unmount
-3. **Edge case: API supported but permission query throws:** Need defensive handling in catch block
-
-### v1.2 Sources
-
-**Official Documentation (HIGH):**
-- [React useState documentation](https://react.dev/reference/react/useState)
-- [React useEffect documentation](https://react.dev/reference/react/useEffect)
-- [MDN: Using the Permissions API](https://developer.mozilla.org/en-US/docs/Web/API/Permissions_API/Using_the_Permissions_API)
-
-**Community Best Practices (MEDIUM):**
-- [Max Rozen - Fixing Race Conditions in React](https://maxrozen.com/race-conditions-fetching-data-react-with-useeffect)
-- [TkDodo - Things to know about useState](https://tkdodo.eu/blog/things-to-know-about-use-state)
-- [Steve Kinney - Loading States and Error Handling](https://stevekinney.com/courses/react-typescript/loading-states-error-handling)
-- [web.dev: Permissions Best Practices](https://web.dev/articles/permissions-best-practices)
-
----
-*v1.2 research completed: 2026-01-18*
+*Research completed: 2026-01-19*
 *Ready for requirements: yes*
