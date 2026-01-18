@@ -232,6 +232,14 @@ const PresentationView: React.FC<PresentationViewProps> = ({ slides, onExit, stu
   } = useWindowManagement();
   const [showPermissionExplainer, setShowPermissionExplainer] = useState(false);
 
+  // Helper function for permission-aware button label
+  const getLaunchButtonLabel = (): string => {
+    if (isLoading) return 'Checking displays...';
+    if (isConnected) return 'Student Active';
+    if (permissionState === 'granted') return 'Launch → External Display';
+    return 'Launch Student View';
+  };
+
   const currentSlide = slides[currentIndex];
   const totalBullets = currentSlide.content.length;
 
@@ -472,13 +480,7 @@ const PresentationView: React.FC<PresentationViewProps> = ({ slides, onExit, stu
                        : 'bg-slate-700 text-slate-300 hover:bg-slate-600 border-slate-600'
                  }`}
                >
-                 {isLoading
-                   ? 'Checking displays...'
-                   : secondaryScreen
-                     ? `Launch on ${secondaryScreen.label}`
-                     : isConnected
-                       ? 'Student Active'
-                       : 'Launch Student'}
+                 {getLaunchButtonLabel()}
                </button>
                {/* Permission Explainer - shown before first launch on Chromium multi-screen */}
                {showPermissionExplainer && (
