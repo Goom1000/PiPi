@@ -47,8 +47,8 @@ Requirements for Permission Flow Fix milestone.
 **Coverage:**
 - v1.2 requirements: 6 total
 - Mapped to phases: 6
-- Unmapped: 0 ✓
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-01-18*
-*Last updated: 2026-01-18 after initial definition*
+*Last updated: 2026-01-18 — roadmap traceability confirmed*
