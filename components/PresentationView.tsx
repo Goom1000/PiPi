@@ -502,15 +502,14 @@ const PresentationView: React.FC<PresentationViewProps> = ({ slides, onExit, stu
                  )}
                  {getLaunchButtonLabel()}
                </button>
-               {/* Permission Explainer - shown before first launch on Chromium multi-screen */}
-               {showPermissionExplainer && (
-                 <PermissionExplainer
-                   onRequestPermission={async () => {
-                     await requestPermission();
-                     setShowPermissionExplainer(false);
-                   }}
-                   onSkip={() => setShowPermissionExplainer(false)}
-                 />
+               {/* Permission request link - only when prompt state and multi-screen */}
+               {!isLoading && permissionState === 'prompt' && hasMultipleScreens && !isConnected && (
+                 <button
+                   onClick={requestPermission}
+                   className="text-xs text-blue-400 hover:text-blue-300 underline transition-colors ml-2"
+                 >
+                   Enable auto-placement
+                 </button>
                )}
 
                {/* Manual Guide - shown for non-Chromium OR permission denied (but NOT when popup blocked) */}
