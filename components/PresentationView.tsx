@@ -418,6 +418,7 @@ const PresentationView: React.FC<PresentationViewProps> = ({ slides, onExit, stu
                  nextSlide={nextSlide}
                  isVisible={showPreview}
                  onToggle={() => setShowPreview(prev => !prev)}
+                 slides={slides}
                />
 
                {/* QUIZ BUTTON */}

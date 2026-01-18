@@ -2,11 +2,13 @@ import React from 'react';
 import { createPortal } from 'react-dom';
 import { Slide } from '../types';
 import FloatingWindow from './FloatingWindow';
+import { usePreviewPersistence } from '../hooks/usePreviewPersistence';
 
 interface NextSlidePreviewProps {
   nextSlide: Slide | null;
   isVisible: boolean;
   onToggle: () => void;
+  slides: Slide[]; // Needed to derive presentationId from slides[0].id
 }
 
 /**
@@ -18,15 +20,25 @@ const NextSlidePreview: React.FC<NextSlidePreviewProps> = ({
   nextSlide,
   isVisible,
   onToggle,
+  slides,
 }) => {
-  // Calculate default position (bottom-right area of viewport)
-  // Using function to get current viewport size at render time
-  const getDefaultPosition = () => ({
+  // Derive presentation ID from first slide for per-presentation persistence
+  const presentationId = slides.length > 0 ? slides[0].id : 'default';
+
+  // Default values for new presentations
+  const defaultState = {
     x: Math.max(0, window.innerWidth - 220),
     y: Math.max(0, window.innerHeight - 200),
-  });
+    width: 200,
+    height: 150,
+    snapEnabled: false,
+  };
 
-  const defaultSize = { width: 200, height: 150 };
+  // Persistence hook - saves position, size, and snap state to localStorage
+  const [previewState, updatePreviewState] = usePreviewPersistence(
+    presentationId,
+    defaultState
+  );
 
   return (
     <>
@@ -43,8 +55,14 @@ const NextSlidePreview: React.FC<NextSlidePreviewProps> = ({
       {isVisible &&
         createPortal(
           <FloatingWindow
-            defaultPosition={getDefaultPosition()}
-            defaultSize={defaultSize}
+            defaultPosition={{ x: previewState.x, y: previewState.y }}
+            defaultSize={{ width: previewState.width, height: previewState.height }}
+            position={{ x: previewState.x, y: previewState.y }}
+            size={{ width: previewState.width, height: previewState.height }}
+            onPositionChange={(pos) => updatePreviewState({ x: pos.x, y: pos.y })}
+            onSizeChange={(size) => updatePreviewState({ width: size.width, height: size.height })}
+            snapEnabled={previewState.snapEnabled}
+            onSnapToggle={() => updatePreviewState({ snapEnabled: !previewState.snapEnabled })}
             minWidth={200}
             minHeight={150}
             aspectRatio={16 / 9}
