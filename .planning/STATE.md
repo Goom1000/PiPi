@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-01-19)
 
 **Core value:** Colleagues can use presentations you create, with optional AI features via their own API keys
-**Current focus:** Phase 3 - Disabled AI State (complete)
+**Current focus:** Phase 4 - Save/Load System (in progress)
 
 ## Current Position
 
-Phase: 3 of 5 (Disabled AI State) ✓ COMPLETE
-Plan: 2/2 complete
-Status: Phase verified, ready for Phase 4
-Last activity: 2026-01-19 — Phase 3 verified and complete
+Phase: 4 of 5 (Save/Load System)
+Plan: 1/3 complete
+Status: In progress
+Last activity: 2026-01-19 — Completed 04-01-PLAN.md
 
-Progress: [██████░░░░] 60%
+Progress: [███████░░░] 70%
 
 ## Performance Metrics
 
@@ -25,11 +25,12 @@ Progress: [██████░░░░] 60%
 - v2.0 Phase 1: 2 plans complete
 - v2.0 Phase 2: 3 plans complete
 - v2.0 Phase 3: 2 plans complete
+- v2.0 Phase 4: 1 plan complete
 
 **Project Totals:**
 - Milestones shipped: 3 (v1.0, v1.1, v1.2)
 - Total phases: 8 (v1.0: 3, v1.1: 2, v1.2: 2, v2.0: 1)
-- Total plans: 19 (14 prior + 5 v2.0)
+- Total plans: 20 (14 prior + 6 v2.0)
 - Total LOC: ~5,400 TypeScript
 
 ## Completed Milestones
@@ -67,6 +68,12 @@ Decisions are logged in PROJECT.md Key Decisions table.
 - Smaller lock icons (w-3 h-3) for Grade buttons in PresentationView
 - onRequestAI callback pattern for child component AI enablement
 
+**v2.0 Phase 4 Decisions:**
+- File version starts at 1, increment on breaking changes
+- JSON pretty-print for human-readable .pipi files
+- 100ms delay before URL.revokeObjectURL (Firefox compatibility)
+- User-friendly error messages for toast display
+
 ### Pending Todos
 
 7 pending - see `.planning/todos/pending/`
@@ -78,10 +85,10 @@ None.
 ## Session Continuity
 
 Last session: 2026-01-19
-Stopped at: Phase 3 verified
+Stopped at: Completed 04-01-PLAN.md
 Resume file: None
-Next: Phase 4 planning (Save/Load System)
+Next: 04-02-PLAN.md (Auto-save system)
 
 ---
 *State initialized: 2026-01-18*
-*Last updated: 2026-01-19 — Phase 3 verified and complete*
+*Last updated: 2026-01-19 — Completed 04-01-PLAN.md*
