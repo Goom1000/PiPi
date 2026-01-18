@@ -227,7 +227,8 @@ const PresentationView: React.FC<PresentationViewProps> = ({ slides, onExit, stu
     hasMultipleScreens,
     permissionState,
     secondaryScreen,
-    requestPermission
+    requestPermission,
+    isLoading
   } = useWindowManagement();
   const [showPermissionExplainer, setShowPermissionExplainer] = useState(false);
 
@@ -240,11 +241,12 @@ const PresentationView: React.FC<PresentationViewProps> = ({ slides, onExit, stu
   }, [currentIndex]);
 
   // Show permission explainer on multi-screen Chromium setup
+  // Only show when NOT loading AND state is definitively 'prompt'
   useEffect(() => {
-    if (isSupported && hasMultipleScreens && permissionState === 'prompt') {
+    if (!isLoading && isSupported && hasMultipleScreens && permissionState === 'prompt') {
       setShowPermissionExplainer(true);
     }
-  }, [isSupported, hasMultipleScreens, permissionState]);
+  }, [isLoading, isSupported, hasMultipleScreens, permissionState]);
 
   // Handle incoming messages (student requesting state)
   useEffect(() => {
@@ -461,18 +463,22 @@ const PresentationView: React.FC<PresentationViewProps> = ({ slides, onExit, stu
                      // Connection state is now derived from heartbeat acknowledgments
                    }
                  }}
-                 disabled={isConnected}
+                 disabled={isLoading || isConnected}
                  className={`px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-colors border ${
-                   isConnected
-                     ? 'bg-green-900/40 text-green-400 border-green-500/50 shadow-[0_0_10px_rgba(34,197,94,0.2)] cursor-not-allowed'
-                     : 'bg-slate-700 text-slate-300 hover:bg-slate-600 border-slate-600'
+                   isLoading
+                     ? 'bg-slate-700 text-slate-400 border-slate-600 cursor-wait'
+                     : isConnected
+                       ? 'bg-green-900/40 text-green-400 border-green-500/50 shadow-[0_0_10px_rgba(34,197,94,0.2)] cursor-not-allowed'
+                       : 'bg-slate-700 text-slate-300 hover:bg-slate-600 border-slate-600'
                  }`}
                >
-                 {secondaryScreen
-                   ? `Launch on ${secondaryScreen.label}`
-                   : isConnected
-                     ? 'Student Active'
-                     : 'Launch Student'}
+                 {isLoading
+                   ? 'Checking displays...'
+                   : secondaryScreen
+                     ? `Launch on ${secondaryScreen.label}`
+                     : isConnected
+                       ? 'Student Active'
+                       : 'Launch Student'}
                </button>
                {/* Permission Explainer - shown before first launch on Chromium multi-screen */}
                {showPermissionExplainer && (
@@ -486,7 +492,7 @@ const PresentationView: React.FC<PresentationViewProps> = ({ slides, onExit, stu
                )}
 
                {/* Manual Guide - shown for non-Chromium OR permission denied (but NOT when popup blocked) */}
-               {hasMultipleScreens && (!isSupported || permissionState === 'denied') && !isConnected && !popupBlocked && (
+               {!isLoading && hasMultipleScreens && (!isSupported || permissionState === 'denied') && !isConnected && !popupBlocked && (
                  <ManualPlacementGuide
                    studentUrl={`${window.location.origin}${window.location.pathname}#/student`}
                  />
