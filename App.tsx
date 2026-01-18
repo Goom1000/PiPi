@@ -63,7 +63,7 @@ function App() {
   }
 
   // Settings and provider
-  const [settings] = useSettings();
+  const [settings, , refreshSettings] = useSettings();
   const [errorModal, setErrorModal] = useState<{ title: string; message: string } | null>(null);
 
   // Create provider instance (memoized to avoid recreation on every render)
@@ -389,7 +389,12 @@ function App() {
         )}
 
         {showSettings && (
-            <SettingsModal onClose={() => setShowSettings(false)} />
+            <SettingsModal onClose={() => {
+              setShowSettings(false);
+              // Re-read settings from localStorage after modal closes
+              // This ensures App.tsx picks up any changes saved by the modal
+              refreshSettings();
+            }} />
         )}
 
         {appState === AppState.INPUT && (

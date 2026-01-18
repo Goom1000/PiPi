@@ -12,7 +12,8 @@ function isValidSettings(data: unknown): data is Settings {
   const obj = data as Record<string, unknown>;
 
   // Validate provider is one of the allowed values
-  const validProviders: AIProvider[] = ['gemini', 'openai', 'claude'];
+  // Note: OpenAI removed - doesn't support browser CORS
+  const validProviders: AIProvider[] = ['gemini', 'claude'];
   if (!validProviders.includes(obj.provider as AIProvider)) return false;
 
   // Validate apiKey is a string
@@ -22,34 +23,41 @@ function isValidSettings(data: unknown): data is Settings {
 }
 
 /**
+ * Read settings from localStorage with validation.
+ * Exported for use outside the hook (e.g., refresh from other components).
+ */
+export function readSettingsFromStorage(): Settings {
+  if (typeof window === 'undefined') return DEFAULT_SETTINGS;
+
+  try {
+    const stored = window.localStorage.getItem(STORAGE_KEY);
+    if (stored) {
+      const parsed = JSON.parse(stored);
+      // Validate parsed data has expected shape
+      if (isValidSettings(parsed)) {
+        // Merge with defaults (in case schema evolved)
+        return { ...DEFAULT_SETTINGS, ...parsed };
+      }
+    }
+  } catch (e) {
+    console.warn('Failed to parse settings from localStorage:', e);
+  }
+  return DEFAULT_SETTINGS;
+}
+
+/**
  * Hook to persist application settings (provider, API key) to localStorage.
  *
  * - Loads from localStorage on mount with validation
  * - Saves on every state change
  * - Handles corrupted data gracefully by falling back to defaults
+ * - Provides refreshSettings() to re-read from localStorage (useful after modal saves)
  *
- * @returns Tuple of [settings, updateSettings function]
+ * @returns Tuple of [settings, updateSettings, refreshSettings]
  */
-export function useSettings(): [Settings, (updates: Partial<Settings>) => void] {
+export function useSettings(): [Settings, (updates: Partial<Settings>) => void, () => void] {
   // Lazy initialization from localStorage
-  const [settings, setSettings] = useState<Settings>(() => {
-    if (typeof window === 'undefined') return DEFAULT_SETTINGS;
-
-    try {
-      const stored = window.localStorage.getItem(STORAGE_KEY);
-      if (stored) {
-        const parsed = JSON.parse(stored);
-        // Validate parsed data has expected shape
-        if (isValidSettings(parsed)) {
-          // Merge with defaults (in case schema evolved)
-          return { ...DEFAULT_SETTINGS, ...parsed };
-        }
-      }
-    } catch (e) {
-      console.warn('Failed to parse settings from localStorage:', e);
-    }
-    return DEFAULT_SETTINGS;
-  });
+  const [settings, setSettings] = useState<Settings>(readSettingsFromStorage);
 
   // Save to localStorage whenever settings change
   useEffect(() => {
@@ -65,7 +73,13 @@ export function useSettings(): [Settings, (updates: Partial<Settings>) => void] 
     setSettings(prev => ({ ...prev, ...updates }));
   }, []);
 
-  return [settings, updateSettings];
+  // Refresh settings by re-reading from localStorage
+  // Use this when another component (like SettingsModal) may have saved directly
+  const refreshSettings = useCallback(() => {
+    setSettings(readSettingsFromStorage());
+  }, []);
+
+  return [settings, updateSettings, refreshSettings];
 }
 
 /**
