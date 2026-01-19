@@ -1,7 +1,7 @@
 
 import React, { useState, useCallback, useMemo, useRef, useEffect } from 'react';
 import { Slide, AppState } from './types';
-import { createAIProvider, AIProviderError, AIProviderInterface } from './services/aiProvider';
+import { createAIProvider, AIProviderError, AIProviderInterface, GenerationInput, GenerationMode } from './services/aiProvider';
 import { useSettings } from './hooks/useSettings';
 import { exportToPowerPoint } from './services/pptxService';
 import { createPiPiFile, downloadPresentation, checkFileSize } from './services/saveService';
@@ -265,9 +265,16 @@ function App() {
     setError(null);
 
     try {
-      // Phase 8: Pass existing behavior for lesson content
-      // Phase 9 will differentiate by uploadMode and use existingPptImages/existingPptText
-      const generatedSlides = await provider.generateLessonSlides(lessonText, pageImages);
+      // Build GenerationInput based on uploadMode
+      const generationInput: GenerationInput = {
+        lessonText: lessonText,
+        lessonImages: pageImages.length > 0 ? pageImages : undefined,
+        presentationText: existingPptText || undefined,
+        presentationImages: existingPptImages.length > 0 ? existingPptImages : undefined,
+        mode: uploadMode as GenerationMode, // Safe cast - we guard against 'none' above
+      };
+
+      const generatedSlides = await provider.generateLessonSlides(generationInput);
       setSlides(generatedSlides);
       setLessonTitle(generatedSlides[0]?.title || "New Lesson");
       setActiveSlideIndex(0);
