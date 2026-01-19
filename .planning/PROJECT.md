@@ -54,7 +54,13 @@ Students see only the presentation; teachers see the presentation plus a telepro
 
 ### Active
 
-(None — waiting for next milestone definition)
+**v2.1 Landing Page & Branding**
+
+- [ ] "Load Presentation" button on landing page alongside PDF upload
+- [ ] Drag-and-drop .pipi files on landing page → auto-loads to editor
+- [ ] Replace LessonLens branding with PiPi logo (PNG)
+- [ ] Update browser tab title to "PiPi"
+- [ ] Update footer/watermark from "LessonLens" to "PiPi"
 
 ### Deferred (v2.1+)
 
@@ -140,4 +146,4 @@ v2.0 delivered shareable presentations:
 | GitHub Actions v4 | Stable action version, v6 doesn't exist | ✓ Good — v2.0 |
 
 ---
-*Last updated: 2026-01-19 after v2.0 milestone completion*
+*Last updated: 2026-01-19 after v2.1 milestone definition*
