@@ -6,11 +6,17 @@ import React, { useEffect, useState, useCallback } from 'react';
 
 export type ToastVariant = 'success' | 'error' | 'warning' | 'info';
 
+export interface ToastAction {
+  label: string;
+  onClick: () => void;
+}
+
 export interface ToastData {
   id: string;
   message: string;
   duration: number;
   variant?: ToastVariant;
+  action?: ToastAction;
 }
 
 // ============================================================================
@@ -24,9 +30,14 @@ export interface ToastData {
 export function useToast() {
   const [toasts, setToasts] = useState<ToastData[]>([]);
 
-  const addToast = useCallback((message: string, duration: number = 3000, variant?: ToastVariant) => {
+  const addToast = useCallback((
+    message: string,
+    duration: number = 3000,
+    variant?: ToastVariant,
+    action?: ToastAction
+  ) => {
     const id = crypto.randomUUID();
-    setToasts((prev) => [...prev, { id, message, duration, variant }]);
+    setToasts((prev) => [...prev, { id, message, duration, variant, action }]);
   }, []);
 
   const removeToast = useCallback((id: string) => {
@@ -45,6 +56,7 @@ interface ToastProps {
   duration: number;
   onDismiss: () => void;
   variant?: ToastVariant;
+  action?: ToastAction;
 }
 
 /**
@@ -73,8 +85,9 @@ function getVariantClasses(variant?: ToastVariant): string {
 /**
  * Single toast notification that auto-dismisses after duration.
  * Supports success (green), error (red), warning (amber), and info (gray) variants.
+ * Optionally displays an action button (e.g., for undo functionality).
  */
-export const Toast: React.FC<ToastProps> = ({ message, duration, onDismiss, variant }) => {
+export const Toast: React.FC<ToastProps> = ({ message, duration, onDismiss, variant, action }) => {
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
@@ -94,15 +107,30 @@ export const Toast: React.FC<ToastProps> = ({ message, duration, onDismiss, vari
     };
   }, [duration, onDismiss]);
 
+  const handleActionClick = () => {
+    if (action) {
+      action.onClick();
+      onDismiss();
+    }
+  };
+
   return (
     <div
       className={`
         ${getVariantClasses(variant)} px-4 py-2 rounded-lg shadow-lg
-        transition-opacity duration-200
+        transition-opacity duration-200 flex items-center gap-3
         ${isVisible ? 'opacity-100' : 'opacity-0'}
       `}
     >
-      {message}
+      <span>{message}</span>
+      {action && (
+        <button
+          onClick={handleActionClick}
+          className="font-bold underline hover:no-underline"
+        >
+          {action.label}
+        </button>
+      )}
     </div>
   );
 };
@@ -131,6 +159,7 @@ export const ToastContainer: React.FC<ToastContainerProps> = ({ toasts, removeTo
           message={toast.message}
           duration={toast.duration}
           variant={toast.variant}
+          action={toast.action}
           onDismiss={() => removeToast(toast.id)}
         />
       ))}
