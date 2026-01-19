@@ -78,7 +78,7 @@ Summary of key v2.1 decisions:
 
 ### Pending Todos
 
-See `.planning/todos/pending/`
+7 todos in `.planning/todos/pending/` — run `/gsd:check-todos` to review
 
 ### Blockers/Concerns
 
