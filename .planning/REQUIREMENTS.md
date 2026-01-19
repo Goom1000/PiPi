@@ -15,9 +15,9 @@ Requirements for v2.1 Landing Page & Branding milestone.
 
 ### Branding
 
-- [ ] **BRND-01**: Header displays PNG logo instead of "L" icon + "LessonLens" text
-- [ ] **BRND-02**: Browser tab title shows "PiPi"
-- [ ] **BRND-03**: ResourceHub footer/watermark shows "PiPi" instead of "LessonLens"
+- [x] **BRND-01**: Header displays PiPi branding instead of "L" icon + "LessonLens" text
+- [x] **BRND-02**: Browser tab title shows "PiPi"
+- [x] **BRND-03**: ResourceHub footer/watermark shows "PiPi" instead of "LessonLens"
 
 ## v2.2+ Requirements
 
@@ -56,9 +56,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 | LAND-01 | Phase 6 | Complete |
 | LAND-02 | Phase 6 | Complete |
 | LAND-03 | Phase 6 | Complete |
-| BRND-01 | Phase 7 | Pending |
-| BRND-02 | Phase 7 | Pending |
-| BRND-03 | Phase 7 | Pending |
+| BRND-01 | Phase 7 | Complete |
+| BRND-02 | Phase 7 | Complete |
+| BRND-03 | Phase 7 | Complete |
 
 **Coverage:**
 - v2.1 requirements: 6 total
@@ -67,4 +67,4 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 ---
 *Requirements defined: 2026-01-19*
-*Last updated: 2026-01-19 — Phase 6 complete*
+*Last updated: 2026-01-19 — v2.1 complete*
