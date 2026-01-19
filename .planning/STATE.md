@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-01-19)
 
 **Core value:** Colleagues can use presentations you create, with optional AI features via their own API keys
-**Current focus:** Phase 4 - Save/Load System (complete)
+**Current focus:** Phase 5 - GitHub Pages Deployment (complete)
 
 ## Current Position
 
-Phase: 4 of 5 (Save/Load System) ✓ COMPLETE
-Plan: 3/3 complete
-Status: Phase verified, ready for Phase 5
-Last activity: 2026-01-19 — Phase 4 verified and complete
+Phase: 5 of 5 (GitHub Pages Deployment) COMPLETE
+Plan: 1/1 complete
+Status: v2.0 complete - app deployed at https://goom1000.github.io/PiPi/
+Last activity: 2026-01-19 — Phase 5 complete, app deployed
 
-Progress: [████████░░] 80%
+Progress: [██████████] 100%
 
 ## Performance Metrics
 
@@ -26,11 +26,12 @@ Progress: [████████░░] 80%
 - v2.0 Phase 2: 3 plans complete
 - v2.0 Phase 3: 2 plans complete
 - v2.0 Phase 4: 3 plans complete
+- v2.0 Phase 5: 1 plan complete
 
 **Project Totals:**
-- Milestones shipped: 3 (v1.0, v1.1, v1.2)
-- Total phases: 8 (v1.0: 3, v1.1: 2, v1.2: 2, v2.0: 4)
-- Total plans: 22 (14 prior + 10 v2.0 so far)
+- Milestones shipped: 4 (v1.0, v1.1, v1.2, v2.0)
+- Total phases: 9 (v1.0: 3, v1.1: 2, v1.2: 2, v2.0: 5)
+- Total plans: 23 (14 prior + 11 v2.0)
 - Total LOC: ~5,400 TypeScript
 
 ## Completed Milestones
@@ -77,6 +78,11 @@ Decisions are logged in PROJECT.md Key Decisions table.
 - Auto-save uses 30s interval with useRef throttling (no lodash)
 - Separate localStorage keys for auto-save data and timestamp
 
+**v2.0 Phase 5 Decisions:**
+- GitHub Actions setup-node@v4 (v6 does not exist)
+- Vite base path /PiPi/ for subdirectory deployment
+- Type checking included in CI before build
+
 ### Pending Todos
 
 7 pending - see `.planning/todos/pending/`
@@ -88,10 +94,10 @@ None.
 ## Session Continuity
 
 Last session: 2026-01-19
-Stopped at: Phase 4 verified
+Stopped at: v2.0 complete
 Resume file: None
-Next: Phase 5 planning (GitHub Pages Deployment)
+Next: None - v2.0 shipped! App live at https://goom1000.github.io/PiPi/
 
 ---
 *State initialized: 2026-01-18*
-*Last updated: 2026-01-19 — Phase 4 verified and complete*
+*Last updated: 2026-01-19 — v2.0 complete, app deployed to GitHub Pages*
