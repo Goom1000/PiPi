@@ -18,6 +18,7 @@ import EnableAIModal from './components/EnableAIModal';
 import RecoveryModal from './components/RecoveryModal';
 import ClassBankSaveModal from './components/ClassBankSaveModal';
 import ClassBankDropdown from './components/ClassBankDropdown';
+import ClassManagementModal from './components/ClassManagementModal';
 import { useToast, ToastContainer } from './components/Toast';
 import useHashRoute from './hooks/useHashRoute';
 import StudentView from './components/StudentView';
@@ -140,10 +141,11 @@ function App() {
   const [nameInput, setNameInput] = useState('');
 
   // Class Bank state
-  const { classes, saveClass } = useClassBank();
+  const { classes, saveClass, deleteClass, renameClass, updateClassStudents } = useClassBank();
   const [showSaveClassModal, setShowSaveClassModal] = useState(false);
   const [showLoadDropdown, setShowLoadDropdown] = useState(false);
   const [activeClassName, setActiveClassName] = useState<string | null>(null);
+  const [showManageModal, setShowManageModal] = useState(false);
 
   // PDF handling state - Lesson Plan
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
@@ -434,6 +436,55 @@ function App() {
     setActiveClassName(classData.name);
     setShowLoadDropdown(false);
     addToast(`Loaded ${classData.name}`, 3000, 'success');
+  };
+
+  // Handle rename with active class sync
+  const handleRenameClass = (classId: string, newName: string) => {
+    // Find the class being renamed
+    const targetClass = classes.find(c => c.id === classId);
+
+    // If this is the currently active class, update activeClassName
+    if (targetClass && targetClass.name === activeClassName) {
+      setActiveClassName(newName);
+    }
+
+    renameClass(classId, newName);
+  };
+
+  // Handle student update
+  const handleUpdateClassStudents = (classId: string, students: string[]) => {
+    updateClassStudents(classId, students);
+  };
+
+  // Handle delete with toast undo
+  const handleDeleteClass = (classId: string, className: string) => {
+    // Store for potential undo
+    const deletedClass = classes.find(c => c.id === classId);
+
+    // Clear activeClassName if deleting the active class
+    if (className === activeClassName) {
+      setActiveClassName(null);
+    }
+
+    // Delete the class
+    deleteClass(classId);
+
+    // Show toast with undo option
+    addToast(
+      `Deleted "${className}"`,
+      5000,
+      'info',
+      {
+        label: 'Undo',
+        onClick: () => {
+          if (deletedClass) {
+            // Re-save the class (will create with same data)
+            saveClass(deletedClass.name, deletedClass.students);
+            addToast(`Restored "${deletedClass.name}"`, 3000, 'success');
+          }
+        }
+      }
+    );
   };
 
   const startPresentation = (fromIndex: number) => {
@@ -1009,6 +1060,10 @@ function App() {
                       classes={classes}
                       onLoad={handleLoadClassBank}
                       onClose={() => setShowLoadDropdown(false)}
+                      onManage={() => {
+                        setShowLoadDropdown(false);
+                        setShowManageModal(true);
+                      }}
                     />
                   )}
                 </div>
@@ -1260,6 +1315,18 @@ function App() {
           onSave={handleSaveClassBank}
           onClose={() => setShowSaveClassModal(false)}
           existingNames={classes.map(c => c.name)}
+        />
+      )}
+
+      {/* Class Bank Management Modal */}
+      {showManageModal && (
+        <ClassManagementModal
+          classes={classes}
+          onClose={() => setShowManageModal(false)}
+          onRename={handleRenameClass}
+          onUpdateStudents={handleUpdateClassStudents}
+          onDelete={handleDeleteClass}
+          activeClassName={activeClassName}
         />
       )}
 
