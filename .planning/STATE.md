@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-01-19)
 
 **Core value:** Students see only the presentation; teachers see the teleprompter script
-**Current focus:** v2.1 Landing Page & Branding
+**Current focus:** v2.1 Landing Page & Branding - COMPLETE
 
 ## Current Position
 
-Phase: 7 of 7 (Branding)
-Plan: 0 of TBD in current phase
-Status: Ready to plan
-Last activity: 2026-01-19 — Phase 6 verified and complete
+Phase: 7 of 7 (Branding) - COMPLETE
+Plan: 1 of 1 in current phase
+Status: v2.1 Milestone Complete
+Last activity: 2026-01-19 — Completed 07-01-PLAN.md (Brand Implementation)
 
-Progress: [##########] Phase 6 complete, Phase 7 ready to plan
+Progress: [###########] v2.1 complete
 
 ## Performance Metrics
 
@@ -23,15 +23,17 @@ Progress: [##########] Phase 6 complete, Phase 7 ready to plan
 - v1.1: 3 plans, 8 hours
 - v1.2: 5 plans, 1 day
 - v2.0: 11 plans, 1 day
+- v2.1: 2 plans, 1 day
 
 **Project Totals:**
-- Milestones shipped: 4 (v1.0, v1.1, v1.2, v2.0)
-- Total phases: 12 (v1.0: 3, v1.1: 2, v1.2: 2, v2.0: 5)
-- Total plans: 25
+- Milestones shipped: 5 (v1.0, v1.1, v1.2, v2.0, v2.1)
+- Total phases: 14 (v1.0: 3, v1.1: 2, v1.2: 2, v2.0: 5, v2.1: 2)
+- Total plans: 27
 - Total LOC: ~7,000 TypeScript
 
 ## Completed Milestones
 
+- v2.1 Landing Page & Branding (2026-01-19) - 2 phases, 2 plans
 - v2.0 Shareable Presentations (2026-01-19) - 5 phases, 11 plans
 - v1.2 Permission Flow Fix (2026-01-18) - 2 phases, 5 plans
 - v1.1 Draggable Preview Window (2026-01-18) - 2 phases, 3 plans
@@ -55,6 +57,9 @@ Summary of key v2.0 decisions:
 v2.1 decisions:
 - Load button placed left of Generate button (secondary action left, primary right)
 - Hint text uses muted colors with accent-colored .pipi extension
+- Header branding uses styled text with whiteboard icon (not logo image)
+- Default to dark mode on initial load
+- Light mode uses subtle violet-50 background tint
 
 ### Pending Todos
 
@@ -67,10 +72,10 @@ None.
 ## Session Continuity
 
 Last session: 2026-01-19
-Stopped at: Phase 6 verified
+Stopped at: v2.1 milestone complete
 Resume file: None
-Next: /gsd:discuss-phase 7 or /gsd:plan-phase 7
+Next: Plan next milestone or deploy
 
 ---
 *State initialized: 2026-01-18*
-*Last updated: 2026-01-19 — Phase 6 verified, Phase 7 ready*
+*Last updated: 2026-01-19 — v2.1 Landing Page & Branding complete*
