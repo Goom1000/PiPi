@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-01-19)
 ## Current Position
 
 Phase: 9 - AI Adaptation Logic
-Plan: 2 of ? complete
-Status: Phase 9 Plan 2 complete
-Last activity: 2026-01-19 - Completed 09-02-PLAN.md (GeminiProvider modes)
+Plan: 3 of 3 complete (Phase 9 COMPLETE)
+Status: Phase 9 complete, ready for Phase 10
+Last activity: 2026-01-20 - Completed 09-03-PLAN.md (App.tsx wiring + prompt fix)
 
-Progress: [#####-----] 3/4 v2.2 plans complete
+Progress: [######----] 4/6 v2.2 plans complete
 
 ## Performance Metrics
 
@@ -24,13 +24,13 @@ Progress: [#####-----] 3/4 v2.2 plans complete
 - v1.2: 5 plans, 1 day
 - v2.0: 11 plans, 1 day
 - v2.1: 2 plans, 4 hours
-- v2.2: In progress (3 plans, 8 min)
+- v2.2: In progress (4 plans, ~15 min)
 
 **Project Totals:**
 - Milestones shipped: 5 (v1.0, v1.1, v1.2, v2.0, v2.1)
-- Total phases: 14 completed + 4 planned (v2.2)
-- Total plans: 28 (27 + 1 new)
-- Total LOC: ~7,100 TypeScript
+- Total phases: 15 completed + 3 planned (v2.2)
+- Total plans: 31
+- Total LOC: ~7,200 TypeScript
 
 ## Completed Milestones
 
@@ -45,11 +45,9 @@ Progress: [#####-----] 3/4 v2.2 plans complete
 | Phase | Name | Status | Requirements |
 |-------|------|--------|--------------|
 | 8 | Flexible Upload UI | Complete | UPLOAD-01 to UPLOAD-04 |
-| 9 | AI Adaptation Logic | In Progress (2/? plans) | UPLOAD-05 to UPLOAD-07 |
+| 9 | AI Adaptation Logic | Complete (3 plans) | UPLOAD-05 to UPLOAD-07 |
 | 10 | Class Bank Core | Ready | CLASS-01 to CLASS-04 |
 | 11 | Class Management UI | Blocked by 10 | CLASS-05 to CLASS-08 |
-
-Note: Phases 9 and 10 can be worked in parallel (independent feature sets).
 
 ## Accumulated Context
 
@@ -62,6 +60,7 @@ Summary of key v2.2 decisions (Phase 9):
 - Shared prompt constants (TELEPROMPTER_RULES, JSON_OUTPUT_FORMAT) for consistency
 - Blend mode limited to 5 images per source (10 total) for token safety
 - GeminiProvider mirrors Claude prompt structure for consistent behavior
+- Refine mode must preserve ALL content (restructure, don't omit) - user decides what to remove
 
 Summary of key v2.2 decisions (Phase 8):
 - Green theme for lesson PDF upload zone (existing pattern)
@@ -86,11 +85,11 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-01-19 11:44 UTC
-Stopped at: Completed 09-02-PLAN.md
+Last session: 2026-01-20
+Stopped at: Completed 09-03-PLAN.md (Phase 9 complete)
 Resume file: None
-Next: Phase 9 Plan 3 (connect App.tsx upload mode to providers) or Phase 10
+Next: Phase 10 (Class Bank Core)
 
 ---
 *State initialized: 2026-01-18*
-*Last updated: 2026-01-19 - Completed Phase 9 Plan 2*
+*Last updated: 2026-01-20 - Completed Phase 9 (AI Adaptation Logic)*
