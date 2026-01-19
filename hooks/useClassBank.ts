@@ -125,11 +125,49 @@ export function useClassBank() {
     setClasses(readClassesFromStorage());
   }, []);
 
+  /**
+   * Rename a class by its ID.
+   * Name is trimmed before saving. Does nothing if trimmed name is empty.
+   */
+  const renameClass = useCallback((classId: string, newName: string) => {
+    const trimmedName = newName.trim();
+    if (!trimmedName) return;
+
+    setClasses(prev => prev.map(c => {
+      if (c.id === classId) {
+        return {
+          ...c,
+          name: trimmedName,
+          savedAt: new Date().toISOString(),
+        };
+      }
+      return c;
+    }));
+  }, []);
+
+  /**
+   * Update the students array for a class by its ID.
+   */
+  const updateClassStudents = useCallback((classId: string, students: string[]) => {
+    setClasses(prev => prev.map(c => {
+      if (c.id === classId) {
+        return {
+          ...c,
+          students: [...students],
+          savedAt: new Date().toISOString(),
+        };
+      }
+      return c;
+    }));
+  }, []);
+
   return {
     classes,
     saveClass,
     deleteClass,
     getClassByName,
     refreshClasses,
+    renameClass,
+    updateClassStudents,
   };
 }
