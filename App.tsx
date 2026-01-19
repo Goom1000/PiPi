@@ -695,48 +695,126 @@ function App() {
               </div>
               
               <div className="bg-white dark:bg-slate-900 rounded-3xl shadow-2xl dark:shadow-black/50 p-8 border border-slate-200 dark:border-slate-800 animate-fade-in relative z-10 transition-colors duration-300">
-                
-                {/* PDF Uploader Area */}
-                <div 
+
+                {/* Dual Upload Zones */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                  {/* Lesson Plan PDF Upload (green theme) */}
+                  <div
                     onClick={() => fileInputRef.current?.click()}
-                    className={`mb-6 border-2 border-dashed rounded-2xl p-8 flex flex-col items-center justify-center cursor-pointer transition-all ${uploadedFile ? 'border-green-300 bg-green-50 dark:bg-green-900/20 dark:border-green-700' : 'border-slate-200 dark:border-slate-700 hover:border-indigo-400 dark:hover:border-amber-400 hover:bg-slate-50 dark:hover:bg-slate-800'}`}
-                >
-                    <input 
-                        type="file" 
-                        ref={fileInputRef} 
-                        onChange={handleFileChange} 
-                        className="hidden" 
-                        accept=".pdf"
+                    className={`border-2 border-dashed rounded-2xl p-6 flex flex-col items-center justify-center cursor-pointer transition-all min-h-[180px] ${uploadedFile ? 'border-green-300 bg-green-50 dark:bg-green-900/20 dark:border-green-700' : 'border-slate-200 dark:border-slate-700 hover:border-green-400 dark:hover:border-green-500 hover:bg-slate-50 dark:hover:bg-slate-800'}`}
+                  >
+                    <input
+                      type="file"
+                      ref={fileInputRef}
+                      onChange={handleFileChange}
+                      className="hidden"
+                      accept=".pdf"
                     />
-                    
+
                     {isProcessingFile ? (
-                        <div className="flex flex-col items-center animate-pulse">
-                            <div className="w-10 h-10 border-4 border-indigo-600 dark:border-amber-500 border-t-transparent rounded-full animate-spin mb-4"></div>
-                            <p className="text-sm font-bold text-indigo-600 dark:text-amber-500 uppercase tracking-widest">Analyzing Pages...</p>
-                        </div>
+                      <div className="flex flex-col items-center animate-pulse">
+                        <div className="w-10 h-10 border-4 border-green-500 dark:border-green-400 border-t-transparent rounded-full animate-spin mb-3"></div>
+                        <p className="text-sm font-bold text-green-600 dark:text-green-400 uppercase tracking-widest">Analyzing...</p>
+                      </div>
                     ) : uploadedFile ? (
-                        <div className="flex items-center gap-4">
-                            <div className="w-12 h-12 bg-green-500 rounded-xl flex items-center justify-center text-white shadow-lg">
-                                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" /></svg>
-                            </div>
-                            <div>
-                                <p className="font-bold text-slate-800 dark:text-white">{uploadedFile.name}</p>
-                                <p className="text-xs text-green-600 dark:text-green-400 font-medium">Document ready for visual analysis</p>
-                            </div>
-                            <button onClick={(e) => { e.stopPropagation(); setUploadedFile(null); setPageImages([]); }} className="p-2 text-slate-400 hover:text-red-500 transition-colors">
-                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
-                            </button>
+                      <div className="flex flex-col items-center text-center">
+                        <div className="w-12 h-12 bg-green-500 rounded-xl flex items-center justify-center text-white shadow-lg mb-3">
+                          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" /></svg>
                         </div>
+                        <p className="font-bold text-slate-800 dark:text-white text-sm truncate max-w-full px-2">{uploadedFile.name}</p>
+                        <p className="text-xs text-green-600 dark:text-green-400 font-medium mt-1">Lesson plan ready</p>
+                        <button onClick={(e) => { e.stopPropagation(); setUploadedFile(null); setPageImages([]); setLessonText(''); }} className="mt-2 p-1.5 text-slate-400 hover:text-red-500 transition-colors rounded-full hover:bg-red-50 dark:hover:bg-red-900/20">
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+                        </button>
+                      </div>
                     ) : (
-                        <div className="text-center">
-                            <div className="w-16 h-16 bg-indigo-50 dark:bg-slate-800 text-indigo-500 dark:text-amber-500 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                                <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" /></svg>
-                            </div>
-                            <p className="font-bold text-slate-700 dark:text-slate-300">Upload Lesson Document (PDF)</p>
-                            <p className="text-sm text-slate-400 dark:text-slate-500">Best for complex tables and charts</p>
+                      <div className="text-center">
+                        <div className="w-14 h-14 bg-green-50 dark:bg-green-900/30 text-green-500 dark:text-green-400 rounded-2xl flex items-center justify-center mx-auto mb-3">
+                          <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
                         </div>
+                        <p className="font-bold text-slate-700 dark:text-slate-300 text-sm">Lesson Plan PDF</p>
+                        <p className="text-xs text-slate-400 dark:text-slate-500 mt-1">AI creates fresh slides</p>
+                      </div>
                     )}
+                  </div>
+
+                  {/* Existing Presentation PDF Upload (blue theme) */}
+                  <div
+                    onClick={() => existingPptInputRef.current?.click()}
+                    className={`border-2 border-dashed rounded-2xl p-6 flex flex-col items-center justify-center cursor-pointer transition-all min-h-[180px] ${existingPptFile ? 'border-blue-300 bg-blue-50 dark:bg-blue-900/20 dark:border-blue-700' : 'border-slate-200 dark:border-slate-700 hover:border-blue-400 dark:hover:border-blue-500 hover:bg-slate-50 dark:hover:bg-slate-800'}`}
+                  >
+                    <input
+                      type="file"
+                      ref={existingPptInputRef}
+                      onChange={handlePptFileChange}
+                      className="hidden"
+                      accept=".pdf"
+                    />
+
+                    {isProcessingPpt ? (
+                      <div className="flex flex-col items-center animate-pulse">
+                        <div className="w-10 h-10 border-4 border-blue-500 dark:border-blue-400 border-t-transparent rounded-full animate-spin mb-3"></div>
+                        <p className="text-sm font-bold text-blue-600 dark:text-blue-400 uppercase tracking-widest">Analyzing...</p>
+                      </div>
+                    ) : existingPptFile ? (
+                      <div className="flex flex-col items-center text-center">
+                        <div className="w-12 h-12 bg-blue-500 rounded-xl flex items-center justify-center text-white shadow-lg mb-3">
+                          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" /></svg>
+                        </div>
+                        <p className="font-bold text-slate-800 dark:text-white text-sm truncate max-w-full px-2">{existingPptFile.name}</p>
+                        <p className="text-xs text-blue-600 dark:text-blue-400 font-medium mt-1">Presentation ready</p>
+                        <button onClick={(e) => { e.stopPropagation(); setExistingPptFile(null); setExistingPptImages([]); setExistingPptText(''); }} className="mt-2 p-1.5 text-slate-400 hover:text-red-500 transition-colors rounded-full hover:bg-red-50 dark:hover:bg-red-900/20">
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="text-center">
+                        <div className="w-14 h-14 bg-blue-50 dark:bg-blue-900/30 text-blue-500 dark:text-blue-400 rounded-2xl flex items-center justify-center mx-auto mb-3">
+                          <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" /></svg>
+                        </div>
+                        <p className="font-bold text-slate-700 dark:text-slate-300 text-sm">Existing Presentation</p>
+                        <p className="text-xs text-slate-400 dark:text-slate-500 mt-1">PDF export from PowerPoint</p>
+                      </div>
+                    )}
+                  </div>
                 </div>
+
+                {/* Mode Indicator */}
+                {uploadMode !== 'none' && (
+                  <div className={`mb-6 p-4 rounded-xl border ${
+                    uploadMode === 'fresh' ? 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-700' :
+                    uploadMode === 'refine' ? 'bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-700' :
+                    'bg-purple-50 dark:bg-purple-900/20 border-purple-200 dark:border-purple-700'
+                  }`}>
+                    <div className="flex items-center gap-3">
+                      <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${
+                        uploadMode === 'fresh' ? 'bg-green-500 text-white' :
+                        uploadMode === 'refine' ? 'bg-blue-500 text-white' :
+                        'bg-purple-500 text-white'
+                      }`}>
+                        {uploadMode === 'fresh' && <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" /></svg>}
+                        {uploadMode === 'refine' && <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>}
+                        {uploadMode === 'blend' && <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>}
+                      </div>
+                      <div>
+                        <p className={`font-bold text-sm ${
+                          uploadMode === 'fresh' ? 'text-green-700 dark:text-green-300' :
+                          uploadMode === 'refine' ? 'text-blue-700 dark:text-blue-300' :
+                          'text-purple-700 dark:text-purple-300'
+                        }`}>
+                          {uploadMode === 'fresh' && 'Fresh Generation'}
+                          {uploadMode === 'refine' && 'Refine Mode'}
+                          {uploadMode === 'blend' && 'Blend Mode'}
+                        </p>
+                        <p className="text-xs text-slate-600 dark:text-slate-400">
+                          {uploadMode === 'fresh' && 'AI creates new slides from your lesson plan'}
+                          {uploadMode === 'refine' && 'AI enhances your existing presentation'}
+                          {uploadMode === 'blend' && 'AI combines lesson content with your slides'}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
 
                 <div className="relative mb-6">
                     <div className="absolute inset-x-0 top-1/2 h-px bg-slate-100 dark:bg-slate-800 -z-10"></div>
@@ -786,10 +864,10 @@ function App() {
                       onClick={handleGenerate}
                       className={`px-16 py-5 text-xl rounded-2xl shadow-indigo-100 dark:shadow-none ${!provider ? 'opacity-50' : ''}`}
                       isLoading={isGenerating}
-                      disabled={(!lessonText.trim() && pageImages.length === 0) || isGenerating}
+                      disabled={uploadMode === 'none' || isGenerating}
                       title={!provider ? 'Add API key in Settings to enable' : undefined}
                     >
-                      Generate Slideshow
+                      {uploadMode === 'refine' ? 'Refine Presentation' : uploadMode === 'blend' ? 'Enhance Slides' : 'Generate Slideshow'}
                     </Button>
                     {!provider && (
                       <span className="absolute -top-1 -right-1 w-5 h-5 bg-slate-500 dark:bg-slate-600 rounded-full flex items-center justify-center shadow-sm">
