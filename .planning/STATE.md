@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-01-19)
 
 **Core value:** Students see only the presentation; teachers see the teleprompter script
-**Current focus:** Planning next milestone
+**Current focus:** v2.2 Flexible Upload & Class Bank
 
 ## Current Position
 
-Phase: Ready for next milestone
-Plan: N/A
-Status: v2.1 shipped, planning next milestone
-Last activity: 2026-01-19 — v2.1 milestone complete
+Phase: 8 - Flexible Upload UI
+Plan: Not started
+Status: Roadmap created, ready for phase planning
+Last activity: 2026-01-19 — v2.2 roadmap created
 
-Progress: [###########] v2.1 complete
+Progress: [----------] Phase 8 ready
 
 ## Performance Metrics
 
@@ -24,10 +24,11 @@ Progress: [###########] v2.1 complete
 - v1.2: 5 plans, 1 day
 - v2.0: 11 plans, 1 day
 - v2.1: 2 plans, 4 hours
+- v2.2: In progress
 
 **Project Totals:**
-- Milestones shipped: 6 (v1.0, v1.1, v1.2, v2.0, v2.1)
-- Total phases: 14 (v1.0: 3, v1.1: 2, v1.2: 2, v2.0: 5, v2.1: 2)
+- Milestones shipped: 5 (v1.0, v1.1, v1.2, v2.0, v2.1)
+- Total phases: 14 completed + 4 planned (v2.2)
 - Total plans: 27
 - Total LOC: ~7,000 TypeScript
 
@@ -38,6 +39,17 @@ Progress: [###########] v2.1 complete
 - v1.2 Permission Flow Fix (2026-01-18) - 2 phases, 5 plans
 - v1.1 Draggable Preview Window (2026-01-18) - 2 phases, 3 plans
 - v1.0 Dual-Monitor Student View (2026-01-18) - 3 phases, 6 plans
+
+## v2.2 Milestone Progress
+
+| Phase | Name | Status | Requirements |
+|-------|------|--------|--------------|
+| 8 | Flexible Upload UI | Ready | UPLOAD-01 to UPLOAD-04 |
+| 9 | AI Adaptation Logic | Blocked by 8 | UPLOAD-05 to UPLOAD-07 |
+| 10 | Class Bank Core | Ready | CLASS-01 to CLASS-04 |
+| 11 | Class Management UI | Blocked by 10 | CLASS-05 to CLASS-08 |
+
+Note: Phases 8 and 10 can be worked in parallel (independent feature sets).
 
 ## Accumulated Context
 
@@ -62,10 +74,10 @@ None.
 ## Session Continuity
 
 Last session: 2026-01-19
-Stopped at: v2.1 milestone shipped
+Stopped at: v2.2 roadmap created
 Resume file: None
-Next: /gsd:new-milestone to start next milestone
+Next: /gsd:plan-phase 8 (or parallel: phases 8 and 10)
 
 ---
 *State initialized: 2026-01-18*
-*Last updated: 2026-01-19 — v2.1 milestone complete*
+*Last updated: 2026-01-19 — v2.2 roadmap created*

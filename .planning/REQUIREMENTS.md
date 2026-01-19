@@ -52,27 +52,27 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| UPLOAD-01 | TBD | Pending |
-| UPLOAD-02 | TBD | Pending |
-| UPLOAD-03 | TBD | Pending |
-| UPLOAD-04 | TBD | Pending |
-| UPLOAD-05 | TBD | Pending |
-| UPLOAD-06 | TBD | Pending |
-| UPLOAD-07 | TBD | Pending |
-| CLASS-01 | TBD | Pending |
-| CLASS-02 | TBD | Pending |
-| CLASS-03 | TBD | Pending |
-| CLASS-04 | TBD | Pending |
-| CLASS-05 | TBD | Pending |
-| CLASS-06 | TBD | Pending |
-| CLASS-07 | TBD | Pending |
-| CLASS-08 | TBD | Pending |
+| UPLOAD-01 | Phase 8 | Pending |
+| UPLOAD-02 | Phase 8 | Pending |
+| UPLOAD-03 | Phase 8 | Pending |
+| UPLOAD-04 | Phase 8 | Pending |
+| UPLOAD-05 | Phase 9 | Pending |
+| UPLOAD-06 | Phase 9 | Pending |
+| UPLOAD-07 | Phase 9 | Pending |
+| CLASS-01 | Phase 10 | Pending |
+| CLASS-02 | Phase 10 | Pending |
+| CLASS-03 | Phase 10 | Pending |
+| CLASS-04 | Phase 10 | Pending |
+| CLASS-05 | Phase 11 | Pending |
+| CLASS-06 | Phase 11 | Pending |
+| CLASS-07 | Phase 11 | Pending |
+| CLASS-08 | Phase 11 | Pending |
 
 **Coverage:**
 - v1 requirements: 15 total
-- Mapped to phases: 0
-- Unmapped: 15
+- Mapped to phases: 15
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-01-19*
-*Last updated: 2026-01-19 after initial definition*
+*Last updated: 2026-01-19 after roadmap creation*
