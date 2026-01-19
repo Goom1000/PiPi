@@ -1,55 +1,149 @@
 
 import { GoogleGenAI, Type } from "@google/genai";
 import { Slide, LessonResource } from "../types";
+import { GenerationInput, GenerationMode } from './aiProvider';
 
-export const generateLessonSlides = async (apiKey: string, rawText: string, pageImages: string[] = []): Promise<Slide[]> => {
+// Shared teleprompter rules used across all generation modes
+const TELEPROMPTER_RULES = `
+STRICT SPEAKER NOTE RULES (TELEPROMPTER LOGIC):
+The app uses a "Progressive Disclosure" system.
+1. The visual bullet point appears.
+2. The Student reads the bullet.
+3. The Teacher (Teleprompter) adds insight.
+
+Therefore:
+- **NEVER** repeat the text that is on the slide in the speaker notes.
+- **NEVER** re-summarize a point that was just made in the previous bullet.
+- Each note must **ADD VALUE**: provide a concrete example, an analogy, or a "Why this matters" explanation.
+- Ensure a continuous narrative flow. Note 2 must naturally follow Note 1.
+
+FORMATTING:
+The speaker notes must use "👉" as a delimiter.
+- Segment 0 (Intro): Set the scene before bullet 1 appears.
+- Segment 1 (for Bullet 1): Elaborate on Bullet 1.
+- Segment 2 (for Bullet 2): Elaborate on Bullet 2 (Do not repeat Segment 1).
+- The number of "👉" segments MUST be exactly (Number of Bullets + 1).
+`;
+
+/**
+ * Get the appropriate system instruction based on generation mode.
+ */
+function getSystemInstructionForMode(mode: GenerationMode): string {
+  switch (mode) {
+    case 'fresh':
+      return `
+You are an elite Primary Education Consultant.
+Your goal is to transform a formal lesson plan into a teaching slideshow.
+
+CRITICAL: You will be provided with both text AND visual images of the document.
+- Use the images to accurately interpret TABLES, CHARTS, and DIAGRAMS that may not have parsed well as text.
+- Preserve the pedagogical structure: 'Hook', 'I Do', 'We Do', 'You Do'.
+- **MANDATORY**: You MUST include distinct slides for **'Success Criteria'** and **'Differentiation'** (Support, Extension, Intervention) found in the document.
+  - Success Criteria should be a clear checklist.
+  - Differentiation should explain how to adapt for different levels (e.g., C Grade, B Grade, A Grade).
+
+${TELEPROMPTER_RULES}
+
+LAYOUTS: Use 'split' for content with images, 'grid' or 'flowchart' for process stages, 'full-image' for hooks, and 'grid' for Success Criteria/Differentiation.
+`;
+
+    case 'refine':
+      return `
+You are an elite Primary Education Consultant.
+Your goal is to transform an existing presentation into clean, less text-dense PiPi-style slides.
+
+REFINE MODE RULES:
+- Extract key concepts from the presentation provided.
+- Create NEW PiPi-style slides from scratch (do not preserve original formatting).
+- You decide the optimal slide count based on content density - do not force matching the original count.
+- You may reorder slides for better pedagogical flow.
+- Note any images/diagrams that existed with "[Visual: description]" in the relevant bullet point so the teacher knows to re-add them.
+- Output stands alone - no references to "original slide 3" or similar markers.
+- Generate teleprompter scripts by inferring the teaching goals from the presentation content.
+
+${TELEPROMPTER_RULES}
+
+LAYOUTS: Use 'split' for content with images, 'grid' or 'flowchart' for process stages, 'full-image' for hooks.
+`;
+
+    case 'blend':
+      return `
+You are an elite Primary Education Consultant.
+Your goal is to create slides that combine lesson content with an existing presentation.
+
+BLEND MODE RULES:
+- Analyze BOTH the lesson plan AND existing presentation provided.
+- Determine content overlap between sources.
+- If the lesson contains topics NOT in the presentation, add new slides for those topics.
+- Standardize ALL output to PiPi style (do not try to match original presentation aesthetic).
+- When lesson says X but presentation says Y, note the discrepancy in speakerNotes: "[Note: Sources differ on...]"
+- Output stands alone - no references to source documents.
+- Synthesize both sources into a cohesive teaching narrative for the teleprompter scripts.
+
+${TELEPROMPTER_RULES}
+
+LAYOUTS: Use 'split' for content with images, 'grid' or 'flowchart' for process stages, 'full-image' for hooks.
+`;
+  }
+}
+
+export const generateLessonSlides = async (
+  apiKey: string,
+  inputOrText: GenerationInput | string,
+  pageImages: string[] = []
+): Promise<Slide[]> => {
+  // Normalize to GenerationInput for backward compatibility
+  const input: GenerationInput = typeof inputOrText === 'string'
+    ? { lessonText: inputOrText, lessonImages: pageImages, mode: 'fresh' }
+    : inputOrText;
+
   const ai = new GoogleGenAI({ apiKey });
-  const model = "gemini-3-flash-preview"; 
-  
-  const systemInstruction = `
-    You are an elite Primary Education Consultant. 
-    Your goal is to transform a formal lesson plan into a teaching slideshow.
-    
-    CRITICAL: You will be provided with both text AND visual images of the document.
-    - Use the images to accurately interpret TABLES, CHARTS, and DIAGRAMS that may not have parsed well as text.
-    - Preserve the pedagogical structure: 'Hook', 'I Do', 'We Do', 'You Do'.
-    - **MANDATORY**: You MUST include distinct slides for **'Success Criteria'** and **'Differentiation'** (Support, Extension, Intervention) found in the document. 
-      - Success Criteria should be a clear checklist.
-      - Differentiation should explain how to adapt for different levels (e.g., C Grade, B Grade, A Grade).
+  const model = "gemini-3-flash-preview";
 
-    STRICT SPEAKER NOTE RULES (TELEPROMPTER LOGIC):
-    The app uses a "Progressive Disclosure" system. 
-    1. The visual bullet point appears. 
-    2. The Student reads the bullet. 
-    3. The Teacher (Teleprompter) adds insight.
-    
-    Therefore:
-    - **NEVER** repeat the text that is on the slide in the speaker notes.
-    - **NEVER** re-summarize a point that was just made in the previous bullet.
-    - Each note must **ADD VALUE**: provide a concrete example, an analogy, or a "Why this matters" explanation.
-    - Ensure a continuous narrative flow. Note 2 must naturally follow Note 1.
+  const systemInstruction = getSystemInstructionForMode(input.mode);
 
-    FORMATTING:
-    The speaker notes must use "👉" as a delimiter. 
-    - Segment 0 (Intro): Set the scene before bullet 1 appears.
-    - Segment 1 (for Bullet 1): Elaborate on Bullet 1.
-    - Segment 2 (for Bullet 2): Elaborate on Bullet 2 (Do not repeat Segment 1).
-    - The number of "👉" segments MUST be exactly (Number of Bullets + 1).
+  // Build contents array based on mode
+  const contents: any[] = [];
 
-    LAYOUTS: Use 'split' for content with images, 'grid' or 'flowchart' for process stages, 'full-image' for hooks, and 'grid' for Success Criteria/Differentiation.
-  `;
+  // Add text prompt based on mode
+  if (input.mode === 'fresh') {
+    contents.push({ text: `Transform this formal lesson plan into a sequence of teaching slides:\n\n${input.lessonText}` });
+  } else if (input.mode === 'refine') {
+    contents.push({ text: `Transform this existing presentation into clean, less text-dense PiPi-style slides:\n\n${input.presentationText || ''}` });
+  } else { // blend
+    contents.push({ text: `Combine this lesson plan:\n\n${input.lessonText}\n\n---\n\nWith this existing presentation:\n\n${input.presentationText || ''}\n\nCreate enhanced PiPi-style slides that incorporate content from both sources.` });
+  }
 
-  const contents: any[] = [{ text: `Transform this formal lesson plan into a sequence of teaching slides: ${rawText}` }];
-  
-  // Add images to the content parts for visual analysis
-  pageImages.forEach(base64 => {
-    contents.push({
-      inlineData: {
-        mimeType: "image/jpeg",
-        data: base64.split(',')[1] // Remove prefix
-      }
-    });
-  });
+  // Helper to add images to content parts
+  const addImages = (images: string[] | undefined, limit: number = 10) => {
+    if (images && images.length > 0) {
+      // Limit images to avoid token limits (especially for blend mode)
+      const limitedImages = images.slice(0, limit);
+      limitedImages.forEach(base64 => {
+        // Remove data URI prefix if present
+        const data = base64.includes(',') ? base64.split(',')[1] : base64;
+        contents.push({
+          inlineData: {
+            mimeType: "image/jpeg",
+            data
+          }
+        });
+      });
+    }
+  };
+
+  // Add images based on mode
+  if (input.mode === 'fresh') {
+    // Fresh mode: only lesson images
+    addImages(input.lessonImages);
+  } else if (input.mode === 'refine') {
+    // Refine mode: only presentation images
+    addImages(input.presentationImages);
+  } else {
+    // Blend mode: both sources (limit each to 5 images to stay within token limits)
+    addImages(input.lessonImages, 5);
+    addImages(input.presentationImages, 5);
+  }
 
   try {
     const response = await ai.models.generateContent({
