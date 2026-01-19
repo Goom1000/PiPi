@@ -28,10 +28,10 @@ v2.1 adds two user-facing improvements: a landing page that accepts .pipi files 
   2. User can click button to open file picker and select .pipi file
   3. User can drag .pipi file onto landing page and it auto-loads
   4. Loading a .pipi file transitions directly to editor with presentation loaded
-**Plans**: TBD
+**Plans**: 1 plan
 
 Plans:
-- [ ] 06-01: Landing page .pipi loading
+- [ ] 06-01-PLAN.md - Add Load button and drag-drop hint to landing page
 
 ### Phase 7: Branding
 **Goal**: App displays PiPi branding consistently throughout all UI elements
@@ -53,7 +53,7 @@ Phase 6 -> Phase 7
 
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
-| 6. Landing Page | v2.1 | 0/TBD | Not started | - |
+| 6. Landing Page | v2.1 | 0/1 | Planned | - |
 | 7. Branding | v2.1 | 0/TBD | Not started | - |
 
 ---
