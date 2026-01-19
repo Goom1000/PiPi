@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-01-19)
 ## Current Position
 
 Phase: 6 of 7 (Landing Page)
-Plan: 0 of TBD in current phase
-Status: Ready to plan
-Last activity: 2026-01-19 — v2.1 roadmap created
+Plan: 1 of 1 complete
+Status: Phase 6 complete
+Last activity: 2026-01-19 — Completed 06-01-PLAN.md (Landing Page File Loading)
 
-Progress: [##########] v2.0 complete, v2.1 starting
+Progress: [##########] Phase 6 complete, Phase 7 next
 
 ## Performance Metrics
 
@@ -52,6 +52,10 @@ Summary of key v2.0 decisions:
 - 30s auto-save interval
 - GitHub Actions v4 (v6 doesn't exist)
 
+v2.1 decisions:
+- Load button placed left of Generate button (secondary action left, primary right)
+- Hint text uses muted colors with accent-colored .pipi extension
+
 ### Pending Todos
 
 See `.planning/todos/pending/`
@@ -63,10 +67,10 @@ None.
 ## Session Continuity
 
 Last session: 2026-01-19
-Stopped at: v2.1 roadmap created
+Stopped at: Completed 06-01-PLAN.md
 Resume file: None
-Next: /gsd:plan-phase 6
+Next: /gsd:plan-phase 7 (Branding)
 
 ---
 *State initialized: 2026-01-18*
-*Last updated: 2026-01-19 — v2.1 roadmap created*
+*Last updated: 2026-01-19 — Completed Phase 6 (Landing Page)*
