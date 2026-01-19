@@ -58,7 +58,19 @@ Students see only the presentation; teachers see the presentation plus a telepro
 
 ### Active
 
-(None — ready for next milestone)
+**v2.2 Flexible Upload & Class Bank**
+
+Flexible Upload:
+- [ ] Landing page accepts lesson PDF, existing PPT (as PDF), or both
+- [ ] AI generates fresh slides from lesson PDF only (current behavior)
+- [ ] AI refines/adapts existing PPT to PiPi format (less text-dense, proper structure)
+- [ ] AI uses lesson content to improve existing slides when both provided
+
+Class Bank:
+- [ ] Save current student list as a named class
+- [ ] Load saved class into any presentation
+- [ ] Class bank stored in localStorage (persists across presentations)
+- [ ] Full class management: view all, rename, edit students, delete
 
 ### Deferred (v2.2+)
 
@@ -148,4 +160,4 @@ v2.1 delivered Landing Page & Branding:
 | Dark mode default | Better visual experience for new users | ✓ Good — v2.1 |
 
 ---
-*Last updated: 2026-01-19 after v2.1 milestone*
+*Last updated: 2026-01-19 after starting v2.2 milestone*
