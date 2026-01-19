@@ -136,64 +136,116 @@ function App() {
   const [studentNames, setStudentNames] = useState<string[]>([]);
   const [nameInput, setNameInput] = useState('');
 
-  // PDF handling state
+  // PDF handling state - Lesson Plan
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const [isProcessingFile, setIsProcessingFile] = useState(false);
   const [pageImages, setPageImages] = useState<string[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  // PDF handling state - Existing Presentation
+  const [existingPptFile, setExistingPptFile] = useState<File | null>(null);
+  const [isProcessingPpt, setIsProcessingPpt] = useState(false);
+  const [existingPptImages, setExistingPptImages] = useState<string[]>([]);
+  const [existingPptText, setExistingPptText] = useState('');
+  const existingPptInputRef = useRef<HTMLInputElement>(null);
+
+  // Derive upload mode from which files are uploaded
+  type UploadMode = 'fresh' | 'refine' | 'blend' | 'none';
+
+  const uploadMode = useMemo<UploadMode>(() => {
+    const hasLesson = uploadedFile !== null || lessonText.trim() !== '';
+    const hasPpt = existingPptFile !== null;
+
+    if (hasLesson && hasPpt) return 'blend';
+    if (hasPpt) return 'refine';
+    if (hasLesson) return 'fresh';
+    return 'none';
+  }, [uploadedFile, lessonText, existingPptFile]);
+
   const activeSlide = slides[activeSlideIndex];
+
+  // Shared PDF processor for both upload zones
+  const processPdf = async (
+    file: File,
+    onProgress: (processing: boolean) => void,
+    onComplete: (text: string, images: string[]) => void,
+    onError: (errorMsg: string) => void
+  ) => {
+    onProgress(true);
+    try {
+      const arrayBuffer = await file.arrayBuffer();
+      pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+      const pdf = await pdfjsLib.getDocument(arrayBuffer).promise;
+
+      let fullText = "";
+      const images: string[] = [];
+      const pagesToProcess = Math.min(pdf.numPages, 5);
+
+      for (let i = 1; i <= pagesToProcess; i++) {
+        const page = await pdf.getPage(i);
+        const textContent = await page.getTextContent();
+        fullText += textContent.items.map((item: any) => item.str).join(' ') + "\n\n";
+
+        const viewport = page.getViewport({ scale: 1.5 });
+        const canvas = document.createElement('canvas');
+        const context = canvas.getContext('2d');
+        canvas.height = viewport.height;
+        canvas.width = viewport.width;
+        await page.render({ canvasContext: context, viewport }).promise;
+        images.push(canvas.toDataURL('image/jpeg', 0.8));
+      }
+
+      onComplete(fullText, images);
+    } catch (err) {
+      console.error("PDF Processing Error:", err);
+      onError("Failed to analyze the PDF structure.");
+    } finally {
+      onProgress(false);
+    }
+  };
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    
+
     if (file.type !== 'application/pdf') {
-        setError("Please upload a PDF document. Other formats coming soon!");
-        return;
+      setError("Please upload a PDF document.");
+      return;
     }
 
     setUploadedFile(file);
-    setIsProcessingFile(true);
     setError(null);
-
-    try {
-        const arrayBuffer = await file.arrayBuffer();
-        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-        const pdf = await pdfjsLib.getDocument(arrayBuffer).promise;
-        
-        let fullText = "";
-        const images: string[] = [];
-
-        // We'll capture up to the first 5 pages to keep context strong but within limits
-        const pagesToProcess = Math.min(pdf.numPages, 5);
-
-        for (let i = 1; i <= pagesToProcess; i++) {
-            const page = await pdf.getPage(i);
-            
-            // Extract Text
-            const textContent = await page.getTextContent();
-            fullText += textContent.items.map((item: any) => item.str).join(' ') + "\n\n";
-
-            // Convert to Image for visual analysis of tables/charts
-            const viewport = page.getViewport({ scale: 1.5 });
-            const canvas = document.createElement('canvas');
-            const context = canvas.getContext('2d');
-            canvas.height = viewport.height;
-            canvas.width = viewport.width;
-
-            await page.render({ canvasContext: context, viewport }).promise;
-            images.push(canvas.toDataURL('image/jpeg', 0.8));
-        }
-
-        setLessonText(fullText);
+    await processPdf(
+      file,
+      setIsProcessingFile,
+      (text, images) => {
+        setLessonText(text);
         setPageImages(images);
-    } catch (err) {
-        console.error("PDF Processing Error:", err);
-        setError("Failed to analyze the PDF structure. You can still paste text manually.");
-    } finally {
-        setIsProcessingFile(false);
+      },
+      setError
+    );
+  };
+
+  const handlePptFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.type !== 'application/pdf') {
+      setError("Please upload a PDF document.");
+      return;
     }
+
+    setExistingPptFile(file);
+    setError(null);
+    await processPdf(
+      file,
+      setIsProcessingPpt,
+      (text, images) => {
+        setExistingPptText(text);
+        setExistingPptImages(images);
+      },
+      setError
+    );
   };
 
   const handleGenerate = async () => {
