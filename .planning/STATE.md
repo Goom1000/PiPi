@@ -9,12 +9,12 @@ See: .planning/PROJECT.md (updated 2026-01-19)
 
 ## Current Position
 
-Phase: 8 - Flexible Upload UI
-Plan: 1 of 1 complete
-Status: Phase 8 complete, Phase 9 ready
-Last activity: 2026-01-19 - Completed 08-01-PLAN.md (dual upload zones)
+Phase: 9 - AI Adaptation Logic
+Plan: 1 of ? in progress
+Status: Phase 9 Plan 1 complete
+Last activity: 2026-01-19 - Completed 09-01-PLAN.md (types and prompts)
 
-Progress: [##--------] 1/4 v2.2 plans complete
+Progress: [####------] 2/4 v2.2 plans complete
 
 ## Performance Metrics
 
@@ -24,7 +24,7 @@ Progress: [##--------] 1/4 v2.2 plans complete
 - v1.2: 5 plans, 1 day
 - v2.0: 11 plans, 1 day
 - v2.1: 2 plans, 4 hours
-- v2.2: In progress (1 plan, 3 min)
+- v2.2: In progress (2 plans, 5 min)
 
 **Project Totals:**
 - Milestones shipped: 5 (v1.0, v1.1, v1.2, v2.0, v2.1)
@@ -45,7 +45,7 @@ Progress: [##--------] 1/4 v2.2 plans complete
 | Phase | Name | Status | Requirements |
 |-------|------|--------|--------------|
 | 8 | Flexible Upload UI | Complete | UPLOAD-01 to UPLOAD-04 |
-| 9 | AI Adaptation Logic | Ready | UPLOAD-05 to UPLOAD-07 |
+| 9 | AI Adaptation Logic | In Progress (1/? plans) | UPLOAD-05 to UPLOAD-07 |
 | 10 | Class Bank Core | Ready | CLASS-01 to CLASS-04 |
 | 11 | Class Management UI | Blocked by 10 | CLASS-05 to CLASS-08 |
 
@@ -56,6 +56,11 @@ Note: Phases 9 and 10 can be worked in parallel (independent feature sets).
 ### Decisions
 
 Decisions are logged in PROJECT.md Key Decisions table.
+
+Summary of key v2.2 decisions (Phase 9):
+- Backward compatible signature (string | GenerationInput) for generateLessonSlides
+- Shared prompt constants (TELEPROMPTER_RULES, JSON_OUTPUT_FORMAT) for consistency
+- Blend mode limited to 5 images per source (10 total) for token safety
 
 Summary of key v2.2 decisions (Phase 8):
 - Green theme for lesson PDF upload zone (existing pattern)
@@ -80,11 +85,11 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-01-19 11:14 UTC
-Stopped at: Completed 08-01-PLAN.md
+Last session: 2026-01-19 11:41 UTC
+Stopped at: Completed 09-01-PLAN.md
 Resume file: None
-Next: Phase 9 (AI Adaptation Logic) or Phase 10 (Class Bank Core)
+Next: Phase 9 Plan 2 (connect App.tsx to GenerationInput) or Phase 10
 
 ---
 *State initialized: 2026-01-18*
-*Last updated: 2026-01-19 - Completed Phase 8 Plan 1*
+*Last updated: 2026-01-19 - Completed Phase 9 Plan 1*
