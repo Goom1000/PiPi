@@ -9,7 +9,7 @@ Transform PiPi from a personal tool into a shareable application colleagues can 
 - v1.0 MVP - Shipped 2026-01-18 (see milestones/v1.0-ROADMAP.md)
 - v1.1 Draggable Preview - Shipped 2026-01-18 (see milestones/v1.1-ROADMAP.md)
 - v1.2 Permission UX - Shipped 2026-01-18 (see milestones/v1.2-ROADMAP.md)
-- **v2.0 Shareable Presentations** - Phases 1-5 (in progress)
+- **v2.0 Shareable Presentations** - Shipped 2026-01-19
 
 ## Phases
 
@@ -21,7 +21,7 @@ Transform PiPi from a personal tool into a shareable application colleagues can 
 - [x] **Phase 2: Multi-Provider AI** - App works with Gemini or Claude (OpenAI removed)
 - [x] **Phase 3: Disabled AI State** - Graceful degradation when no API key configured
 - [x] **Phase 4: Save/Load System** - Export and import presentations as .pipi files
-- [ ] **Phase 5: GitHub Pages Deployment** - App accessible via public URL
+- [x] **Phase 5: GitHub Pages Deployment** - App accessible via public URL
 
 ## Phase Details
 
@@ -101,7 +101,7 @@ Plans:
 **Plans**: 1 plan
 
 Plans:
-- [ ] 05-01-PLAN.md - Vite config, GitHub Actions workflow, and deployment verification
+- [x] 05-01-PLAN.md - Vite config, GitHub Actions workflow, and deployment verification
 
 ## Progress
 
@@ -114,8 +114,8 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5
 | 2. Multi-Provider AI | 3/3 | Complete | 2026-01-19 |
 | 3. Disabled AI State | 2/2 | Complete | 2026-01-19 |
 | 4. Save/Load System | 3/3 | Complete | 2026-01-19 |
-| 5. GitHub Pages Deployment | 0/1 | Ready | - |
+| 5. GitHub Pages Deployment | 1/1 | Complete | 2026-01-19 |
 
 ---
 *Roadmap created: 2026-01-19*
-*Last updated: 2026-01-19 - Phase 5 planned (GitHub Pages Deployment)*
+*Last updated: 2026-01-19 - v2.0 complete (all 5 phases shipped)*

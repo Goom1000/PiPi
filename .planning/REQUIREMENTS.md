@@ -54,9 +54,9 @@ Requirements for shareable presentations milestone.
 
 ### Deployment
 
-- [ ] **DEPL-01**: App deploys to GitHub Pages
-- [ ] **DEPL-02**: App auto-deploys when main branch is pushed
-- [ ] **DEPL-03**: Deployed app loads without blank page (base path correct)
+- [x] **DEPL-01**: App deploys to GitHub Pages
+- [x] **DEPL-02**: App auto-deploys when main branch is pushed
+- [x] **DEPL-03**: Deployed app loads without blank page (base path correct)
 
 ## v2.1 Requirements
 
@@ -122,9 +122,9 @@ Deferred to future release.
 | INST-01 | 1 | Complete |
 | INST-02 | 1 | Complete |
 | INST-03 | 1 | Complete |
-| DEPL-01 | 5 | Pending |
-| DEPL-02 | 5 | Pending |
-| DEPL-03 | 5 | Pending |
+| DEPL-01 | 5 | Complete |
+| DEPL-02 | 5 | Complete |
+| DEPL-03 | 5 | Complete |
 
 **Coverage:**
 - v2.0 requirements: 30 total
@@ -133,4 +133,4 @@ Deferred to future release.
 
 ---
 *Requirements defined: 2026-01-19*
-*Last updated: 2026-01-19 — Phase 4 requirements complete (SAVE-01 through SAVE-08)*
+*Last updated: 2026-01-19 — v2.0 complete (all requirements shipped)*
