@@ -1,5 +1,32 @@
 # Project Milestones: PiPi
 
+## v2.0 Shareable Presentations (Shipped: 2026-01-19)
+
+**Delivered:** Transformed PiPi from a personal tool into a shareable application with save/load functionality, multi-provider AI support (Gemini/Claude), and public deployment to GitHub Pages.
+
+**Phases completed:** 1-5 (11 plans total)
+
+**Key accomplishments:**
+
+- Settings panel with API key management, provider selection, and step-by-step setup instructions
+- Multi-provider AI abstraction supporting Gemini and Claude (OpenAI removed due to CORS)
+- Graceful AI degradation with lock icons and EnableAIModal for unconfigured users
+- Save/load system with .pipi file format, drag-drop, auto-save, and crash recovery
+- GitHub Pages deployment with automatic CI/CD at goom1000.github.io/PiPi
+
+**Stats:**
+
+- 71 files created/modified
+- 6,956 lines of TypeScript (project total)
+- 5 phases, 11 plans
+- 1 day (2026-01-19)
+
+**Git range:** `feat(01-01)` → `docs(05)`
+
+**What's next:** TBD with /gsd:new-milestone
+
+---
+
 ## v1.2 Permission Flow Fix (Shipped: 2026-01-18)
 
 **Delivered:** Fixed permission detection race condition and improved permission UX with dynamic button labels, inline permission requests, and browser-specific recovery guidance.

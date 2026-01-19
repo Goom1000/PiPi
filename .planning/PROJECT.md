@@ -4,39 +4,7 @@
 
 A presentation tool for teachers that transforms PDF lesson plans into interactive slideshows with AI-generated content, a teleprompter script for the teacher, and progressive bullet reveal. Teachers upload their existing lesson plans, select student age/grade level, and the AI creates an engaging presentation with speaker notes that guide the teacher through natural, conversational delivery.
 
-**v1.2 shipped:** Dual-monitor presentation mode with permission UX polish — auto-projector placement on Chromium, draggable/resizable preview window, and reliable permission handling.
-
-## Current Milestone: v2.0 Shareable Presentations
-
-**Goal:** Enable colleagues to use presentations you create by deploying to GitHub Pages with save/load functionality and multi-provider API support.
-
-**Target features:**
-- Save presentation (slides + source PDF) to downloadable `.pipi` file
-- Load presentation from file — each teacher enters their own class list
-- Multi-provider AI support (Google Gemini, Anthropic Claude, OpenAI) — user picks one
-- API key stored locally in browser, never transmitted to any server
-- AI features visible but disabled when no key configured
-- Setup instructions with cost information for each provider
-- GitHub Pages deployment for free public hosting
-
-## Shipped Milestones
-
-### v1.2 Permission Flow Fix (Shipped 2026-01-18)
-
-**Delivered:** Fixed permission detection race condition and improved permission UX with dynamic button labels, inline permission requests, and browser-specific recovery guidance.
-
-Auto-projector placement is now reliable and obvious in the classroom.
-
-### v1.1 Draggable Preview Window (Shipped 2026-01-18)
-
-**Delivered:** Fully interactive floating preview window with drag, resize, snap-to-grid, and session persistence.
-
-**Features shipped:**
-- Draggable preview window (click center to move anywhere on screen)
-- Resizable preview window (drag corners to adjust size, aspect ratio locked)
-- Snap-to-grid toggle button with 50px invisible grid
-- Position/size persistence (localStorage per presentation)
-- Preview floats above all UI via portal rendering (z-index 9999)
+**v2.0 shipped:** Shareable app deployed to GitHub Pages with save/load functionality and multi-provider AI support (Gemini/Claude). Colleagues can use presentations you create by loading .pipi files and configuring their own API keys.
 
 ## Core Value
 
@@ -75,21 +43,28 @@ Students see only the presentation; teachers see the presentation plus a telepro
 - ✓ Dynamic button labels for auto-placement status — v1.2
 - ✓ Inline permission request link — v1.2
 - ✓ Browser-specific recovery guidance for denied permissions — v1.2
+- ✓ Save presentation to downloadable .pipi file — v2.0
+- ✓ Load presentation from .pipi file (file picker + drag-drop) — v2.0
+- ✓ Multi-provider AI support (Gemini, Claude) — v2.0
+- ✓ API key settings UI with local storage — v2.0
+- ✓ AI features disabled state when no API key — v2.0
+- ✓ Provider setup instructions with cost information — v2.0
+- ✓ GitHub Pages deployment (auto-deploy on push) — v2.0
+- ✓ Auto-save to localStorage with crash recovery — v2.0
 
 ### Active
 
-- [ ] Save presentation to downloadable .pipi file (slides + source PDF)
-- [ ] Load presentation from .pipi file
-- [ ] Multi-provider AI support (Gemini, Claude, OpenAI)
-- [ ] API key settings UI with local storage
-- [ ] AI features disabled state when no API key
-- [ ] Provider setup instructions with cost information
-- [ ] GitHub Pages deployment configuration
+(None — waiting for next milestone definition)
 
-### Deferred (v1.3+)
+### Deferred (v2.1+)
 
-- [ ] Elapsed time display showing presentation duration (PRES-03)
-- [ ] Fullscreen recovery (auto re-enter if exited) (PRES-04)
+- [ ] Elapsed time display showing presentation duration
+- [ ] Fullscreen recovery (auto re-enter if exited)
+- [ ] Setup wizard with screenshots
+- [ ] Video walkthrough for API key setup
+- [ ] API calls this session counter
+- [ ] Auto-save indicator in header
+- [ ] Model selection dropdown in settings
 
 ### Out of Scope
 
@@ -101,48 +76,39 @@ Students see only the presentation; teachers see the presentation plus a telepro
 - Video embedding — storage/bandwidth concerns
 - User accounts / login system — colleagues load shared files, no auth needed
 - Desktop installer (Electron/Tauri) — GitHub Pages simpler, free, auto-updates
+- OpenAI provider support — browser CORS blocked, no workaround without backend
 
 ## Context
 
 ### Current State
 
-Shipped v1.2 with 4,499 LOC TypeScript.
-Tech stack: React 19, Vite, Gemini API, Tailwind CSS, react-rnd.
+Shipped v2.0 with 6,956 LOC TypeScript.
+Tech stack: React 19, Vite, Gemini/Claude API, Tailwind CSS, react-rnd.
 Client-side only (no backend).
+Deployed at: https://goom1000.github.io/PiPi/
 
-v1.2 delivered permission UX improvements:
-- isLoading state pattern prevents race condition
-- Dynamic button labels ("Launch → External Display")
-- Inline permission request link
-- Browser-specific recovery modal (Chrome/Edge)
-- Warning icon for denied state
-
-v1.1 delivered interactive preview window:
-- react-rnd for drag/resize with aspect ratio lock
-- Portal-based floating UI for z-index isolation
-- Edge magnetism snaps preview to viewport edges
-- Per-presentation localStorage persistence
-- Invisible snap-to-grid (50px) with toggle button
-
-v1.0 delivered rock-solid dual-monitor presentation:
-- BroadcastChannel cross-window sync
-- Window Management API for auto projector placement
-- Heartbeat-based connection monitoring
-- Keyboard navigation for presenter remotes
+v2.0 delivered shareable presentations:
+- Settings panel with provider dropdown, API key management, and setup instructions
+- Multi-provider AI (Gemini + Claude) with strategy pattern abstraction
+- Graceful AI degradation with lock icons and EnableAIModal
+- Save/load system with .pipi files, drag-drop, and auto-save
+- GitHub Pages deployment with automatic CI/CD
 
 ### Technical Environment
 
 - React 19 SPA with Vite
-- Gemini API for AI generation
+- Gemini/Claude API for AI generation
 - Tailwind CSS for styling
 - No backend — client-side only
 - CDN-loaded dependencies (PDF.js, PptxGenJS, html2pdf)
+- GitHub Pages hosting with GitHub Actions CI/CD
 
 ## Constraints
 
 - **Tech stack**: Must remain a client-side SPA (no server). React + Vite.
 - **Browser APIs**: Limited to what modern browsers provide (Window Management API, Presentation API, or fullscreen heuristics)
 - **Backward compatibility**: Must not break existing functionality (editing, presenting, quizzes)
+- **API providers**: Limited to providers with browser CORS support (Gemini, Claude)
 
 ## Key Decisions
 
@@ -165,6 +131,13 @@ v1.0 delivered rock-solid dual-monitor presentation:
 | Friendly display label | "External Display" instead of raw device name | ✓ Good — v1.2 |
 | Inline permission link | Simpler than popup-based explainer | ✓ Good — v1.2 |
 | Browser detection order | Check Edg/ before Chrome/ (Edge UA includes Chrome) | ✓ Good — v1.2 |
+| Strategy pattern for providers | Clean abstraction for multi-provider AI | ✓ Good — v2.0 |
+| OpenAI removed | Browser CORS blocked, confusing for users | ✓ Good — v2.0 |
+| Settings sync on modal close | Prevents race condition with localStorage | ✓ Good — v2.0 |
+| Lock icon overlay pattern | Consistent disabled AI appearance | ✓ Good — v2.0 |
+| JSON pretty-print for .pipi | Human-readable file format | ✓ Good — v2.0 |
+| 30s auto-save interval | Balances safety with performance | ✓ Good — v2.0 |
+| GitHub Actions v4 | Stable action version, v6 doesn't exist | ✓ Good — v2.0 |
 
 ---
-*Last updated: 2026-01-19 after v2.0 milestone start*
+*Last updated: 2026-01-19 after v2.0 milestone completion*
