@@ -8,13 +8,15 @@ import { useEffect } from 'react';
  *
  * @param onFile - Callback invoked when a valid .pipi file is dropped
  * @param enabled - Whether to listen for drops (default: true). Set to false during modals.
+ * @param onInvalidFile - Optional callback invoked when an invalid (non-.pipi) file is dropped
  *
  * @example
- * useDragDrop((file) => handleLoadFile(file), !showSettings && !showResourceHub);
+ * useDragDrop((file) => handleLoadFile(file), !showSettings, (file) => showError(`${file.name} is not a .pipi file`));
  */
 export function useDragDrop(
   onFile: (file: File) => void,
-  enabled: boolean = true
+  enabled: boolean = true,
+  onInvalidFile?: (file: File) => void
 ): void {
   useEffect(() => {
     // Don't attach listeners if disabled
@@ -32,11 +34,13 @@ export function useDragDrop(
       e.stopPropagation();
 
       const file = e.dataTransfer?.files[0];
-      if (file?.name.endsWith('.pipi')) {
+      if (!file) return;
+
+      if (file.name.endsWith('.pipi')) {
         onFile(file);
+      } else if (onInvalidFile) {
+        onInvalidFile(file);
       }
-      // Ignore non-.pipi files silently
-      // (load service will show proper error if user picks wrong file via picker)
     };
 
     // Attach window-level listeners
@@ -48,7 +52,7 @@ export function useDragDrop(
       window.removeEventListener('dragover', handleDragOver);
       window.removeEventListener('drop', handleDrop);
     };
-  }, [onFile, enabled]);
+  }, [onFile, enabled, onInvalidFile]);
 }
 
 export default useDragDrop;

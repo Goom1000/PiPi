@@ -467,7 +467,8 @@ function App() {
 
   useDragDrop(
     handleLoadFile,
-    !showSettings && !showResourceHub && appState !== AppState.PRESENTING && !showFilenamePrompt && !showRecoveryModal
+    !showSettings && !showResourceHub && appState !== AppState.PRESENTING && !showFilenamePrompt && !showRecoveryModal,
+    (file) => addToast(`"${file.name}" is not a .pipi file. Only .pipi files can be loaded.`, 5000, 'error')
   );
 
   // ============================================================================
