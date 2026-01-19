@@ -694,7 +694,14 @@ function App() {
 
                 {error && <p className="mt-4 text-red-500 text-sm font-medium bg-red-50 p-3 rounded-lg border border-red-100 mb-6">⚠️ {error}</p>}
                 
-                <div className="flex justify-center">
+                <div className="flex justify-center gap-4">
+                  <Button
+                    variant="secondary"
+                    onClick={handleLoadClick}
+                    className="px-8 py-4 text-lg"
+                  >
+                    Load Presentation
+                  </Button>
                   <div className="relative">
                     <Button
                       onClick={handleGenerate}
@@ -714,6 +721,9 @@ function App() {
                     )}
                   </div>
                 </div>
+                <p className="text-center text-sm text-slate-400 dark:text-slate-500 mt-4">
+                  or drag a <span className="font-mono text-indigo-500 dark:text-amber-400">.pipi</span> file anywhere to open
+                </p>
               </div>
             </div>
           </div>
