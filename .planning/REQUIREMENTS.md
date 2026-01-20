@@ -21,8 +21,8 @@ Requirements for bug fix milestone. All are high-priority fixes for broken funct
 
 ### Error Handling
 
-- [ ] **ERROR-01**: AI slide revision shows user-friendly error on failure (not crash)
-- [ ] **ERROR-02**: Malformed AI response shows parse error message
+- [x] **ERROR-01**: AI slide revision shows user-friendly error on failure (not crash)
+- [x] **ERROR-02**: Malformed AI response shows parse error message
 
 ## Future Requirements
 
@@ -62,8 +62,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | SYNC-01 | Phase 14 | Pending |
 | SYNC-02 | Phase 14 | Pending |
 | SYNC-03 | Phase 14 | Pending |
-| ERROR-01 | Phase 13 | Pending |
-| ERROR-02 | Phase 13 | Pending |
+| ERROR-01 | Phase 13 | Complete |
+| ERROR-02 | Phase 13 | Complete |
 
 **Coverage:**
 - v2.3 requirements: 8 total
