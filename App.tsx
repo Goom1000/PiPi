@@ -146,6 +146,7 @@ function App() {
   const [showLoadDropdown, setShowLoadDropdown] = useState(false);
   const [activeClassName, setActiveClassName] = useState<string | null>(null);
   const [showManageModal, setShowManageModal] = useState(false);
+  const loadClassButtonRef = useRef<HTMLButtonElement>(null);
 
   // PDF handling state - Lesson Plan
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
@@ -1044,6 +1045,7 @@ function App() {
 
                   {/* Load Button */}
                   <button
+                    ref={loadClassButtonRef}
                     onClick={() => setShowLoadDropdown(!showLoadDropdown)}
                     disabled={classes.length === 0}
                     title={classes.length === 0 ? 'No saved classes' : 'Load class'}
@@ -1064,6 +1066,7 @@ function App() {
                         setShowLoadDropdown(false);
                         setShowManageModal(true);
                       }}
+                      anchorRef={loadClassButtonRef}
                     />
                   )}
                 </div>

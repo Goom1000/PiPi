@@ -1,4 +1,5 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { SavedClass } from '../types';
 
 // ============================================================================
@@ -14,6 +15,8 @@ interface ClassBankDropdownProps {
   onClose: () => void;
   /** Callback when user clicks "Manage Classes..." */
   onManage: () => void;
+  /** Reference to the anchor element (button) for positioning */
+  anchorRef: React.RefObject<HTMLButtonElement>;
 }
 
 // ============================================================================
@@ -29,30 +32,46 @@ interface ClassBankDropdownProps {
  * - Escape key closes dropdown
  * - Hover states for list items
  * - Empty state (defensive, shouldn't appear since button is disabled when empty)
+ * - Uses portal to escape overflow containers
  *
- * Position: absolute, positioned below trigger by parent container
+ * Position: Fixed, positioned below anchor element via portal
  */
 const ClassBankDropdown: React.FC<ClassBankDropdownProps> = ({
   classes,
   onLoad,
   onClose,
   onManage,
+  anchorRef,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
+  const [position, setPosition] = useState({ top: 0, left: 0 });
+
+  // Calculate position based on anchor element
+  useEffect(() => {
+    if (anchorRef.current) {
+      const rect = anchorRef.current.getBoundingClientRect();
+      setPosition({
+        top: rect.bottom + 4, // 4px gap below button
+        left: rect.left,
+      });
+    }
+  }, [anchorRef]);
 
   // Handle click outside to close
   useEffect(() => {
     const handleMouseDown = (e: MouseEvent) => {
       if (
         containerRef.current &&
-        !containerRef.current.contains(e.target as Node)
+        !containerRef.current.contains(e.target as Node) &&
+        anchorRef.current &&
+        !anchorRef.current.contains(e.target as Node)
       ) {
         onClose();
       }
     };
     document.addEventListener('mousedown', handleMouseDown);
     return () => document.removeEventListener('mousedown', handleMouseDown);
-  }, [onClose]);
+  }, [onClose, anchorRef]);
 
   // Handle escape key to close
   useEffect(() => {
@@ -65,10 +84,15 @@ const ClassBankDropdown: React.FC<ClassBankDropdownProps> = ({
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, [onClose]);
 
-  return (
+  const dropdownContent = (
     <div
       ref={containerRef}
-      className="absolute top-full left-0 mt-1 w-64 bg-white dark:bg-slate-800 rounded-xl shadow-xl border border-slate-200 dark:border-slate-700 overflow-hidden z-50 animate-fade-in"
+      style={{
+        position: 'fixed',
+        top: position.top,
+        left: position.left,
+      }}
+      className="w-64 bg-white dark:bg-slate-800 rounded-xl shadow-xl border border-slate-200 dark:border-slate-700 overflow-hidden z-[9999] animate-fade-in"
     >
       {/* Header */}
       <div className="px-4 py-2 border-b border-slate-100 dark:border-slate-700">
@@ -155,6 +179,9 @@ const ClassBankDropdown: React.FC<ClassBankDropdownProps> = ({
       )}
     </div>
   );
+
+  // Render via portal to escape overflow containers
+  return createPortal(dropdownContent, document.body);
 };
 
 export default ClassBankDropdown;
