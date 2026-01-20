@@ -1,3 +1,4 @@
+import { QuizQuestion } from './services/geminiService';
 
 export interface Slide {
   id: string;
@@ -23,13 +24,24 @@ export interface PresentationState {
   slides: Slide[];
 }
 
+// Game state synchronized from teacher to student view
+// Note: Only sync 'loading', 'play', 'summary' modes - NOT 'setup' (teacher-only configuration screen)
+export interface GameSyncState {
+  mode: 'loading' | 'play' | 'summary';
+  questions: QuizQuestion[];
+  currentQuestionIndex: number;
+  isAnswerRevealed: boolean;
+}
+
 // Discriminated union for type-safe message handling
 export type PresentationMessage =
   | { type: 'STATE_UPDATE'; payload: PresentationState }
   | { type: 'STATE_REQUEST' }
   | { type: 'HEARTBEAT'; timestamp: number }
   | { type: 'HEARTBEAT_ACK'; timestamp: number }
-  | { type: 'CLOSE_STUDENT' };
+  | { type: 'CLOSE_STUDENT' }
+  | { type: 'GAME_STATE_UPDATE'; payload: GameSyncState }
+  | { type: 'GAME_CLOSE' };
 
 export interface LessonResource {
   id: string;
