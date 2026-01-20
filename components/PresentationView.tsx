@@ -303,9 +303,9 @@ const PresentationView: React.FC<PresentationViewProps> = ({ slides, onExit, stu
       // Subtract padding (p-4 = 1rem = 16px each side = 32px total)
       const availableWidth = container.clientWidth - 32;
       const availableHeight = container.clientHeight - 32;
-      // Fixed slide dimensions (16:9)
-      const slideWidth = 1600;
-      const slideHeight = 900;
+      // Fixed slide dimensions (16:9) - match student view for consistent rendering
+      const slideWidth = 1920;
+      const slideHeight = 1080;
       // Scale to fit while preserving aspect ratio (never scale above 1)
       const scaleX = availableWidth / slideWidth;
       const scaleY = availableHeight / slideHeight;
@@ -648,8 +648,8 @@ const PresentationView: React.FC<PresentationViewProps> = ({ slides, onExit, stu
                <div
                   className="bg-white rounded-lg overflow-hidden shadow-2xl"
                   style={{
-                    width: 1600,
-                    height: 900,
+                    width: 1920,
+                    height: 1080,
                     transform: `scale(${slideScale})`,
                     transformOrigin: 'center center'
                   }}
