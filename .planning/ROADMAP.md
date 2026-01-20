@@ -57,10 +57,11 @@ Plans:
   2. Game state syncs in real-time: question number changes, answer reveals
   3. When teacher closes game, student view returns to current slide
   4. Game display in student view matches teacher view content (same question, same state)
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 14-01: TBD
+- [ ] 14-01-PLAN.md — Add game sync types and broadcast game state from teacher view
+- [ ] 14-02-PLAN.md — Receive game state in student view and render synchronized game display
 
 ## Progress
 
@@ -68,7 +69,7 @@ Plans:
 |-------|-----------|----------------|--------|-----------|
 | 12. CSS Layout Fixes | v2.3 | 1/1 | Complete | 2026-01-20 |
 | 13. AI Error Handling | v2.3 | 1/1 | Complete | 2026-01-20 |
-| 14. Game Sync | v2.3 | 0/TBD | Not started | - |
+| 14. Game Sync | v2.3 | 0/2 | Not started | - |
 
 ---
 *Roadmap created: 2026-01-20*
