@@ -1009,7 +1009,7 @@ function App() {
         {appState === AppState.EDITING && (
           <div className="flex-1 flex flex-col overflow-hidden">
              {/* TOP CLASS MANAGEMENT BAR */}
-             <div className="h-16 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 px-6 flex items-center gap-6 shrink-0 overflow-x-auto transition-colors duration-300">
+             <div className="h-16 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 px-6 flex items-center gap-6 shrink-0 overflow-x-auto transition-colors duration-300 relative z-10">
                 <div className="flex items-center gap-2 shrink-0">
                     <span className="text-xs font-bold text-slate-500 uppercase tracking-widest">Students:</span>
                     <div className="flex items-center gap-1 bg-slate-50 dark:bg-slate-800 p-1 rounded-xl border border-slate-100 dark:border-slate-700">
