@@ -132,12 +132,12 @@ export const FlowchartLayout: React.FC<{ slide: Slide, visibleBullets: number }>
             </h2>
          </div>
          
-         <div className="flex w-full px-4 gap-4 md:gap-6 flex-1 items-start justify-center">
+         <div className="flex w-full px-4 gap-4 md:gap-6 flex-1 items-stretch justify-center">
             {slide.content.map((point, idx) => (
                 <React.Fragment key={idx}>
                     {/* Arrow (except first) */}
                     {idx > 0 && (
-                        <div className={`transition-all duration-500 delay-100 shrink-0 flex items-center justify-center h-full pb-20 px-2 ${idx < visibleBullets ? 'opacity-100' : 'opacity-0'}`}>
+                        <div className={`transition-all duration-500 delay-100 shrink-0 flex items-center justify-center px-2 ${idx < visibleBullets ? 'opacity-100' : 'opacity-0'}`}>
                             <svg className="w-8 h-8 md:w-16 md:h-16 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={3}>
                                 <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
                             </svg>
@@ -147,7 +147,7 @@ export const FlowchartLayout: React.FC<{ slide: Slide, visibleBullets: number }>
                     {/* Card */}
                     <div className={`flex-1 min-w-0 transition-all duration-500 transform ${idx < visibleBullets ? 'opacity-100 scale-100' : 'opacity-0 scale-95'}`}>
                         <div className={`
-                             aspect-[4/3] rounded-3xl p-4 md:p-8 flex items-center justify-center text-center shadow-xl border-b-[8px] md:border-b-[12px] h-full w-full
+                             h-full rounded-3xl p-4 md:p-8 flex items-center justify-center text-center shadow-xl border-b-[8px] md:border-b-[12px] w-full
                              ${idx % 3 === 0 ? 'bg-indigo-600 border-indigo-800 text-white' : ''}
                              ${idx % 3 === 1 ? 'bg-amber-400 border-amber-600 text-indigo-900' : ''}
                              ${idx % 3 === 2 ? 'bg-emerald-600 border-emerald-800 text-white' : ''}
