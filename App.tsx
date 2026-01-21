@@ -141,7 +141,7 @@ function App() {
   const [nameInput, setNameInput] = useState('');
 
   // Class Bank state
-  const { classes, saveClass, deleteClass, renameClass, updateClassStudents } = useClassBank();
+  const { classes, saveClass, deleteClass, renameClass, updateClassStudents, updateStudentGrade } = useClassBank();
   const [showSaveClassModal, setShowSaveClassModal] = useState(false);
   const [showLoadDropdown, setShowLoadDropdown] = useState(false);
   const [activeClassName, setActiveClassName] = useState<string | null>(null);
@@ -1353,6 +1353,7 @@ function App() {
           onRename={handleRenameClass}
           onUpdateStudents={handleUpdateClassStudents}
           onDelete={handleDeleteClass}
+          onUpdateGrade={updateStudentGrade}
           activeClassName={activeClassName}
         />
       )}
