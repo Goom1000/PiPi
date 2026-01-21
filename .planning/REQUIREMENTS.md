@@ -22,8 +22,8 @@ Requirements for targeted questioning milestone. Each maps to roadmap phases.
 ### Targeting Mode
 
 - [ ] **TARG-01**: Toggle switch in teleprompter: Manual vs Targeted mode
-- [ ] **TARG-02**: Manual mode: click grade → generate question (current behavior)
-- [ ] **TARG-03**: Targeted mode: click grade → generate question + select student at that level
+- [ ] **TARG-02**: Manual mode: click grade -> generate question (current behavior)
+- [ ] **TARG-03**: Targeted mode: click grade -> generate question + select student at that level
 
 ### Student Display
 
@@ -75,28 +75,28 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| QGEN-01 | TBD | Pending |
-| QGEN-02 | TBD | Pending |
-| QGEN-03 | TBD | Pending |
-| GRAD-01 | TBD | Pending |
-| GRAD-02 | TBD | Pending |
-| GRAD-03 | TBD | Pending |
-| TARG-01 | TBD | Pending |
-| TARG-02 | TBD | Pending |
-| TARG-03 | TBD | Pending |
-| DISP-01 | TBD | Pending |
-| DISP-02 | TBD | Pending |
-| DISP-03 | TBD | Pending |
-| CYCL-01 | TBD | Pending |
-| CYCL-02 | TBD | Pending |
-| CYCL-03 | TBD | Pending |
-| CYCL-04 | TBD | Pending |
+| QGEN-01 | Phase 16 | Pending |
+| QGEN-02 | Phase 16 | Pending |
+| QGEN-03 | Phase 16 | Pending |
+| GRAD-01 | Phase 15 | Pending |
+| GRAD-02 | Phase 15 | Pending |
+| GRAD-03 | Phase 15 | Pending |
+| TARG-01 | Phase 17 | Pending |
+| TARG-02 | Phase 17 | Pending |
+| TARG-03 | Phase 17 | Pending |
+| DISP-01 | Phase 18 | Pending |
+| DISP-02 | Phase 18 | Pending |
+| DISP-03 | Phase 18 | Pending |
+| CYCL-01 | Phase 17 | Pending |
+| CYCL-02 | Phase 17 | Pending |
+| CYCL-03 | Phase 17 | Pending |
+| CYCL-04 | Phase 17 | Pending |
 
 **Coverage:**
 - v2.4 requirements: 16 total
-- Mapped to phases: 0
-- Unmapped: 16 ⚠️
+- Mapped to phases: 16
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-01-21*
-*Last updated: 2026-01-21 after initial definition*
+*Last updated: 2026-01-21 after roadmap creation*

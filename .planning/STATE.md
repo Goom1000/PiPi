@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-01-21)
 
 **Core value:** Students see only the presentation; teachers see the teleprompter script
-**Current focus:** Planning next milestone
+**Current focus:** v2.4 Targeted Questioning
 
 ## Current Position
 
-Phase: Not started (defining requirements)
-Plan: —
-Status: Defining requirements
-Last activity: 2026-01-21 — Milestone v2.4 started
+Phase: 15 - Student Grades
+Plan: Not started
+Status: Ready for planning
+Last activity: 2026-01-21 - Roadmap created
 
-Progress: Defining requirements
+Progress: [--------------------] 0/4 phases
 
 ## Performance Metrics
 
@@ -32,6 +32,16 @@ Progress: Defining requirements
 - Total phases: 28 completed
 - Total plans: 49
 - Total LOC: ~8,000 TypeScript
+
+## Current Milestone: v2.4 Targeted Questioning
+
+**Phases:**
+- Phase 15: Student Grades (GRAD-01, GRAD-02, GRAD-03) - Pending
+- Phase 16: Question Enhancement (QGEN-01, QGEN-02, QGEN-03) - Pending
+- Phase 17: Targeting Mode (TARG-01 to TARG-03, CYCL-01 to CYCL-04) - Pending
+- Phase 18: Student Display (DISP-01, DISP-02, DISP-03) - Pending
+
+**Requirements:** 16 total, 0 complete
 
 ## Completed Milestones
 
@@ -51,7 +61,7 @@ Decisions are logged in PROJECT.md Key Decisions table.
 
 ### Pending Todos
 
-12 todos in `.planning/todos/pending/` — run `/gsd:check-todos` to review
+12 todos in `.planning/todos/pending/` - run `/gsd:check-todos` to review
 
 ### Blockers/Concerns
 
@@ -60,10 +70,10 @@ None.
 ## Session Continuity
 
 Last session: 2026-01-21
-Stopped at: v2.3 milestone complete
+Stopped at: Roadmap created for v2.4
 Resume file: None
-Next: Start next milestone with /gsd:new-milestone
+Next: Plan Phase 15 with /gsd:plan-phase 15
 
 ---
 *State initialized: 2026-01-18*
-*Last updated: 2026-01-21 - v2.3 milestone complete*
+*Last updated: 2026-01-21 - v2.4 roadmap created*
