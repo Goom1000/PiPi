@@ -618,19 +618,30 @@ function App() {
     try {
       const pipiFile = await readPiPiFile(file);
       setSlides(pipiFile.content.slides);
-      setStudentNames(pipiFile.content.studentNames || []);
+      const loadedStudents = pipiFile.content.studentNames || [];
+      setStudentNames(loadedStudents);
       setLessonText(pipiFile.content.lessonText || '');
       setLessonTitle(pipiFile.title);
       setAppState(AppState.EDITING);
       setActiveSlideIndex(0);
       clearAutoSave();
       setHasUnsavedChanges(false);
+
+      // Restore grade data if present - save as class with grades
+      const loadedGrades = pipiFile.content.studentGrades;
+      if (loadedGrades && loadedGrades.length > 0 && loadedStudents.length > 0) {
+        const className = pipiFile.title || 'Imported Class';
+        // saveClass now accepts studentData - handles both new and existing classes
+        saveClass(className, loadedStudents, loadedGrades);
+        setActiveClassName(className);
+      }
+
       addToast('Presentation loaded successfully!', 3000, 'success');
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Failed to load file.';
       addToast(message, 5000, 'error');
     }
-  }, [hasUnsavedChanges, addToast]);
+  }, [hasUnsavedChanges, addToast, saveClass]);
 
   const handleLoadClick = useCallback(() => {
     loadFileInputRef.current?.click();
