@@ -1,6 +1,6 @@
 import { AIProviderInterface, AIProviderError, AIErrorCode, USER_ERROR_MESSAGES, GenerationInput, GenerationMode } from '../aiProvider';
 import { Slide, LessonResource } from '../../types';
-import { QuizQuestion } from '../geminiService';
+import { QuizQuestion, QuestionWithAnswer } from '../geminiService';
 
 // Shared teleprompter rules used across all generation modes
 const TELEPROMPTER_RULES = `
@@ -532,5 +532,59 @@ Each question object must have:
 
     const response = await callClaude(this.apiKey, messages, systemPrompt, 4096);
     return extractJSON<QuizQuestion[]>(response);
+  }
+
+  async generateQuestionWithAnswer(
+    slideTitle: string,
+    slideContent: string[],
+    difficulty: 'A' | 'B' | 'C' | 'D' | 'E'
+  ): Promise<QuestionWithAnswer> {
+    const systemPrompt = `
+You are a teaching assistant helper for a Year 6 (10-11 year old) class.
+Generate a single oral question with an expected answer that the teacher can use as a teleprompter guide.
+
+BLOOM'S TAXONOMY DIFFICULTY MAPPING:
+- Grade E (Recall): "What is...", "Name the...", "List the..." - Pure factual recall.
+- Grade D (Comprehension): "Give an example of...", "Which one shows..." - Basic understanding.
+- Grade C (Understanding): "Describe in your own words", "What does X mean?" - Deeper understanding.
+- Grade B (Application): "How would you use...", "Explain how..." - Apply concepts.
+- Grade A (Analysis/Synthesis): "Why does X affect Y?", "What would happen if..." - Critical thinking.
+
+ANSWER FORMAT RULES:
+- Write a sample answer a good student would give.
+- Use **bold** around KEY POINTS the teacher should listen for.
+- Length:
+  - Grade E/D: 1-2 sentences
+  - Grade C: 2-3 sentences
+  - Grade B/A: 2-3 sentences with deeper reasoning
+- Example: "The water cycle includes **evaporation**, **condensation**, and **precipitation**."
+
+OUTPUT RULES:
+- Question should be conversational and age-appropriate.
+- Answer should be natural, not robotic.
+- Bold the 2-4 most important key terms or concepts.
+
+IMPORTANT: Return your response as valid JSON with these fields:
+- question (string)
+- answer (string - sample answer with **key points** bolded)
+
+Do not include any text before or after the JSON.
+`;
+
+    const messages: ClaudeMessage[] = [{
+      role: 'user',
+      content: `Topic: ${slideTitle}\nKey Points on Slide: ${slideContent.join('; ')}\n\nGenerate a Grade ${difficulty} question with expected answer.`
+    }];
+
+    try {
+      const response = await callClaude(this.apiKey, messages, systemPrompt, 512);
+      return extractJSON<QuestionWithAnswer>(response);
+    } catch (error) {
+      // Fallback on error
+      return {
+        question: "Could not generate question",
+        answer: "Please try again"
+      };
+    }
   }
 }

@@ -2,6 +2,7 @@ import { AIProviderInterface, AIProviderError, USER_ERROR_MESSAGES, GenerationIn
 import { Slide, LessonResource } from '../../types';
 import {
   QuizQuestion,
+  QuestionWithAnswer,
   generateLessonSlides as geminiGenerateLessonSlides,
   generateSlideImage as geminiGenerateSlideImage,
   generateResourceImage as geminiGenerateResourceImage,
@@ -11,6 +12,7 @@ import {
   generateExemplarSlide as geminiGenerateExemplarSlide,
   generateLessonResources as geminiGenerateLessonResources,
   generateImpromptuQuiz as geminiGenerateImpromptuQuiz,
+  generateQuestionWithAnswer as geminiGenerateQuestionWithAnswer,
 } from '../geminiService';
 
 /**
@@ -105,6 +107,18 @@ export class GeminiProvider implements AIProviderInterface {
   ): Promise<QuizQuestion[]> {
     try {
       return await geminiGenerateImpromptuQuiz(this.apiKey, slides, currentIndex, numQuestions);
+    } catch (error) {
+      throw this.wrapError(error);
+    }
+  }
+
+  async generateQuestionWithAnswer(
+    slideTitle: string,
+    slideContent: string[],
+    difficulty: 'A' | 'B' | 'C' | 'D' | 'E'
+  ): Promise<QuestionWithAnswer> {
+    try {
+      return await geminiGenerateQuestionWithAnswer(this.apiKey, slideTitle, slideContent, difficulty);
     } catch (error) {
       throw this.wrapError(error);
     }

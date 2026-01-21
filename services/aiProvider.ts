@@ -1,5 +1,5 @@
 import { Slide, LessonResource, AIProvider } from '../types';
-import { QuizQuestion } from './geminiService';
+import { QuizQuestion, QuestionWithAnswer } from './geminiService';
 import { GeminiProvider } from './providers/geminiProvider';
 import { ClaudeProvider } from './providers/claudeProvider';
 
@@ -80,6 +80,11 @@ export interface AIProviderInterface {
     currentIndex: number,
     numQuestions?: number
   ): Promise<QuizQuestion[]>;
+  generateQuestionWithAnswer(
+    slideTitle: string,
+    slideContent: string[],
+    difficulty: 'A' | 'B' | 'C' | 'D' | 'E'
+  ): Promise<QuestionWithAnswer>;
 }
 
 // Factory function to create the appropriate provider instance
