@@ -94,8 +94,12 @@ export function useClassBank() {
    * Save or update a class with the given name and students.
    * If a class with the same name exists, it will be replaced.
    * Name is trimmed before saving.
+   *
+   * @param name - Class name
+   * @param students - Array of student names
+   * @param studentData - Optional array of students with grades (for import restoration)
    */
-  const saveClass = useCallback((name: string, students: string[]) => {
+  const saveClass = useCallback((name: string, students: string[], studentData?: StudentWithGrade[]) => {
     const trimmedName = name.trim();
     if (!trimmedName) return;
 
@@ -108,7 +112,10 @@ export function useClassBank() {
         name: trimmedName,
         students: [...students],
         studentData: students.map(name => {
-          // Preserve existing grades if class exists
+          // If studentData provided (from import), use it first
+          const provided = studentData?.find(s => s.name === name);
+          if (provided) return provided;
+          // Otherwise fall back to existing grades if class exists
           const existingStudent = existingIndex >= 0
             ? prev[existingIndex].studentData?.find(s => s.name === name)
             : undefined;
