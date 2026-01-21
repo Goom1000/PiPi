@@ -82,6 +82,7 @@ export interface PiPiFileContent {
   slides: Slide[];
   studentNames: string[];
   lessonText: string;
+  studentGrades?: StudentWithGrade[];  // Optional for backward compatibility
 }
 
 // .pipi file format with version metadata

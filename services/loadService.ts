@@ -25,6 +25,12 @@ export function isValidPiPiFile(data: unknown): data is PiPiFile {
   // Validate content.slides is an array
   if (!Array.isArray(content.slides)) return false;
 
+  // Validate optional studentGrades if present
+  if (content.studentGrades !== undefined) {
+    if (!Array.isArray(content.studentGrades)) return false;
+    // Shallow validation - detailed validation happens in useClassBank
+  }
+
   return true;
 }
 

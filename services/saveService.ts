@@ -1,4 +1,4 @@
-import { Slide, PiPiFile, CURRENT_FILE_VERSION } from '../types';
+import { Slide, PiPiFile, CURRENT_FILE_VERSION, StudentWithGrade } from '../types';
 
 /**
  * Create a PiPiFile object for saving.
@@ -8,6 +8,7 @@ import { Slide, PiPiFile, CURRENT_FILE_VERSION } from '../types';
  * @param studentNames - Array of student names
  * @param lessonText - Original lesson text input
  * @param existingFile - Optional existing file to preserve createdAt
+ * @param studentGrades - Optional array of student grade assignments
  * @returns PiPiFile object ready for serialization
  */
 export function createPiPiFile(
@@ -15,7 +16,8 @@ export function createPiPiFile(
   slides: Slide[],
   studentNames: string[],
   lessonText: string,
-  existingFile?: PiPiFile
+  existingFile?: PiPiFile,
+  studentGrades?: StudentWithGrade[]
 ): PiPiFile {
   const now = new Date().toISOString();
 
@@ -28,6 +30,7 @@ export function createPiPiFile(
       slides,
       studentNames,
       lessonText,
+      ...(studentGrades && studentGrades.length > 0 ? { studentGrades } : {}),
     },
   };
 }
