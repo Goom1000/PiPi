@@ -15,9 +15,9 @@ Requirements for targeted questioning milestone. Each maps to roadmap phases.
 
 ### Student Grades
 
-- [ ] **GRAD-01**: Teacher can assign grade level (A/B/C/D/E) to each student in class bank
-- [ ] **GRAD-02**: Grade assignments persist in localStorage with class data
-- [ ] **GRAD-03**: Modal UI to view and edit student grade assignments
+- [x] **GRAD-01**: Teacher can assign grade level (A/B/C/D/E) to each student in class bank
+- [x] **GRAD-02**: Grade assignments persist in localStorage with class data
+- [x] **GRAD-03**: Modal UI to view and edit student grade assignments
 
 ### Targeting Mode
 
@@ -78,9 +78,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 | QGEN-01 | Phase 16 | Pending |
 | QGEN-02 | Phase 16 | Pending |
 | QGEN-03 | Phase 16 | Pending |
-| GRAD-01 | Phase 15 | Pending |
-| GRAD-02 | Phase 15 | Pending |
-| GRAD-03 | Phase 15 | Pending |
+| GRAD-01 | Phase 15 | Complete |
+| GRAD-02 | Phase 15 | Complete |
+| GRAD-03 | Phase 15 | Complete |
 | TARG-01 | Phase 17 | Pending |
 | TARG-02 | Phase 17 | Pending |
 | TARG-03 | Phase 17 | Pending |
