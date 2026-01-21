@@ -41,6 +41,12 @@ Plans:
 
 **Dependencies:** None (independent of Phase 15)
 
+**Plans:** 2 plans
+
+Plans:
+- [ ] 16-01-PLAN.md - AI service layer: generateQuestionWithAnswer with structured output
+- [ ] 16-02-PLAN.md - UI: 5 difficulty buttons and answer display in teleprompter
+
 **Requirements:**
 - QGEN-01: AI generates question + expected answer for teleprompter
 - QGEN-02: Five difficulty levels (A/B/C/D/E) available as buttons
@@ -105,7 +111,7 @@ Plans:
 | Phase | Name | Requirements | Status |
 |-------|------|--------------|--------|
 | 15 | Student Grades | GRAD-01, GRAD-02, GRAD-03 | Complete |
-| 16 | Question Enhancement | QGEN-01, QGEN-02, QGEN-03 | Pending |
+| 16 | Question Enhancement | QGEN-01, QGEN-02, QGEN-03 | Planned |
 | 17 | Targeting Mode | TARG-01, TARG-02, TARG-03, CYCL-01, CYCL-02, CYCL-03, CYCL-04 | Pending |
 | 18 | Student Display | DISP-01, DISP-02, DISP-03 | Pending |
 
@@ -116,3 +122,4 @@ Plans:
 *Phase 15 planned: 2026-01-21*
 *Phase 15 gap closure: 2026-01-21*
 *Phase 15 complete: 2026-01-21*
+*Phase 16 planned: 2026-01-22*
