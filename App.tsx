@@ -19,6 +19,7 @@ import RecoveryModal from './components/RecoveryModal';
 import ClassBankSaveModal from './components/ClassBankSaveModal';
 import ClassBankDropdown from './components/ClassBankDropdown';
 import ClassManagementModal from './components/ClassManagementModal';
+import StudentListModal from './components/StudentListModal';
 import { useToast, ToastContainer } from './components/Toast';
 import useHashRoute from './hooks/useHashRoute';
 import StudentView from './components/StudentView';
@@ -146,6 +147,7 @@ function App() {
   const [showLoadDropdown, setShowLoadDropdown] = useState(false);
   const [activeClassName, setActiveClassName] = useState<string | null>(null);
   const [showManageModal, setShowManageModal] = useState(false);
+  const [showStudentListModal, setShowStudentListModal] = useState(false);
   const loadClassButtonRef = useRef<HTMLButtonElement>(null);
 
   // PDF handling state - Lesson Plan
@@ -510,6 +512,15 @@ function App() {
         }
       }
     );
+  };
+
+  // Handle grade update from StudentListModal (wraps updateStudentGrade with activeClass lookup)
+  const handleUpdateGradeForActiveClass = (studentName: string, grade: import('./types').GradeLevel | null) => {
+    if (!activeClassName) return;
+    const activeClass = classes.find(c => c.name === activeClassName);
+    if (activeClass) {
+      updateStudentGrade(activeClass.id, studentName, grade);
+    }
   };
 
   const startPresentation = (fromIndex: number) => {
@@ -1054,102 +1065,39 @@ function App() {
 
         {appState === AppState.EDITING && (
           <div className="flex-1 flex flex-col overflow-hidden">
-             {/* TOP CLASS MANAGEMENT BAR */}
-             <div className="h-16 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 px-6 flex items-center gap-6 shrink-0 overflow-x-auto transition-colors duration-300 relative z-10">
-                <div className="flex items-center gap-2 shrink-0">
-                    <span className="text-xs font-bold text-slate-500 uppercase tracking-widest">Students:</span>
-                    <div className="flex items-center gap-1 bg-slate-50 dark:bg-slate-800 p-1 rounded-xl border border-slate-100 dark:border-slate-700">
-                        <input 
-                          value={nameInput}
-                          onChange={(e) => setNameInput(e.target.value)}
-                          onKeyDown={(e) => e.key === 'Enter' && handleAddNames()}
-                          placeholder="Add Student Name..."
-                          className="bg-transparent text-xs px-3 py-1.5 focus:outline-none w-36 text-slate-700 dark:text-slate-200 placeholder:text-slate-400 dark:placeholder:text-slate-500"
-                        />
-                        <button onClick={handleAddNames} className="p-1.5 bg-indigo-600 dark:bg-amber-500 text-white dark:text-slate-900 rounded-lg hover:bg-indigo-700 dark:hover:bg-amber-400 transition-colors">
-                           <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M12 4v16m8-8H4" /></svg>
-                        </button>
-                    </div>
-                </div>
-
-                <div className="h-8 w-px bg-slate-100 dark:bg-slate-800 shrink-0"></div>
-
-                {/* Class Bank Controls */}
-                <div className="flex items-center gap-1 shrink-0 relative">
-                  {/* Save Button */}
-                  <button
-                    onClick={() => setShowSaveClassModal(true)}
-                    disabled={studentNames.length === 0}
-                    title={studentNames.length === 0 ? 'Add students first' : 'Save class'}
-                    className="p-1.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg transition-colors text-slate-600 dark:text-slate-400"
-                  >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
-                    </svg>
-                  </button>
-
-                  {/* Load Button */}
-                  <button
-                    ref={loadClassButtonRef}
-                    onClick={() => setShowLoadDropdown(!showLoadDropdown)}
-                    disabled={classes.length === 0}
-                    title={classes.length === 0 ? 'No saved classes' : 'Load class'}
-                    className="p-1.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg transition-colors text-slate-600 dark:text-slate-400"
-                  >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 19a2 2 0 01-2-2V7a2 2 0 012-2h4l2 2h4a2 2 0 012 2v1M5 19h14a2 2 0 002-2v-5a2 2 0 00-2-2H9a2 2 0 00-2 2v5a2 2 0 01-2 2z" />
-                    </svg>
-                  </button>
-
-                  {/* Load Dropdown */}
-                  {showLoadDropdown && (
-                    <ClassBankDropdown
-                      classes={classes}
-                      onLoad={handleLoadClassBank}
-                      onClose={() => setShowLoadDropdown(false)}
-                      onManage={() => {
-                        setShowLoadDropdown(false);
-                        setShowManageModal(true);
-                      }}
-                      anchorRef={loadClassButtonRef}
-                    />
-                  )}
-                </div>
-
-                <div className="h-8 w-px bg-slate-100 dark:bg-slate-800 shrink-0"></div>
-
-                {/* Active Class Indicator */}
-                {activeClassName && (
-                  <div className="flex items-center gap-1 shrink-0">
-                    <span className="text-[10px] bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 px-2 py-0.5 rounded-full font-medium">
+             {/* TOP BAR - Clean Edit Class Button */}
+             <div className="h-14 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 px-6 flex items-center gap-4 shrink-0 transition-colors duration-300 relative z-10">
+                {/* Edit Class Button */}
+                <button
+                  onClick={() => setShowStudentListModal(true)}
+                  className="flex items-center gap-2 px-4 py-2 bg-indigo-50 dark:bg-slate-800 hover:bg-indigo-100 dark:hover:bg-slate-700 text-indigo-700 dark:text-amber-400 border border-indigo-200 dark:border-slate-700 rounded-xl transition-colors"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" />
+                  </svg>
+                  <span className="text-sm font-bold">
+                    {studentNames.length === 0 ? 'Add Students' : `${studentNames.length} Student${studentNames.length !== 1 ? 's' : ''}`}
+                  </span>
+                  {activeClassName && (
+                    <span className="text-[10px] bg-indigo-600 dark:bg-amber-500 text-white dark:text-slate-900 px-1.5 py-0.5 rounded font-medium">
                       {activeClassName}
                     </span>
-                    <button
-                      onClick={() => setActiveClassName(null)}
-                      className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
-                      title="Clear active class"
-                    >
-                      <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                      </svg>
-                    </button>
-                  </div>
-                )}
+                  )}
+                </button>
 
-                <div className="flex items-center gap-2 overflow-x-auto py-2 no-scrollbar">
-                    {studentNames.map(name => (
-                        <div key={name} className="flex items-center gap-2 bg-indigo-50 dark:bg-slate-800 text-indigo-700 dark:text-amber-400 px-3 py-1 rounded-lg text-[10px] font-bold border border-indigo-100 dark:border-amber-500/20 whitespace-nowrap group">
-                            {name}
-                            <button
-                                onClick={() => { setStudentNames(prev => prev.filter(n => n !== name)); setActiveClassName(null); }}
-                                className="text-indigo-300 dark:text-amber-600 hover:text-red-500 transition-colors"
-                            >
-                                <svg className="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M6 18L18 6M6 6l12 12" /></svg>
-                            </button>
-                        </div>
-                    ))}
-                    {studentNames.length === 0 && <span className="text-[10px] text-slate-300 dark:text-slate-600 italic">No students added to the class yet.</span>}
-                </div>
+                {/* Graded count hint */}
+                {(() => {
+                  const activeClass = activeClassName ? classes.find(c => c.name === activeClassName) : null;
+                  const gradedCount = activeClass?.studentData?.filter(s => s.grade).length || 0;
+                  if (gradedCount > 0) {
+                    return (
+                      <span className="text-xs text-slate-400 dark:text-slate-500">
+                        {gradedCount} graded
+                      </span>
+                    );
+                  }
+                  return null;
+                })()}
              </div>
 
              {/* MAIN WORKSPACE: Sidebar + Stage */}
@@ -1376,6 +1324,43 @@ function App() {
           onDelete={handleDeleteClass}
           onUpdateGrade={updateStudentGrade}
           activeClassName={activeClassName}
+        />
+      )}
+
+      {/* Student List Modal */}
+      {showStudentListModal && (
+        <StudentListModal
+          studentNames={studentNames}
+          studentData={(() => {
+            const activeClass = activeClassName ? classes.find(c => c.name === activeClassName) : null;
+            return activeClass?.studentData || [];
+          })()}
+          onUpdateStudents={(students) => {
+            setStudentNames(students);
+            // If we had an active class, clear it since list changed
+            if (activeClassName) {
+              // Also update the class bank
+              const activeClass = classes.find(c => c.name === activeClassName);
+              if (activeClass) {
+                updateClassStudents(activeClass.id, students);
+              }
+            }
+          }}
+          onUpdateGrade={handleUpdateGradeForActiveClass}
+          onClose={() => setShowStudentListModal(false)}
+          classes={classes}
+          onSaveClass={() => {
+            setShowStudentListModal(false);
+            setShowSaveClassModal(true);
+          }}
+          onLoadClass={(classData) => {
+            handleLoadClassBank(classData);
+          }}
+          activeClassName={activeClassName}
+          onManageClasses={() => {
+            setShowStudentListModal(false);
+            setShowManageModal(true);
+          }}
         />
       )}
 
