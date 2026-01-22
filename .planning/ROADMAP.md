@@ -8,11 +8,17 @@
 
 | Phase | Name | Goal | Requirements | Status |
 |-------|------|------|--------------|--------|
-| 19 | Rebrand to Cue | Replace all PiPi branding with Cue across UI, files, and repo | BRAND-01 through BRAND-05, FILE-01 through FILE-03, REPO-01, REPO-02 | Pending |
+| 19 | Rebrand to Cue | Replace all PiPi branding with Cue across UI, files, and repo | BRAND-01 through BRAND-05, FILE-01 through FILE-03, REPO-01, REPO-02 | Planned |
 
 ## Phase 19: Rebrand to Cue
 
 **Goal:** Replace all PiPi branding with Cue across UI, file format, and GitHub repository.
+
+**Plans:** 2 plans
+
+Plans:
+- [ ] 19-01-PLAN.md — UI branding + file format migration (BRAND-01 through BRAND-05, FILE-01 through FILE-03)
+- [ ] 19-02-PLAN.md — Repository rename + deployment (REPO-01, REPO-02)
 
 **Requirements covered:**
 - BRAND-01: App header displays "Cue"
