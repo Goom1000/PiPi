@@ -37,11 +37,12 @@ Plans:
   3. Game state syncs correctly to student view without cross-contamination between game types
   4. Teacher can reveal/hide answers consistently across all game types
   5. Switching between games clears previous state completely
-**Plans**: TBD
+**Plans**: 3 plans
 
 Plans:
-- [ ] 20-01: TBD
-- [ ] 20-02: TBD
+- [ ] 20-01-PLAN.md — Type system & game menu dropdown
+- [ ] 20-02-PLAN.md — Game container & Quick Quiz refactor
+- [ ] 20-03-PLAN.md — Integration & CSS animations
 
 ### Phase 21: Millionaire Game
 
@@ -160,7 +161,7 @@ Phases execute in numeric order: 20 → 21 → 22 → 23 → 24 → 25 → 26
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 20. Game Foundation & Type System | 0/TBD | Not started | - |
+| 20. Game Foundation & Type System | 0/3 | Ready | - |
 | 21. Millionaire Game | 0/TBD | Not started | - |
 | 22. AI Integration | 0/TBD | Not started | - |
 | 23. The Chase | 0/TBD | Not started | - |
