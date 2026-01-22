@@ -329,6 +329,15 @@ const PresentationView: React.FC<PresentationViewProps> = ({ slides, onExit, stu
   const [cyclingState, setCyclingState] = useState<TargetedCyclingState>(() =>
     initializeCycling(studentData)
   );
+  const [isCounterExpanded, setIsCounterExpanded] = useState(false);
+
+  // Helper to manually mark student as asked (voluntary answers)
+  const markStudentAsAsked = useCallback((studentName: string) => {
+    setCyclingState(prev => ({
+      ...prev,
+      askedStudents: new Set([...prev.askedStudents, studentName]),
+    }));
+  }, []);
 
   // Derived state for mode availability
   const hasStudentsWithGrades = studentData.some(s => s.grade !== null);
@@ -375,6 +384,7 @@ const PresentationView: React.FC<PresentationViewProps> = ({ slides, onExit, stu
   // Reset cycling state when slide changes (CYCL-04)
   useEffect(() => {
     setCyclingState(initializeCycling(studentData));
+    setIsCounterExpanded(false);
   }, [currentIndex, studentData]);
 
   // Next student for Targeted mode preview
@@ -886,6 +896,68 @@ const PresentationView: React.FC<PresentationViewProps> = ({ slides, onExit, stu
                                                    <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
                                                </svg>
                                            </span>
+                                       )}
+                                   </div>
+
+                                   {/* Progress Counter */}
+                                   <div className="mt-3 border-t border-slate-600 pt-3">
+                                       <button
+                                           onClick={() => setIsCounterExpanded(!isCounterExpanded)}
+                                           className="w-full text-left text-xs text-slate-400 hover:text-slate-300 flex items-center justify-between transition-colors"
+                                       >
+                                           <span>
+                                               {cyclingState.currentIndex} of {cyclingState.shuffledOrder.length} students asked
+                                           </span>
+                                           <svg
+                                               className={`w-4 h-4 transition-transform ${isCounterExpanded ? 'rotate-180' : ''}`}
+                                               fill="none"
+                                               stroke="currentColor"
+                                               viewBox="0 0 24 24"
+                                           >
+                                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                                           </svg>
+                                       </button>
+
+                                       {/* Expanded Student List */}
+                                       {isCounterExpanded && (
+                                           <div className="mt-2 p-2 bg-slate-800 rounded-lg max-h-40 overflow-y-auto space-y-1">
+                                               {cyclingState.shuffledOrder.map((name, idx) => {
+                                                   const isAsked = idx < cyclingState.currentIndex || cyclingState.askedStudents.has(name);
+                                                   const student = studentData.find(s => s.name === name);
+                                                   return (
+                                                       <div
+                                                           key={name}
+                                                           className="flex items-center justify-between text-xs py-1 px-2 rounded hover:bg-slate-700/50"
+                                                       >
+                                                           <div className="flex items-center gap-2">
+                                                               <span className={isAsked ? 'text-green-400' : 'text-slate-500'}>
+                                                                   {isAsked ? '\u2713' : '\u25CB'}
+                                                               </span>
+                                                               <span className={isAsked ? 'text-slate-400' : 'text-white'}>
+                                                                   {name}
+                                                               </span>
+                                                               {student?.grade && (
+                                                                   <span className="text-[9px] text-slate-500">
+                                                                       ({student.grade})
+                                                                   </span>
+                                                               )}
+                                                           </div>
+                                                           {!isAsked && (
+                                                               <button
+                                                                   onClick={(e) => {
+                                                                       e.stopPropagation();
+                                                                       markStudentAsAsked(name);
+                                                                   }}
+                                                                   className="text-[9px] text-slate-500 hover:text-amber-400 px-1.5 py-0.5 rounded hover:bg-slate-600"
+                                                                   title="Mark as asked (answered voluntarily)"
+                                                               >
+                                                                   mark
+                                                               </button>
+                                                           )}
+                                                       </div>
+                                                   );
+                                               })}
+                                           </div>
                                        )}
                                    </div>
                                </div>
