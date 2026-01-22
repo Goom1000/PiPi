@@ -320,6 +320,7 @@ const PresentationView: React.FC<PresentationViewProps> = ({ slides, onExit, stu
     question: string;
     answer: string;
     level: string;
+    studentName?: string;  // For Targeted mode
   } | null>(null);
   const [isGeneratingQuestion, setIsGeneratingQuestion] = useState(false);
 
@@ -437,7 +438,7 @@ const PresentationView: React.FC<PresentationViewProps> = ({ slides, onExit, stu
     postMessage({ type: 'CLOSE_STUDENT' });
   }, [postMessage]);
 
-  const handleGenerateQuestion = async (level: 'A' | 'B' | 'C' | 'D' | 'E') => {
+  const handleGenerateQuestion = async (level: 'A' | 'B' | 'C' | 'D' | 'E', studentName?: string) => {
       if (!provider) {
           onRequestAI(`generate a Grade ${level} question`);
           return;
@@ -445,7 +446,7 @@ const PresentationView: React.FC<PresentationViewProps> = ({ slides, onExit, stu
       setIsGeneratingQuestion(true);
       try {
           const result = await provider.generateQuestionWithAnswer(currentSlide.title, currentSlide.content, level);
-          setQuickQuestion({ question: result.question, answer: result.answer, level: `Grade ${level}` });
+          setQuickQuestion({ question: result.question, answer: result.answer, level: `Grade ${level}`, studentName });
       } catch (err) {
           if (err instanceof AIProviderError) {
               onError('Question Generation Failed', err.userMessage);
@@ -871,7 +872,7 @@ const PresentationView: React.FC<PresentationViewProps> = ({ slides, onExit, stu
                                    <div className="relative">
                                        <button
                                            onClick={() => {
-                                               handleGenerateQuestion(nextStudent.grade);
+                                               handleGenerateQuestion(nextStudent.grade, nextStudent.name);
                                                setCyclingState(prev => advanceCycling(prev, studentData));
                                            }}
                                            className={`w-full bg-amber-600 hover:bg-amber-500 text-white border border-amber-500/50 rounded-lg py-3 text-sm font-bold uppercase tracking-wider transition-colors ${!isAIAvailable ? 'opacity-50' : ''}`}
@@ -952,9 +953,16 @@ const PresentationView: React.FC<PresentationViewProps> = ({ slides, onExit, stu
                                     'Grade E': 'bg-emerald-900 text-emerald-300',
                                   };
                                   return (
-                                    <span className={`text-[9px] font-bold uppercase tracking-widest px-1.5 py-0.5 rounded ${levelColors[quickQuestion.level] || 'bg-slate-700 text-slate-300'}`}>
-                                      {quickQuestion.level}
-                                    </span>
+                                    <div className="flex items-center gap-2">
+                                      <span className={`text-[9px] font-bold uppercase tracking-widest px-1.5 py-0.5 rounded ${levelColors[quickQuestion.level] || 'bg-slate-700 text-slate-300'}`}>
+                                        {quickQuestion.level}
+                                      </span>
+                                      {quickQuestion.studentName && (
+                                        <span className="text-[10px] font-bold text-indigo-400">
+                                          for {quickQuestion.studentName}
+                                        </span>
+                                      )}
+                                    </div>
                                   );
                                 })()}
                                 <button onClick={() => setQuickQuestion(null)} className="text-slate-400 hover:text-white">
