@@ -6,6 +6,20 @@ A presentation tool for teachers that transforms PDF lesson plans into interacti
 
 **v2.5 shipped:** Complete rebrand from PiPi to Cue with .cue file format (backward compatible with .pipi), deployed at https://goom1000.github.io/Cue/
 
+## Current Milestone: v2.6 Quiz Game Variety
+
+**Goal:** Add multiple TV show-style quiz games (The Chase, Beat the Chaser, Who Wants to Be a Millionaire) with a unified game selection menu, integrated with the existing A-E grade difficulty system.
+
+**Target features:**
+- Game selection menu replacing current Kahoot button
+- The Chase game with AI-controlled or teacher-controlled chaser
+- Beat the Chaser variant with different mechanics
+- Who Wants to Be a Millionaire with functional lifelines (50:50, Ask the Audience, Phone-a-Friend)
+- Individual or team competition modes (teacher chooses)
+- AI-generated questions from lesson content
+- Grade-level integration for difficulty targeting
+- Game board display on student view with teacher-controlled answer reveals
+
 ## Core Value
 
 Students see only the presentation; teachers see the presentation plus a teleprompter script that lets them sound knowledgeable and natural without reading slides verbatim.
@@ -80,7 +94,13 @@ Students see only the presentation; teachers see the presentation plus a telepro
 
 ### Active
 
-(None - ready for next milestone)
+- [ ] Game selection menu with all quiz game options
+- [ ] The Chase game format (AI or teacher-controlled chaser)
+- [ ] Beat the Chaser game format
+- [ ] Who Wants to Be a Millionaire with functional lifelines
+- [ ] Individual vs team competition modes
+- [ ] AI question generation integrated with A-E grade difficulty
+- [ ] Game board synced to student view with answer reveal control
 
 ### Deferred (v2.6+)
 
@@ -195,4 +215,4 @@ v2.5 delivered Rebrand to Cue:
 | Repository name "Cue" | Simple, matches brand, short URL | ✓ Good — v2.5 |
 
 ---
-*Last updated: 2026-01-22 after v2.5 milestone completion*
+*Last updated: 2026-01-22 after v2.6 milestone started*
