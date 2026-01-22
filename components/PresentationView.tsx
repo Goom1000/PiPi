@@ -379,7 +379,11 @@ const PresentationView: React.FC<PresentationViewProps> = ({ slides, onExit, stu
   // Clear question when slide changes
   useEffect(() => {
       setQuickQuestion(null);
-  }, [currentIndex]);
+      // Clear student banner on student view when slide changes
+      if (isTargetedMode) {
+        postMessage({ type: 'STUDENT_CLEAR' });
+      }
+  }, [currentIndex, postMessage, isTargetedMode]);
 
   // Reset cycling state when slide changes (CYCL-04)
   useEffect(() => {
@@ -884,6 +888,8 @@ const PresentationView: React.FC<PresentationViewProps> = ({ slides, onExit, stu
                                            onClick={() => {
                                                handleGenerateQuestion(nextStudent.grade, nextStudent.name);
                                                setCyclingState(prev => advanceCycling(prev, studentData));
+                                               // Broadcast student selection to student view
+                                               postMessage({ type: 'STUDENT_SELECT', payload: { studentName: nextStudent.name } });
                                            }}
                                            className={`w-full bg-amber-600 hover:bg-amber-500 text-white border border-amber-500/50 rounded-lg py-3 text-sm font-bold uppercase tracking-wider transition-colors ${!isAIAvailable ? 'opacity-50' : ''}`}
                                            title={!isAIAvailable ? 'Add API key in Settings to enable' : `Generate question for ${nextStudent.name}`}

@@ -41,7 +41,9 @@ export type PresentationMessage =
   | { type: 'HEARTBEAT_ACK'; timestamp: number }
   | { type: 'CLOSE_STUDENT' }
   | { type: 'GAME_STATE_UPDATE'; payload: GameSyncState }
-  | { type: 'GAME_CLOSE' };
+  | { type: 'GAME_CLOSE' }
+  | { type: 'STUDENT_SELECT'; payload: { studentName: string } }
+  | { type: 'STUDENT_CLEAR' };
 
 export interface LessonResource {
   id: string;
