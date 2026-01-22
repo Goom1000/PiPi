@@ -6,7 +6,7 @@ A presentation tool for teachers that transforms PDF lesson plans into interacti
 
 **v2.5 shipped:** Complete rebrand from PiPi to Cue with .cue file format (backward compatible with .pipi), deployed at https://goom1000.github.io/Cue/
 
-## Current Milestone: v2.6 Quiz Game Variety
+## Current Milestone: v3.0 Quiz Game Variety
 
 **Goal:** Add multiple TV show-style quiz games (The Chase, Beat the Chaser, Who Wants to Be a Millionaire) with a unified game selection menu, integrated with the existing A-E grade difficulty system.
 
@@ -102,7 +102,7 @@ Students see only the presentation; teachers see the presentation plus a telepro
 - [ ] AI question generation integrated with A-E grade difficulty
 - [ ] Game board synced to student view with answer reveal control
 
-### Deferred (v2.6+)
+### Deferred (v3.0+)
 
 - [ ] Elapsed time display showing presentation duration
 - [ ] Fullscreen recovery (auto re-enter if exited)
@@ -215,4 +215,4 @@ v2.5 delivered Rebrand to Cue:
 | Repository name "Cue" | Simple, matches brand, short URL | ✓ Good — v2.5 |
 
 ---
-*Last updated: 2026-01-22 after v2.6 milestone started*
+*Last updated: 2026-01-22 after v3.0 milestone started*

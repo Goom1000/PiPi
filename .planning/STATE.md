@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-01-22)
 
 **Core value:** Students see only the presentation; teachers see the teleprompter script
-**Current focus:** v2.6 Quiz Game Variety
+**Current focus:** v3.0 Quiz Game Variety
 
 ## Current Position
 
 Phase: Not started (defining requirements)
 Plan: —
 Status: Defining requirements
-Last activity: 2026-01-22 — Milestone v2.6 started
+Last activity: 2026-01-22 — Milestone v3.0 started
 
-Progress: ░░░░░░░░░░░░░░░░░░░░ 0% (v2.6 Quiz Game Variety)
+Progress: ░░░░░░░░░░░░░░░░░░░░ 0% (v3.0 Quiz Game Variety)
 
 ## Performance Metrics
 
@@ -69,10 +69,10 @@ None.
 ## Session Continuity
 
 Last session: 2026-01-22
-Stopped at: Defining v2.6 requirements
+Stopped at: Defining v3.0 requirements
 Resume file: None
 Next: Complete requirements → create roadmap
 
 ---
 *State initialized: 2026-01-18*
-*Last updated: 2026-01-22 - v2.6 milestone started*
+*Last updated: 2026-01-22 - v3.0 milestone started*
