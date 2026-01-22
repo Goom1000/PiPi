@@ -63,19 +63,19 @@ ${JSON_OUTPUT_FORMAT}
     case 'refine':
       return `
 You are an elite Primary Education Consultant.
-Your goal is to transform an existing presentation into clean, less text-dense PiPi-style slides.
+Your goal is to transform an existing presentation into clean, less text-dense Cue-style slides.
 
 CRITICAL RULE - CONTENT PRESERVATION:
 **You MUST preserve ALL content from the original presentation.**
 - Do NOT omit any slides, sections, activities, examples, or instructions.
 - If the original has a "Daily Challenge" - include it.
 - If the original has a "Worked Example" - include it.
-- If something seems clunky or doesn't fit the PiPi style, RESTRUCTURE it to fit - do NOT remove it.
+- If something seems clunky or doesn't fit the Cue style, RESTRUCTURE it to fit - do NOT remove it.
 - The teacher will decide what to remove later. Your job is to improve presentation, not edit content.
 
 REFINE MODE RULES:
 - Extract key concepts from the presentation provided.
-- Create NEW PiPi-style slides from scratch (do not preserve original formatting).
+- Create NEW Cue-style slides from scratch (do not preserve original formatting).
 - You may split dense slides into multiple slides - but all original content must appear somewhere.
 - You may reorder slides for better pedagogical flow.
 - Note any images/diagrams that existed with "[Visual: description]" in the relevant bullet point so the teacher knows to re-add them.
@@ -98,7 +98,7 @@ BLEND MODE RULES:
 - Analyze BOTH the lesson plan AND existing presentation provided.
 - Determine content overlap between sources.
 - If the lesson contains topics NOT in the presentation, add new slides for those topics.
-- Standardize ALL output to PiPi style (do not try to match original presentation aesthetic).
+- Standardize ALL output to Cue style (do not try to match original presentation aesthetic).
 - When lesson says X but presentation says Y, note the discrepancy in speakerNotes: "[Note: Sources differ on...]"
 - Output stands alone - no references to source documents.
 - Synthesize both sources into a cohesive teaching narrative for the teleprompter scripts.
@@ -249,12 +249,12 @@ export class ClaudeProvider implements AIProviderInterface {
     } else if (input.mode === 'refine') {
       contentParts.push({
         type: 'text',
-        text: `Transform this existing presentation into clean, less text-dense PiPi-style slides:\n\n${input.presentationText || ''}`
+        text: `Transform this existing presentation into clean, less text-dense Cue-style slides:\n\n${input.presentationText || ''}`
       });
     } else { // blend
       contentParts.push({
         type: 'text',
-        text: `Combine this lesson plan:\n\n${input.lessonText}\n\n---\n\nWith this existing presentation:\n\n${input.presentationText || ''}\n\nCreate enhanced PiPi-style slides that incorporate content from both sources.`
+        text: `Combine this lesson plan:\n\n${input.lessonText}\n\n---\n\nWith this existing presentation:\n\n${input.presentationText || ''}\n\nCreate enhanced Cue-style slides that incorporate content from both sources.`
       });
     }
 

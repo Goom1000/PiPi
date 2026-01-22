@@ -752,7 +752,7 @@ function App() {
             <line x1="12" y1="17" x2="12" y2="21" />
             <line x1="8" y1="21" x2="16" y2="21" />
           </svg>
-          <h1 className="font-fredoka text-2xl font-bold text-violet-600 dark:text-amber-400 tracking-tight">PiPi</h1>
+          <h1 className="font-fredoka text-2xl font-bold text-violet-600 dark:text-amber-400 tracking-tight">Cue</h1>
         </div>
         
         <div className="flex items-center gap-4">
@@ -852,7 +852,7 @@ function App() {
                   <line x1="12" y1="17" x2="12" y2="21" />
                   <line x1="8" y1="21" x2="16" y2="21" />
                 </svg>
-                <h2 className="font-fredoka text-6xl font-bold text-violet-600 dark:text-amber-400 mt-2">PiPi</h2>
+                <h2 className="font-fredoka text-6xl font-bold text-violet-600 dark:text-amber-400 mt-2">Cue</h2>
               </div>
 
               <div className="text-center mb-10 animate-fade-in">
