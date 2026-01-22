@@ -365,43 +365,60 @@ const ClassManagementModal: React.FC<ClassManagementModalProps> = ({
                     {/* Expanded Student Editor */}
                     {isExpanded && (
                       <div className="px-4 pb-4 pt-0 border-t border-slate-100 dark:border-slate-700 mt-1">
-                        {/* Student Chips */}
-                        <div className="flex flex-wrap gap-1.5 mt-3 mb-3">
+                        {/* Student List - Vertical Layout */}
+                        <div className="flex flex-col gap-2 mt-3 mb-3">
                           {classData.students.length === 0 ? (
                             <span className="text-xs text-slate-400 dark:text-slate-500 italic">
                               No students in this class
                             </span>
                           ) : (
-                            classData.students.map((student) => {
+                            [...classData.students].sort((a, b) => a.localeCompare(b)).map((student) => {
                               const currentGrade = getStudentGrade(classData, student);
+                              const grades: (GradeLevel | null)[] = ['A', 'B', 'C', 'D', 'E'];
                               return (
                                 <div
                                   key={student}
-                                  className="flex items-center gap-1.5 bg-indigo-50 dark:bg-slate-700 text-indigo-700 dark:text-amber-400 px-2.5 py-1 rounded-lg text-[10px] font-bold border border-indigo-100 dark:border-amber-500/20"
+                                  className="flex items-center justify-between gap-3 py-1.5"
                                 >
-                                  {student}
-                                  {/* Grade Select */}
-                                  <select
-                                    value={currentGrade || ''}
-                                    onChange={(e) => onUpdateGrade(classData.id, student, (e.target.value || null) as GradeLevel | null)}
-                                    className="ml-1 px-1 py-0.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 rounded text-[9px] text-slate-600 dark:text-slate-300 focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:focus:ring-amber-500"
-                                    onClick={(e) => e.stopPropagation()}
-                                  >
-                                    <option value="">-</option>
-                                    <option value="A">A</option>
-                                    <option value="B">B</option>
-                                    <option value="C">C</option>
-                                    <option value="D">D</option>
-                                    <option value="E">E</option>
-                                  </select>
-                                  <button
-                                    onClick={() => handleRemoveStudent(classData.id, classData.students, student)}
-                                    className="text-indigo-300 dark:text-amber-600 hover:text-red-500 transition-colors"
-                                  >
-                                    <svg className="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M6 18L18 6M6 6l12 12" />
-                                    </svg>
-                                  </button>
+                                  {/* Student Name */}
+                                  <span className="text-sm font-medium text-slate-700 dark:text-white min-w-0 truncate flex-1">
+                                    {student}
+                                  </span>
+
+                                  {/* Grade Buttons */}
+                                  <div className="flex items-center gap-1 shrink-0">
+                                    {grades.map((grade) => {
+                                      const isSelected = currentGrade === grade;
+                                      const colorClasses = {
+                                        A: isSelected ? 'bg-rose-500 text-white border-rose-500' : 'text-rose-500 border-rose-300 dark:border-rose-700 hover:bg-rose-50 dark:hover:bg-rose-900/20',
+                                        B: isSelected ? 'bg-orange-500 text-white border-orange-500' : 'text-orange-500 border-orange-300 dark:border-orange-700 hover:bg-orange-50 dark:hover:bg-orange-900/20',
+                                        C: isSelected ? 'bg-amber-500 text-white border-amber-500' : 'text-amber-500 border-amber-300 dark:border-amber-700 hover:bg-amber-50 dark:hover:bg-amber-900/20',
+                                        D: isSelected ? 'bg-green-500 text-white border-green-500' : 'text-green-500 border-green-300 dark:border-green-700 hover:bg-green-50 dark:hover:bg-green-900/20',
+                                        E: isSelected ? 'bg-emerald-500 text-white border-emerald-500' : 'text-emerald-500 border-emerald-300 dark:border-emerald-700 hover:bg-emerald-50 dark:hover:bg-emerald-900/20',
+                                      };
+                                      return (
+                                        <button
+                                          key={grade}
+                                          onClick={() => onUpdateGrade(classData.id, student, isSelected ? null : grade)}
+                                          className={`w-7 h-7 text-xs font-bold rounded-md border transition-all ${colorClasses[grade!]}`}
+                                          title={isSelected ? `Remove grade ${grade}` : `Set grade to ${grade}`}
+                                        >
+                                          {grade}
+                                        </button>
+                                      );
+                                    })}
+
+                                    {/* Remove Student Button */}
+                                    <button
+                                      onClick={() => handleRemoveStudent(classData.id, classData.students, student)}
+                                      className="w-7 h-7 ml-1 text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-md transition-colors flex items-center justify-center"
+                                      title="Remove student"
+                                    >
+                                      <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                      </svg>
+                                    </button>
+                                  </div>
                                 </div>
                               );
                             })
