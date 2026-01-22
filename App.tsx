@@ -139,6 +139,7 @@ function App() {
   
   const [autoGenerateImages, setAutoGenerateImages] = useState(true);
   const [studentNames, setStudentNames] = useState<string[]>([]);
+  const [studentGrades, setStudentGrades] = useState<import('./types').StudentWithGrade[]>([]);
   const [nameInput, setNameInput] = useState('');
 
   // Class Bank state
@@ -460,6 +461,7 @@ function App() {
       }
     }
     setStudentNames(classData.students);
+    setStudentGrades(classData.studentData || []);
     setActiveClassName(classData.name);
     setShowLoadDropdown(false);
     addToast(`Loaded ${classData.name}`, 3000, 'success');
@@ -514,12 +516,25 @@ function App() {
     );
   };
 
-  // Handle grade update from StudentListModal (wraps updateStudentGrade with activeClass lookup)
-  const handleUpdateGradeForActiveClass = (studentName: string, grade: import('./types').GradeLevel | null) => {
-    if (!activeClassName) return;
-    const activeClass = classes.find(c => c.name === activeClassName);
-    if (activeClass) {
-      updateStudentGrade(activeClass.id, studentName, grade);
+  // Handle grade update - stores in local state (synced to class bank on save)
+  const handleUpdateStudentGrade = (studentName: string, grade: import('./types').GradeLevel | null) => {
+    setStudentGrades(prev => {
+      const existing = prev.find(s => s.name === studentName);
+      if (existing) {
+        // Update existing
+        return prev.map(s => s.name === studentName ? { ...s, grade } : s);
+      } else {
+        // Add new
+        return [...prev, { name: studentName, grade }];
+      }
+    });
+
+    // Also update class bank if a class is active
+    if (activeClassName) {
+      const activeClass = classes.find(c => c.name === activeClassName);
+      if (activeClass) {
+        updateStudentGrade(activeClass.id, studentName, grade);
+      }
     }
   };
 
@@ -535,8 +550,8 @@ function App() {
   // Auto-save while editing with slides
   const autoSaveData = useMemo<AutoSaveData | null>(() => {
     if (appState !== AppState.EDITING || slides.length === 0) return null;
-    return { slides, studentNames, lessonText, lessonTitle };
-  }, [appState, slides, studentNames, lessonText, lessonTitle]);
+    return { slides, studentNames, studentGrades, lessonText, lessonTitle };
+  }, [appState, slides, studentNames, studentGrades, lessonText, lessonTitle]);
 
   useAutoSave(autoSaveData, appState === AppState.EDITING && slides.length > 0);
 
@@ -560,6 +575,7 @@ function App() {
     if (recoveryData) {
       setSlides(recoveryData.slides);
       setStudentNames(recoveryData.studentNames);
+      setStudentGrades(recoveryData.studentGrades || []);
       setLessonText(recoveryData.lessonText);
       setLessonTitle(recoveryData.lessonTitle);
       setAppState(AppState.EDITING);
@@ -580,11 +596,7 @@ function App() {
   // ============================================================================
 
   const handleSaveClick = useCallback(() => {
-    // Look up active class's grade data
-    const activeClass = activeClassName ? classes.find(c => c.name === activeClassName) : null;
-    const studentGrades = activeClass?.studentData;
-
-    // Check file size first
+    // Check file size first (use local studentGrades)
     const file = createPiPiFile(lessonTitle, slides, studentNames, lessonText, undefined, studentGrades);
     const sizeInfo = checkFileSize(file);
 
@@ -595,20 +607,17 @@ function App() {
     // Open filename prompt with lesson title as default
     setPendingSaveFilename(lessonTitle || 'New Lesson');
     setShowFilenamePrompt(true);
-  }, [lessonTitle, slides, studentNames, lessonText, addToast, classes, activeClassName]);
+  }, [lessonTitle, slides, studentNames, lessonText, addToast, studentGrades]);
 
   const handleSaveConfirm = useCallback(() => {
-    // Look up active class's grade data
-    const activeClass = activeClassName ? classes.find(c => c.name === activeClassName) : null;
-    const studentGrades = activeClass?.studentData;
-
+    // Use local studentGrades
     const file = createPiPiFile(lessonTitle, slides, studentNames, lessonText, undefined, studentGrades);
     downloadPresentation(file, pendingSaveFilename);
     addToast('Presentation saved successfully!', 3000, 'success');
     setHasUnsavedChanges(false);
     setShowFilenamePrompt(false);
     setPendingSaveFilename('');
-  }, [lessonTitle, slides, studentNames, lessonText, pendingSaveFilename, addToast, classes, activeClassName]);
+  }, [lessonTitle, slides, studentNames, lessonText, pendingSaveFilename, addToast, studentGrades]);
 
   const handleSaveCancel = useCallback(() => {
     setShowFilenamePrompt(false);
@@ -638,11 +647,13 @@ function App() {
       clearAutoSave();
       setHasUnsavedChanges(false);
 
-      // Restore grade data if present - save as class with grades
-      const loadedGrades = pipiFile.content.studentGrades;
-      if (loadedGrades && loadedGrades.length > 0 && loadedStudents.length > 0) {
+      // Restore grade data if present
+      const loadedGrades = pipiFile.content.studentGrades || [];
+      setStudentGrades(loadedGrades);
+
+      // Also save as class with grades if students present
+      if (loadedGrades.length > 0 && loadedStudents.length > 0) {
         const className = pipiFile.title || 'Imported Class';
-        // saveClass now accepts studentData - handles both new and existing classes
         saveClass(className, loadedStudents, loadedGrades);
         setActiveClassName(className);
       }
@@ -709,13 +720,12 @@ function App() {
   }, [hasUnsavedChanges]);
 
   if (appState === AppState.PRESENTING) {
-    const activeClass = activeClassName ? classes.find(c => c.name === activeClassName) : null;
     return (
       <PresentationView
         slides={slides}
         onExit={() => setAppState(AppState.EDITING)}
         studentNames={studentNames}
-        studentData={activeClass?.studentData || []}
+        studentData={studentGrades}
         initialSlideIndex={presentationStartIndex}
         provider={provider}
         onError={handleComponentError}
@@ -1075,9 +1085,12 @@ function App() {
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" />
                   </svg>
-                  <span className="text-sm font-bold">
-                    {studentNames.length === 0 ? 'Add Students' : `${studentNames.length} Student${studentNames.length !== 1 ? 's' : ''}`}
-                  </span>
+                  <span className="text-sm font-bold">Edit Class List</span>
+                  {studentNames.length > 0 && (
+                    <span className="text-xs bg-white/20 dark:bg-black/20 px-1.5 py-0.5 rounded">
+                      {studentNames.length}
+                    </span>
+                  )}
                   {activeClassName && (
                     <span className="text-[10px] bg-indigo-600 dark:bg-amber-500 text-white dark:text-slate-900 px-1.5 py-0.5 rounded font-medium">
                       {activeClassName}
@@ -1331,22 +1344,20 @@ function App() {
       {showStudentListModal && (
         <StudentListModal
           studentNames={studentNames}
-          studentData={(() => {
-            const activeClass = activeClassName ? classes.find(c => c.name === activeClassName) : null;
-            return activeClass?.studentData || [];
-          })()}
+          studentData={studentGrades}
           onUpdateStudents={(students) => {
             setStudentNames(students);
-            // If we had an active class, clear it since list changed
+            // Remove grades for students no longer in the list
+            setStudentGrades(prev => prev.filter(sg => students.includes(sg.name)));
+            // If we had an active class, also update the class bank
             if (activeClassName) {
-              // Also update the class bank
               const activeClass = classes.find(c => c.name === activeClassName);
               if (activeClass) {
                 updateClassStudents(activeClass.id, students);
               }
             }
           }}
-          onUpdateGrade={handleUpdateGradeForActiveClass}
+          onUpdateGrade={handleUpdateStudentGrade}
           onClose={() => setShowStudentListModal(false)}
           classes={classes}
           onSaveClass={() => {

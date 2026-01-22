@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { Slide } from '../types';
+import { Slide, StudentWithGrade } from '../types';
 
 // ============================================================================
 // Constants
@@ -20,6 +20,7 @@ const AUTOSAVE_INTERVAL = 30000; // 30 seconds
 export interface AutoSaveData {
   slides: Slide[];
   studentNames: string[];
+  studentGrades?: StudentWithGrade[];
   lessonText: string;
   lessonTitle: string;
 }
