@@ -295,13 +295,14 @@ interface PresentationViewProps {
   slides: Slide[];
   onExit: () => void;
   studentNames: string[];
+  studentData: StudentWithGrade[];
   initialSlideIndex?: number;
   provider: AIProviderInterface | null;
   onError: (title: string, message: string) => void;
   onRequestAI: (featureName: string) => void;
 }
 
-const PresentationView: React.FC<PresentationViewProps> = ({ slides, onExit, studentNames, initialSlideIndex = 0, provider, onError, onRequestAI }) => {
+const PresentationView: React.FC<PresentationViewProps> = ({ slides, onExit, studentNames, studentData, initialSlideIndex = 0, provider, onError, onRequestAI }) => {
   const isAIAvailable = provider !== null;
   const [currentIndex, setCurrentIndex] = useState(initialSlideIndex);
   const [visibleBullets, setVisibleBullets] = useState(0);

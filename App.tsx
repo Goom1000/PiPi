@@ -698,11 +698,13 @@ function App() {
   }, [hasUnsavedChanges]);
 
   if (appState === AppState.PRESENTING) {
+    const activeClass = activeClassName ? classes.find(c => c.name === activeClassName) : null;
     return (
       <PresentationView
         slides={slides}
         onExit={() => setAppState(AppState.EDITING)}
         studentNames={studentNames}
+        studentData={activeClass?.studentData || []}
         initialSlideIndex={presentationStartIndex}
         provider={provider}
         onError={handleComponentError}
