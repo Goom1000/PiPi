@@ -59,6 +59,11 @@ export interface MillionaireState extends BaseGameState {
   };
   prizeLadder: number[];
   currentPrize: number;
+  eliminatedOptions: number[]; // Indices hidden by 50:50 lifeline
+  audiencePoll: [number, number, number, number] | null; // A, B, C, D percentages (0-100)
+  phoneHint: { confidence: 'high' | 'medium' | 'low'; response: string } | null;
+  safeHavenAmount: number; // Current guaranteed minimum prize
+  questionCount: 3 | 5 | 10; // Selected at game launch
 }
 
 // The Chase state (outrun the chaser)
