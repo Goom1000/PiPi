@@ -17,14 +17,14 @@ Requirements for the Quiz Game Variety milestone. Each maps to roadmap phases.
 
 ### Who Wants to Be a Millionaire
 
-- [ ] **MILL-01**: 15-question vertical progression with increasing difficulty
-- [ ] **MILL-02**: Money tree display showing current position and prize amounts
-- [ ] **MILL-03**: Safe havens at questions 5 and 10 (guaranteed minimum if wrong after)
-- [ ] **MILL-04**: 50:50 lifeline removes 2 wrong answers from display
-- [ ] **MILL-05**: Ask the Audience lifeline shows simulated poll percentages
-- [ ] **MILL-06**: Phone-a-Friend lifeline shows AI-generated hint text
-- [ ] **MILL-07**: Game ends on wrong answer (falls to last safe haven)
-- [ ] **MILL-08**: Victory screen when all 15 questions answered correctly
+- [x] **MILL-01**: Configurable question count (3, 5, or 10) with vertical progression
+- [x] **MILL-02**: Money tree display showing current position and prize amounts
+- [x] **MILL-03**: Safe havens at appropriate positions (guaranteed minimum if wrong after)
+- [x] **MILL-04**: 50:50 lifeline removes 2 wrong answers from display
+- [x] **MILL-05**: Ask the Audience lifeline shows difficulty-scaled poll percentages
+- [x] **MILL-06**: Phone-a-Friend lifeline shows AI-generated hint text
+- [x] **MILL-07**: Game ends on wrong answer (falls to last safe haven)
+- [x] **MILL-08**: Victory screen when all questions answered correctly
 
 ### The Chase
 
@@ -106,14 +106,14 @@ Which phases cover which requirements. Updated during roadmap creation.
 | FOUND-03 | Phase 20 | Complete |
 | FOUND-04 | Phase 20 | Complete |
 | FOUND-05 | Phase 20 | Complete |
-| MILL-01 | Phase 21 | Pending |
-| MILL-02 | Phase 21 | Pending |
-| MILL-03 | Phase 21 | Pending |
-| MILL-04 | Phase 21 | Pending |
-| MILL-05 | Phase 21 | Pending |
-| MILL-06 | Phase 21 | Pending |
-| MILL-07 | Phase 21 | Pending |
-| MILL-08 | Phase 21 | Pending |
+| MILL-01 | Phase 21 | Complete |
+| MILL-02 | Phase 21 | Complete |
+| MILL-03 | Phase 21 | Complete |
+| MILL-04 | Phase 21 | Complete |
+| MILL-05 | Phase 21 | Complete |
+| MILL-06 | Phase 21 | Complete |
+| MILL-07 | Phase 21 | Complete |
+| MILL-08 | Phase 21 | Complete |
 | AI-01 | Phase 22 | Pending |
 | AI-02 | Phase 22 | Pending |
 | AI-03 | Phase 22 | Pending |

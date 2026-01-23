@@ -61,10 +61,10 @@ Plans:
 **Plans**: 4 plans
 
 Plans:
-- [ ] 21-01-PLAN.md — Type extensions & money tree component
-- [ ] 21-02-PLAN.md — Question display & game flow
-- [ ] 21-03-PLAN.md — Lifeline system with AI phone-a-friend
-- [ ] 21-04-PLAN.md — Student view & celebration animations
+- [x] 21-01-PLAN.md — Type extensions & money tree component
+- [x] 21-02-PLAN.md — Question display & game flow
+- [x] 21-03-PLAN.md — Lifeline system with AI phone-a-friend
+- [x] 21-04-PLAN.md — Student view & celebration animations
 
 ### Phase 22: AI Integration
 
@@ -164,7 +164,7 @@ Phases execute in numeric order: 20 → 21 → 22 → 23 → 24 → 25 → 26
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 20. Game Foundation & Type System | 3/3 | ✓ Complete | 2026-01-23 |
-| 21. Millionaire Game | 0/4 | In progress | - |
+| 21. Millionaire Game | 4/4 | ✓ Complete | 2026-01-23 |
 | 22. AI Integration | 0/TBD | Not started | - |
 | 23. The Chase | 0/TBD | Not started | - |
 | 24. Beat the Chaser | 0/TBD | Not started | - |
