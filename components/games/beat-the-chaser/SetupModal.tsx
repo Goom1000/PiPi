@@ -1,14 +1,24 @@
 import React, { useState } from 'react';
 import { BEAT_THE_CHASER_DIFFICULTY, BeatTheChaserDifficulty } from './beatTheChaserConfig';
+import CompetitionModeSection from '../shared/CompetitionModeSection';
+import { CompetitionMode } from '../../../types';
 
 interface SetupModalProps {
-  onStart: (difficulty: BeatTheChaserDifficulty, isAIControlled: boolean) => void;
+  onStart: (
+    difficulty: BeatTheChaserDifficulty,
+    isAIControlled: boolean,
+    competitionMode: CompetitionMode
+  ) => void;
   onCancel: () => void;
 }
 
 const SetupModal: React.FC<SetupModalProps> = ({ onStart, onCancel }) => {
   const [selectedDifficulty, setSelectedDifficulty] = useState<BeatTheChaserDifficulty>('medium');
   const [isAIControlled, setIsAIControlled] = useState(true);
+  const [competitionMode, setCompetitionMode] = useState<CompetitionMode>({
+    mode: 'individual',
+    playerName: ''
+  });
 
   return (
     <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 font-poppins">
@@ -16,6 +26,11 @@ const SetupModal: React.FC<SetupModalProps> = ({ onStart, onCancel }) => {
         <h2 className="text-3xl font-black text-amber-400 mb-6 text-center">
           Beat the Chaser Setup
         </h2>
+
+        <CompetitionModeSection
+          value={competitionMode}
+          onChange={setCompetitionMode}
+        />
 
         {/* Difficulty Selection */}
         <div className="mb-6">
@@ -84,7 +99,7 @@ const SetupModal: React.FC<SetupModalProps> = ({ onStart, onCancel }) => {
             Cancel
           </button>
           <button
-            onClick={() => onStart(selectedDifficulty, isAIControlled)}
+            onClick={() => onStart(selectedDifficulty, isAIControlled, competitionMode)}
             className="flex-1 py-3 px-6 bg-amber-500 hover:bg-amber-400 text-amber-950 font-bold rounded-xl transition-colors"
           >
             Start Game
