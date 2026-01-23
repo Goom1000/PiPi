@@ -10,9 +10,9 @@ See: .planning/PROJECT.md (updated 2026-01-22)
 ## Current Position
 
 Phase: 22 of 26 (AI Integration)
-Plan: 2 of 4 complete
+Plan: 3 of 4 complete
 Status: In progress
-Last activity: 2026-01-23 - Completed 22-02-PLAN.md (Gemini game question generation)
+Last activity: 2026-01-23 - Completed 22-03-PLAN.md (Claude game question generation)
 
 Progress: █████░░░░░░░░░░░░░░░░ 18% (v3.0 Quiz Game Variety)
 
@@ -28,7 +28,7 @@ Progress: █████░░░░░░░░░░░░░░░░ 18% (v
 - v2.3: 4 plans, 2 days
 - v2.4: 9 plans, 2 days
 - v2.5: 2 plans, 1 day
-- v3.0: Phase 20 complete (3 plans, 43min), Phase 21 complete (4 plans, 15min), Phase 22 plan 01 (4min), plan 02 (2min)
+- v3.0: Phase 20 complete (3 plans, 43min), Phase 21 complete (4 plans, 15min), Phase 22 plan 01 (4min), plan 02 (2min), plan 03 (4min)
 
 **Project Totals:**
 - Milestones shipped: 9 (v1.0, v1.1, v1.2, v2.0, v2.1, v2.2, v2.3, v2.4, v2.5)
@@ -116,6 +116,12 @@ v3.0 key decisions:
 - Content constraint in prompts prevents hallucination (questions only from slides)
 - Returns empty array on error - caller (Plan 04) handles retries
 
+22-03 decisions (Claude game question generation):
+- Uses tool_use pattern with forced tool_choice for reliable structured JSON output
+- Millionaire progression rules match GeminiProvider exactly for consistent cross-provider behavior
+- Fallback text parsing if tool_use unexpectedly returns text block
+- Private helper methods (getErrorMessage, getErrorCode) for error handling consistency
+
 All decisions logged in PROJECT.md Key Decisions table.
 
 ### Pending Todos
@@ -128,11 +134,11 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-01-23 09:20:04 UTC
-Stopped at: Completed 22-02-PLAN.md (Gemini game question generation)
+Last session: 2026-01-23 11:19:00 UTC
+Stopped at: Completed 22-03-PLAN.md (Claude game question generation)
 Resume file: None
-Next: Phase 22-03 - Claude game question implementation
+Next: Phase 22-04 - Integration testing with game flows
 
 ---
 *State initialized: 2026-01-18*
-*Last updated: 2026-01-23 - Phase 22 plan 01 complete (Game question type system)*
+*Last updated: 2026-01-23 - Phase 22 plan 03 complete (Claude game question generation)*
