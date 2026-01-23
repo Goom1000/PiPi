@@ -651,11 +651,10 @@ const BeatTheChaserStudentView: React.FC<{ state: BeatTheChaserState }> = ({ sta
   if (state.phase === 'cash-builder') {
     return (
       <div className="h-screen w-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex flex-col items-center justify-center p-6 font-poppins text-white">
+        <PhaseBanner phase="Cash Builder" />
+
         {/* Time Bank Display */}
         <div className="text-center mb-12">
-          <h2 className="text-3xl font-black text-green-400 uppercase tracking-widest mb-4">
-            Cash Builder
-          </h2>
           <div className="bg-slate-800/60 p-8 rounded-2xl border-2 border-green-500/30">
             <div className="text-sm text-slate-400 uppercase tracking-wider mb-2">Time Bank</div>
             <div className="text-8xl font-black text-green-400">
