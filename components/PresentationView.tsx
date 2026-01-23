@@ -341,8 +341,9 @@ const PresentationView: React.FC<PresentationViewProps> = ({ slides, onExit, stu
     isAIControlled: boolean,
     compMode?: CompetitionMode
   ): BeatTheChaserState => {
-    // Get chaser's time based on difficulty (dim chaser gets more time, genius gets less)
-    const chaserConfig = BEAT_THE_CHASER_DIFFICULTY[difficulty];
+    // Hardcoded times to ensure they're set correctly
+    const CONTESTANT_TIME = 45;  // Fixed 45 seconds for student
+    const CHASER_TIMES = { easy: 55, medium: 45, hard: 35 };
 
     return {
       gameType: 'beat-the-chaser',
@@ -353,8 +354,8 @@ const PresentationView: React.FC<PresentationViewProps> = ({ slides, onExit, stu
       accumulatedTime: 0,
       cashBuilderQuestionsAnswered: 0,
       cashBuilderCorrectAnswers: 0,
-      contestantTime: CONTESTANT_START_TIME,  // Fixed 45 seconds for student
-      chaserTime: chaserConfig.chaserTime,    // Varies by difficulty
+      contestantTime: CONTESTANT_TIME,
+      chaserTime: CHASER_TIMES[difficulty],
       activePlayer: 'contestant',
       chaserDifficulty: difficulty,
       isAIControlled,
