@@ -6,6 +6,7 @@ import MoneyTree from './games/millionaire/MoneyTree';
 import { MONEY_TREE_CONFIGS } from './games/millionaire/millionaireConfig';
 import GameBoard from './games/the-chase/GameBoard';
 import VotingWidget from './games/the-chase/VotingWidget';
+import ScoreDisplay from './games/shared/ScoreDisplay';
 
 interface StudentGameViewProps {
   gameState: GameState;
@@ -54,25 +55,37 @@ const StudentGameView: React.FC<StudentGameViewProps> = ({ gameState }) => {
     );
   }
 
+  // Helper to wrap game content with score display
+  const renderWithScoreDisplay = (gameContent: React.ReactNode) => {
+    return (
+      <>
+        {gameContent}
+        {gameState.competitionMode && (
+          <ScoreDisplay competitionMode={gameState.competitionMode} />
+        )}
+      </>
+    );
+  };
+
   // Game-specific rendering based on discriminated union (playing/reveal status)
   if (gameState.gameType === 'quick-quiz') {
-    return <QuickQuizStudentView state={gameState} />;
+    return renderWithScoreDisplay(<QuickQuizStudentView state={gameState} />);
   }
 
   if (gameState.gameType === 'millionaire') {
-    return <MillionaireStudentView state={gameState} />;
+    return renderWithScoreDisplay(<MillionaireStudentView state={gameState} />);
   }
 
   if (gameState.gameType === 'the-chase') {
-    return <TheChaseStudentView state={gameState} />;
+    return renderWithScoreDisplay(<TheChaseStudentView state={gameState} />);
   }
 
   if (gameState.gameType === 'beat-the-chaser') {
-    return <BeatTheChaserStudentView state={gameState} />;
+    return renderWithScoreDisplay(<BeatTheChaserStudentView state={gameState} />);
   }
 
   // Fallback for any future placeholder games
-  return <PlaceholderStudentView gameType={gameState.gameType} />;
+  return renderWithScoreDisplay(<PlaceholderStudentView gameType={gameState.gameType} />);
 };
 
 // Quick Quiz student view component (extracted for clarity)
