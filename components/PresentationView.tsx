@@ -333,7 +333,7 @@ const PresentationView: React.FC<PresentationViewProps> = ({ slides, onExit, stu
       case 'the-chase':
         return { ...base, gameType: 'the-chase', phase: 'cash-builder', cashBuilderScore: 0, cashBuilderTimeRemaining: 60, offers: [], selectedOfferIndex: null, votes: {}, isVotingOpen: false, contestantPosition: 4, chaserPosition: 0, chaserDifficulty: 'medium', isAIControlled: true, isChaserThinking: false, finalChaseContestantScore: 0, finalChaseContestantTime: 120, finalChaseChaserScore: 0, finalChaseChaserTime: 120, chaserTargetScore: 0, currentQuestionAnswered: false, contestantAnswer: null, chaserAnswer: null, showChaserAnswer: false, isChasing: false };
       case 'beat-the-chaser':
-        return { ...base, gameType: 'beat-the-chaser', contestantTime: 0, chaserTime: 0, activePlayer: 'contestant' };
+        return { ...base, gameType: 'beat-the-chaser', phase: 'setup', accumulatedTime: 0, cashBuilderQuestionsAnswered: 0, cashBuilderCorrectAnswers: 0, contestantTime: 0, chaserTime: 0, activePlayer: 'contestant', chaserDifficulty: 'medium', isAIControlled: true, contestantAnswer: null, chaserAnswer: null, showTimeBonusEffect: false, winner: null };
     }
   }, []);
 

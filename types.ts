@@ -118,12 +118,29 @@ export interface TheChaseState extends BaseGameState {
   isChasing: boolean;
 }
 
+// Beat the Chaser game phase union
+export type BeatTheChaserPhase = 'setup' | 'cash-builder' | 'timed-battle' | 'game-over';
+
 // Beat the Chaser state (race against time)
 export interface BeatTheChaserState extends BaseGameState {
   gameType: 'beat-the-chaser';
+  phase: BeatTheChaserPhase;
+  // Cash Builder state
+  accumulatedTime: number; // Seconds earned in Cash Builder (5s per correct)
+  cashBuilderQuestionsAnswered: number;
+  cashBuilderCorrectAnswers: number;
+  // Timed Battle state
   contestantTime: number;
   chaserTime: number;
   activePlayer: 'contestant' | 'chaser';
+  chaserDifficulty: 'easy' | 'medium' | 'hard';
+  isAIControlled: boolean;
+  // Question state
+  contestantAnswer: number | null;
+  chaserAnswer: number | null;
+  showTimeBonusEffect: boolean; // For +5s animation trigger
+  // Game outcome
+  winner: 'contestant' | 'chaser' | null;
 }
 
 // Unified game state discriminated union
