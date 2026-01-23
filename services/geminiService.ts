@@ -1,7 +1,7 @@
 
 import { GoogleGenAI, Type } from "@google/genai";
 import { Slide, LessonResource } from "../types";
-import { GenerationInput, GenerationMode, AIProviderError, USER_ERROR_MESSAGES } from './aiProvider';
+import { GenerationInput, GenerationMode, AIProviderError, USER_ERROR_MESSAGES, GameQuestionRequest, SlideContext, BLOOM_DIFFICULTY_MAP } from './aiProvider';
 
 // Shared teleprompter rules used across all generation modes
 const TELEPROMPTER_RULES = `
@@ -663,4 +663,136 @@ Provide your phone-a-friend response.
     } catch (e) {
         return { confidence: 'low', response: "The connection cut out! I couldn't hear the question properly." };
     }
+};
+
+// Helper function for Millionaire progressive difficulty rules
+function getMillionaireProgressionRules(count: 3 | 5 | 10): string {
+  if (count === 3) {
+    return `
+Question 1: EASY (Remember/Understand) - "What is...", "Name the..."
+Question 2: MEDIUM (Apply/Analyze) - "How would...", "What would happen..."
+Question 3: HARD (Evaluate/Create) - "Why does...", "What is the best..."`;
+  }
+  if (count === 5) {
+    return `
+Questions 1-2: EASY (Remember/Understand) - "What is...", "Name the..."
+Questions 3-4: MEDIUM (Apply/Analyze) - "How would...", "What would happen..."
+Question 5: HARD (Evaluate/Create) - "Why does...", "What is the best..."`;
+  }
+  // count === 10
+  return `
+Questions 1-3: EASY (Remember/Understand) - "What is...", "Name the..."
+Questions 4-6: MEDIUM (Apply/Analyze) - "How would...", "What would happen..."
+Questions 7-10: HARD (Evaluate/Create) - "Why does...", "What is the best..."`;
+}
+
+export const generateGameQuestions = async (
+  apiKey: string,
+  request: GameQuestionRequest
+): Promise<QuizQuestion[]> => {
+  const ai = new GoogleGenAI({ apiKey });
+  const model = "gemini-3-flash-preview";
+
+  // Build system instruction based on game type
+  let systemInstruction: string;
+
+  if (request.gameType === 'millionaire') {
+    systemInstruction = `
+You are a quiz master creating "Who Wants to Be a Millionaire" style questions for Year 6 students (10-11 years old).
+
+PROGRESSIVE DIFFICULTY RULES (Bloom's Taxonomy):
+${getMillionaireProgressionRules(request.questionCount as 3 | 5 | 10)}
+
+DISTRACTOR RULES (CRITICAL):
+- All 4 options must be similar in length and specificity
+- Distractors must be plausible misconceptions a student might have
+- Never include "All of the above" or "None of the above"
+- Avoid using negatives in questions ("Which is NOT...")
+
+CONTENT CONSTRAINT (CRITICAL):
+- Generate questions ONLY from the provided lesson content
+- Do NOT use external knowledge beyond what is in the slides
+- If content is thin, focus on what IS there rather than inventing new facts
+
+OUTPUT FORMAT:
+Return a JSON array with exactly ${request.questionCount} questions.
+`;
+  } else {
+    // Chase or Beat the Chaser - consistent difficulty
+    const difficultyConfig = BLOOM_DIFFICULTY_MAP[request.difficulty];
+    systemInstruction = `
+You are a quiz master creating rapid-fire questions for "The Chase" style game for Year 6 students (10-11 years old).
+
+DIFFICULTY: ${request.difficulty.toUpperCase()}
+${difficultyConfig.description}
+Question types: ${difficultyConfig.questionTypes}
+
+ALL questions must be at ${request.difficulty} level. No progression - consistent difficulty throughout.
+
+QUICK-FIRE RULES:
+- Questions should be answerable in 5-10 seconds
+- Single concept per question, no multi-part questions
+- Avoid ambiguous wording
+- Keep options short (1-5 words each when possible)
+
+DISTRACTOR RULES:
+- All 4 options must be plausible
+- Distractors should reflect common misconceptions
+- Similar length and specificity across all options
+
+CONTENT CONSTRAINT (CRITICAL):
+- Generate questions ONLY from the provided lesson content
+- Do NOT use external knowledge beyond what is in the slides
+
+OUTPUT FORMAT:
+Return a JSON array with exactly ${request.questionCount} questions.
+`;
+  }
+
+  // Build prompt with slide context
+  let prompt = `
+LESSON CONTENT (Generate questions from this material only):
+Topic: ${request.slideContext.lessonTopic}
+
+${request.slideContext.cumulativeContent}
+
+Current slide focus: ${request.slideContext.currentSlideTitle}
+Key points: ${request.slideContext.currentSlideContent.join('; ')}
+`;
+
+  // Add teacher hints if provided
+  if (request.optionalHints) {
+    prompt += `\n\nTEACHER HINTS: ${request.optionalHints}`;
+  }
+
+  prompt += '\n\nGenerate the quiz now.';
+
+  try {
+    const response = await ai.models.generateContent({
+      model,
+      contents: prompt,
+      config: {
+        systemInstruction,
+        responseMimeType: "application/json",
+        responseSchema: {
+          type: Type.ARRAY,
+          items: {
+            type: Type.OBJECT,
+            properties: {
+              question: { type: Type.STRING },
+              options: { type: Type.ARRAY, items: { type: Type.STRING }, description: "Must be exactly 4 options" },
+              correctAnswerIndex: { type: Type.INTEGER, description: "Index 0-3" },
+              explanation: { type: Type.STRING }
+            },
+            required: ['question', 'options', 'correctAnswerIndex', 'explanation']
+          }
+        }
+      }
+    });
+
+    return JSON.parse(response.text || "[]");
+  } catch (error) {
+    console.error("Game Question Gen Error", error);
+    return [];
+  }
 };

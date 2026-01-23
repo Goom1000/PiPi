@@ -13,6 +13,7 @@ import {
   generateLessonResources as geminiGenerateLessonResources,
   generateImpromptuQuiz as geminiGenerateImpromptuQuiz,
   generateQuestionWithAnswer as geminiGenerateQuestionWithAnswer,
+  generateGameQuestions as geminiGenerateGameQuestions,
 } from '../geminiService';
 
 /**
@@ -125,11 +126,11 @@ export class GeminiProvider implements AIProviderInterface {
   }
 
   async generateGameQuestions(request: GameQuestionRequest): Promise<QuizQuestion[]> {
-    // TODO: Implement in Phase 22-02 (Gemini game question generation)
-    throw new AIProviderError(
-      'Game question generation not yet implemented for Gemini',
-      'UNKNOWN_ERROR'
-    );
+    try {
+      return await geminiGenerateGameQuestions(this.apiKey, request);
+    } catch (error) {
+      throw this.wrapError(error);
+    }
   }
 
   /**
