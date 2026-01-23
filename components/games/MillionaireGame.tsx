@@ -5,6 +5,9 @@ import MillionaireQuestion from './millionaire/MillionaireQuestion';
 import LifelinePanel from './millionaire/LifelinePanel';
 import AudiencePollOverlay from './millionaire/AudiencePollOverlay';
 import PhoneAFriendOverlay from './millionaire/PhoneAFriendOverlay';
+import SafeHavenCelebration from './millionaire/SafeHavenCelebration';
+import WrongAnswerReveal from './millionaire/WrongAnswerReveal';
+import VictoryCelebration from './millionaire/VictoryCelebration';
 import { MONEY_TREE_CONFIGS, getSafeHavenAmount } from './millionaire/millionaireConfig';
 import ResultScreen from './shared/ResultScreen';
 
@@ -36,6 +39,11 @@ const MillionaireGame: React.FC<MillionaireGameProps> = ({
   });
   const [showAudiencePoll, setShowAudiencePoll] = useState(false);
   const [showPhoneHint, setShowPhoneHint] = useState(false);
+  const [soundEnabled, setSoundEnabled] = useState(false); // OFF by default per CONTEXT.md
+  const [showSafeHaven, setShowSafeHaven] = useState(false);
+  const [showWrongAnswer, setShowWrongAnswer] = useState(false);
+  const [showVictory, setShowVictory] = useState(false);
+  const [lastSafeHavenReached, setLastSafeHavenReached] = useState<number | null>(null);
 
   const currentQuestion = state.questions[state.currentQuestionIndex];
   const config = MONEY_TREE_CONFIGS[state.questionCount];
@@ -83,6 +91,37 @@ const MillionaireGame: React.FC<MillionaireGameProps> = ({
       setShowPhoneHint(true);
     }
   }, [state.phoneHint, showPhoneHint]);
+
+  // Trigger safe haven celebration when reaching a safe haven position
+  useEffect(() => {
+    if (state.status === 'playing' && state.currentQuestionIndex > 0) {
+      const config = MONEY_TREE_CONFIGS[state.questionCount];
+      const currentIndex = state.currentQuestionIndex - 1; // Previous question just completed
+
+      // Check if we just passed a safe haven
+      if (config.safeHavens.includes(currentIndex) && lastSafeHavenReached !== currentIndex) {
+        setLastSafeHavenReached(currentIndex);
+        setShowSafeHaven(true);
+      }
+    }
+  }, [state.status, state.currentQuestionIndex, state.questionCount, lastSafeHavenReached]);
+
+  // Trigger wrong answer or victory when status becomes 'result'
+  useEffect(() => {
+    if (state.status === 'result' && revealState.showResult) {
+      const config = MONEY_TREE_CONFIGS[state.questionCount];
+      const allCorrect = state.currentQuestionIndex === state.questions.length - 1 &&
+                         state.selectedOption === currentQuestion.correctAnswerIndex;
+
+      if (allCorrect) {
+        // Victory - won the top prize
+        setShowVictory(true);
+      } else if (state.selectedOption !== null && state.selectedOption !== currentQuestion.correctAnswerIndex) {
+        // Wrong answer - show reveal
+        setShowWrongAnswer(true);
+      }
+    }
+  }, [state.status, revealState.showResult]);
 
   // Build answeredCorrectly array for MoneyTree
   const answeredCorrectly = new Array(state.questions.length).fill(false);
@@ -170,11 +209,29 @@ const MillionaireGame: React.FC<MillionaireGameProps> = ({
 
       {/* Right Column - Question and Controls (70%) */}
       <div className="flex-1 flex flex-col">
-        {/* Question Number Badge */}
-        <div className="mb-4 text-center">
+        {/* Question Number Badge with Sound Toggle */}
+        <div className="mb-4 flex items-center justify-between">
+          <div className="flex-1"></div>
           <span className="inline-block px-6 py-2 bg-indigo-900/60 backdrop-blur-sm rounded-full text-lg font-bold uppercase tracking-widest text-indigo-300 border border-indigo-400/30">
             Question {state.currentQuestionIndex + 1} of {state.questions.length}
           </span>
+          <div className="flex-1 flex justify-end">
+            <button
+              onClick={() => setSoundEnabled(!soundEnabled)}
+              className="px-4 py-2 bg-indigo-900/60 backdrop-blur-sm rounded-full border border-indigo-400/30 hover:bg-indigo-800/60 transition-colors"
+              title={soundEnabled ? 'Mute sound' : 'Unmute sound'}
+            >
+              {soundEnabled ? (
+                <svg className="w-6 h-6 text-indigo-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
+                </svg>
+              ) : (
+                <svg className="w-6 h-6 text-indigo-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2" />
+                </svg>
+              )}
+            </button>
+          </div>
         </div>
 
         {/* Question Component */}
@@ -227,6 +284,37 @@ const MillionaireGame: React.FC<MillionaireGameProps> = ({
         <PhoneAFriendOverlay
           hint={state.phoneHint}
           onClose={() => setShowPhoneHint(false)}
+        />
+      )}
+
+      {/* Safe Haven Celebration */}
+      {showSafeHaven && (
+        <SafeHavenCelebration
+          amount={state.safeHavenAmount}
+          onComplete={() => setShowSafeHaven(false)}
+        />
+      )}
+
+      {/* Wrong Answer Reveal */}
+      {showWrongAnswer && (
+        <WrongAnswerReveal
+          correctAnswer={currentQuestion.options[currentQuestion.correctAnswerIndex]}
+          correctLetter={String.fromCharCode(65 + currentQuestion.correctAnswerIndex)}
+          safeHavenAmount={state.safeHavenAmount}
+          onClose={() => {
+            setShowWrongAnswer(false);
+            // Trigger result screen after wrong answer reveal is dismissed
+            if (onClose) onClose();
+          }}
+        />
+      )}
+
+      {/* Victory Celebration */}
+      {showVictory && (
+        <VictoryCelebration
+          finalPrize={state.currentPrize}
+          onClose={onClose}
+          onRestart={onRestart}
         />
       )}
     </div>
