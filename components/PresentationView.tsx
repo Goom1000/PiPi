@@ -4,7 +4,7 @@ import { Slide, PresentationMessage, BROADCAST_CHANNEL_NAME, GameState, GameType
 import Button from './Button';
 import { MarkdownText, SlideContentRenderer } from './SlideRenderers';
 import { QuizQuestion, generatePhoneAFriendHint } from '../services/geminiService';
-import { AIProviderInterface, AIProviderError } from '../services/aiProvider';
+import { AIProviderInterface, AIProviderError, buildSlideContext, withRetry, GameQuestionRequest } from '../services/aiProvider';
 import useBroadcastSync from '../hooks/useBroadcastSync';
 import useWindowManagement from '../hooks/useWindowManagement';
 import useKeyboardNavigation from '../hooks/useKeyboardNavigation';
@@ -333,7 +333,7 @@ const PresentationView: React.FC<PresentationViewProps> = ({ slides, onExit, stu
     setPendingGameType(null);
   }, [provider, slides, currentIndex, createQuickQuizState, onRequestAI, onError]);
 
-  // Launch Millionaire (async question generation with question count)
+  // Launch Millionaire (async question generation with progressive difficulty)
   const launchMillionaire = useCallback(async (questionCount: 3 | 5 | 10) => {
     if (!provider) {
       onRequestAI('start the Millionaire game');
@@ -343,18 +343,14 @@ const PresentationView: React.FC<PresentationViewProps> = ({ slides, onExit, stu
     // Close setup modal
     setShowMillionaireSetup(false);
 
-    // Set loading state with question count
+    // Show loading state immediately
     setActiveGame({
       gameType: 'millionaire',
       status: 'loading',
       questions: [],
       currentQuestionIndex: 0,
       selectedOption: null,
-      lifelines: {
-        fiftyFifty: true,
-        phoneAFriend: true,
-        askTheAudience: true,
-      },
+      lifelines: { fiftyFifty: true, phoneAFriend: true, askTheAudience: true },
       prizeLadder: [],
       currentPrize: 0,
       eliminatedOptions: [],
@@ -365,7 +361,24 @@ const PresentationView: React.FC<PresentationViewProps> = ({ slides, onExit, stu
     });
 
     try {
-      const questions = await provider.generateImpromptuQuiz(slides, currentIndex, questionCount);
+      const slideContext = buildSlideContext(slides, currentIndex);
+      const request: GameQuestionRequest = {
+        gameType: 'millionaire',
+        difficulty: 'medium', // Ignored for Millionaire (uses progressive difficulty internally)
+        questionCount,
+        slideContext,
+      };
+
+      const questions = await withRetry<QuizQuestion[]>(
+        () => provider.generateGameQuestions(request),
+        3,  // max retries
+        1000 // initial delay
+      );
+
+      if (questions.length === 0) {
+        throw new AIProviderError('No questions generated', 'PARSE_ERROR');
+      }
+
       setActiveGame(createMillionaireState(questions, questionCount));
     } catch (e) {
       console.error(e);
