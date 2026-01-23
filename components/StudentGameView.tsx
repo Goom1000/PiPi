@@ -46,6 +46,45 @@ const PhaseBanner: React.FC<PhaseBannerProps> = ({ phase, turn }) => {
   );
 };
 
+// Large timer with screen edge glow for urgency
+interface UrgentTimerProps {
+  seconds: number;
+  label?: string;
+  isActive?: boolean; // Only show urgency effects when active
+}
+
+const UrgentTimer: React.FC<UrgentTimerProps> = ({ seconds, label, isActive = true }) => {
+  const isUrgent = seconds <= 10 && seconds > 0 && isActive;
+
+  // Format as M:SS
+  const mins = Math.floor(seconds / 60);
+  const secs = seconds % 60;
+  const display = `${mins}:${secs.toString().padStart(2, '0')}`;
+
+  return (
+    <>
+      {/* Screen edge glow overlay for urgency */}
+      {isUrgent && (
+        <div className="fixed inset-0 pointer-events-none z-30 animate-urgency-glow" />
+      )}
+
+      <div className="text-center">
+        {label && (
+          <div className="text-sm text-slate-400 uppercase tracking-wider mb-2">{label}</div>
+        )}
+        <div className={`
+          text-7xl md:text-8xl font-black font-mono transition-all duration-300
+          ${isUrgent
+            ? 'text-red-500 animate-rapid-pulse'
+            : 'text-white'}
+        `}>
+          {display}
+        </div>
+      </div>
+    </>
+  );
+};
+
 /**
  * Read-only game display for student view.
  * Routes game state based on discriminated union type.
