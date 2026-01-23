@@ -215,6 +215,29 @@
       .animate-chase-move {
         animation: chaseBoardMove 0.3s ease-out;
       }
+
+      /* Student view urgency animations */
+      @keyframes urgentScreenGlow {
+        0%, 100% {
+          box-shadow: inset 0 0 60px rgba(239, 68, 68, 0.3);
+        }
+        50% {
+          box-shadow: inset 0 0 120px rgba(239, 68, 68, 0.6);
+        }
+      }
+
+      .animate-urgency-glow {
+        animation: urgentScreenGlow 0.5s ease-in-out infinite;
+      }
+
+      @keyframes rapidPulse {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.08); }
+      }
+
+      .animate-rapid-pulse {
+        animation: rapidPulse 0.3s ease-in-out infinite;
+      }
     </style>
   <script type="importmap">
 {
