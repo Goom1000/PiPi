@@ -17,6 +17,7 @@ import GameMenu from './games/GameMenu';
 import GameContainer from './games/GameContainer';
 import { MONEY_TREE_CONFIGS, getSafeHavenAmount } from './games/millionaire/millionaireConfig';
 import CompetitionModeSection from './games/shared/CompetitionModeSection';
+import ScoreOverlay from './games/shared/ScoreOverlay';
 
 // Fisher-Yates shuffle - unbiased O(n) randomization
 function shuffleArray<T>(array: T[]): T[] {
@@ -258,17 +259,19 @@ const PresentationView: React.FC<PresentationViewProps> = ({ slides, onExit, stu
   }, [postMessage]);
 
   // Game state factory functions
-  const createQuickQuizState = useCallback((questions: QuizQuestion[]): QuickQuizState => ({
+  const createQuickQuizState = useCallback((questions: QuizQuestion[], compMode?: CompetitionMode): QuickQuizState => ({
     gameType: 'quick-quiz',
     status: 'playing',
     questions,
     currentQuestionIndex: 0,
     isAnswerRevealed: false,
+    competitionMode: compMode,
   }), []);
 
   const createMillionaireState = useCallback((
     questions: QuizQuestion[],
-    questionCount: 3 | 5 | 10
+    questionCount: 3 | 5 | 10,
+    compMode?: CompetitionMode
   ): MillionaireState => {
     const config = MONEY_TREE_CONFIGS[questionCount];
     return {
@@ -289,13 +292,15 @@ const PresentationView: React.FC<PresentationViewProps> = ({ slides, onExit, stu
       phoneHint: null,
       safeHavenAmount: 0,
       questionCount,
+      competitionMode: compMode,
     };
   }, []);
 
   const createChaseState = useCallback((
     questions: QuizQuestion[],
     difficulty: 'easy' | 'medium' | 'hard',
-    isAIControlled: boolean
+    isAIControlled: boolean,
+    compMode?: CompetitionMode
   ): TheChaseState => {
     return {
       gameType: 'the-chase',
@@ -324,14 +329,16 @@ const PresentationView: React.FC<PresentationViewProps> = ({ slides, onExit, stu
       chaserAnswer: null,
       showChaserAnswer: false,
       isChasing: false,
+      competitionMode: compMode,
     };
   }, []);
 
-  const createPlaceholderState = useCallback((gameType: GameType): GameState => {
+  const createPlaceholderState = useCallback((gameType: GameType, compMode?: CompetitionMode): GameState => {
     const base = {
       status: 'splash' as const,
       questions: [],
       currentQuestionIndex: 0,
+      competitionMode: compMode,
     };
     switch (gameType) {
       case 'quick-quiz':
@@ -346,7 +353,7 @@ const PresentationView: React.FC<PresentationViewProps> = ({ slides, onExit, stu
   }, []);
 
   // Launch Quick Quiz (async question generation)
-  const launchQuickQuiz = useCallback(async () => {
+  const launchQuickQuiz = useCallback(async (compMode?: CompetitionMode) => {
     if (!provider) {
       onRequestAI('start the quiz game');
       setPendingGameType(null);
@@ -360,11 +367,12 @@ const PresentationView: React.FC<PresentationViewProps> = ({ slides, onExit, stu
       questions: [],
       currentQuestionIndex: 0,
       isAnswerRevealed: false,
+      competitionMode: compMode,
     });
 
     try {
       const questions = await provider.generateImpromptuQuiz(slides, currentIndex, 5);
-      setActiveGame(createQuickQuizState(questions));
+      setActiveGame(createQuickQuizState(questions, compMode));
     } catch (e) {
       console.error(e);
       if (e instanceof AIProviderError) {
@@ -402,6 +410,7 @@ const PresentationView: React.FC<PresentationViewProps> = ({ slides, onExit, stu
       phoneHint: null,
       safeHavenAmount: 0,
       questionCount,
+      competitionMode,
     });
 
     try {
@@ -423,7 +432,7 @@ const PresentationView: React.FC<PresentationViewProps> = ({ slides, onExit, stu
         throw new AIProviderError('No questions generated', 'PARSE_ERROR');
       }
 
-      setActiveGame(createMillionaireState(questions, questionCount));
+      setActiveGame(createMillionaireState(questions, questionCount, competitionMode));
     } catch (e) {
       console.error(e);
       if (e instanceof AIProviderError) {
@@ -433,7 +442,7 @@ const PresentationView: React.FC<PresentationViewProps> = ({ slides, onExit, stu
       }
       setActiveGame(null);
     }
-  }, [provider, slides, currentIndex, createMillionaireState, onRequestAI, onError]);
+  }, [provider, slides, currentIndex, createMillionaireState, onRequestAI, onError, competitionMode]);
 
   // Launch The Chase (async question generation)
   const launchTheChase = useCallback(async (difficulty: 'easy' | 'medium' | 'hard', isAIControlled: boolean) => {
@@ -473,6 +482,7 @@ const PresentationView: React.FC<PresentationViewProps> = ({ slides, onExit, stu
       chaserAnswer: null,
       showChaserAnswer: false,
       isChasing: false,
+      competitionMode,
     });
 
     try {
@@ -494,7 +504,7 @@ const PresentationView: React.FC<PresentationViewProps> = ({ slides, onExit, stu
         throw new AIProviderError('No questions generated', 'PARSE_ERROR');
       }
 
-      setActiveGame(createChaseState(questions, difficulty, isAIControlled));
+      setActiveGame(createChaseState(questions, difficulty, isAIControlled, competitionMode));
     } catch (e) {
       console.error(e);
       if (e instanceof AIProviderError) {
@@ -504,7 +514,7 @@ const PresentationView: React.FC<PresentationViewProps> = ({ slides, onExit, stu
       }
       setActiveGame(null);
     }
-  }, [provider, slides, currentIndex, createChaseState, onRequestAI, onError]);
+  }, [provider, slides, currentIndex, createChaseState, onRequestAI, onError, competitionMode]);
 
   // Game selection handler with confirmation dialog
   const handleSelectGame = useCallback((gameType: GameType) => {
@@ -524,9 +534,29 @@ const PresentationView: React.FC<PresentationViewProps> = ({ slides, onExit, stu
       setShowChaseSetup(true);
     } else {
       // Launch placeholder game directly
-      setActiveGame(createPlaceholderState(gameType));
+      setActiveGame(createPlaceholderState(gameType, competitionMode));
     }
-  }, [activeGame, launchQuickQuiz, createPlaceholderState]);
+  }, [activeGame, launchQuickQuiz, createPlaceholderState, competitionMode]);
+
+  // Score update handler for competition mode
+  const handleUpdateScore = useCallback((teamIndex: number, delta: number) => {
+    if (!activeGame?.competitionMode || activeGame.competitionMode.mode !== 'team') return;
+
+    const newTeams = activeGame.competitionMode.teams.map((team, i) =>
+      i === teamIndex ? { ...team, score: Math.max(0, team.score + delta) } : team
+    );
+
+    setActiveGame(prev => {
+      if (!prev || !prev.competitionMode || prev.competitionMode.mode !== 'team') return prev;
+      return {
+        ...prev,
+        competitionMode: {
+          ...prev.competitionMode,
+          teams: newTeams
+        }
+      };
+    });
+  }, [activeGame]);
 
   // Game control handlers
   const handleRevealAnswer = useCallback(() => {
@@ -538,15 +568,27 @@ const PresentationView: React.FC<PresentationViewProps> = ({ slides, onExit, stu
   const handleNextQuestion = useCallback(() => {
     if (activeGame?.gameType === 'quick-quiz') {
       const state = activeGame as QuickQuizState;
+
+      // Rotate active team if in team mode
+      let updatedCompetitionMode = state.competitionMode;
+      if (updatedCompetitionMode?.mode === 'team') {
+        const nextTeamIndex = (updatedCompetitionMode.activeTeamIndex + 1) % updatedCompetitionMode.teams.length;
+        updatedCompetitionMode = {
+          ...updatedCompetitionMode,
+          activeTeamIndex: nextTeamIndex
+        };
+      }
+
       if (state.currentQuestionIndex < state.questions.length - 1) {
         setActiveGame({
           ...state,
           currentQuestionIndex: state.currentQuestionIndex + 1,
           isAnswerRevealed: false,
           status: 'playing',
+          competitionMode: updatedCompetitionMode,
         });
       } else {
-        setActiveGame({ ...state, status: 'result' });
+        setActiveGame({ ...state, status: 'result', competitionMode: updatedCompetitionMode });
       }
     }
   }, [activeGame]);
@@ -1046,6 +1088,14 @@ const PresentationView: React.FC<PresentationViewProps> = ({ slides, onExit, stu
               isLifelineLoading={lifelineLoading}
               onChaseStateUpdate={handleChaseStateUpdate}
             />
+
+            {/* Score Overlay - Teacher View */}
+            {activeGame.competitionMode && (
+              <ScoreOverlay
+                competitionMode={activeGame.competitionMode}
+                onUpdateScore={handleUpdateScore}
+              />
+            )}
           </div>,
           document.body
       )}
@@ -1384,7 +1434,7 @@ const PresentationView: React.FC<PresentationViewProps> = ({ slides, onExit, stu
                 onClick={() => {
                   setShowQuickQuizSetup(false);
                   setPendingGameType('quick-quiz');
-                  launchQuickQuiz();
+                  launchQuickQuiz(competitionMode);
                 }}
                 disabled={!isAIAvailable}
                 className={`flex-1 py-3 font-bold rounded-xl transition-all ${
