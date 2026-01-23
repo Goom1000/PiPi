@@ -10,9 +10,9 @@ See: .planning/PROJECT.md (updated 2026-01-22)
 ## Current Position
 
 Phase: 24 of 26 (Beat the Chaser)
-Plan: 3 of 4 complete
+Plan: 4 of 5 complete
 Status: In progress
-Last activity: 2026-01-23 - Completed 24-03-PLAN.md (Timed Battle phase)
+Last activity: 2026-01-24 - Completed 24-04-PLAN.md (Game Orchestrator)
 
 Progress: █████░░░░░░░░░░░░░░░░ 25% (v3.0 Quiz Game Variety)
 
@@ -28,13 +28,13 @@ Progress: █████░░░░░░░░░░░░░░░░ 25% (v
 - v2.3: 4 plans, 2 days
 - v2.4: 9 plans, 2 days
 - v2.5: 2 plans, 1 day
-- v3.0: Phase 20 complete (3 plans, 43min), Phase 21 complete (4 plans, 15min), Phase 22 complete (4 plans: 01=4min, 02=2min, 03=4min, 04=2min), Phase 23 complete (01=2min, 02=2min, 03=1min, 04=1.5min, 05=2.9min, 06=2min, 07=3.8min, 08=2min), Phase 24 in progress (01=3min, 02=1min, 03=2min)
+- v3.0: Phase 20 complete (3 plans, 43min), Phase 21 complete (4 plans, 15min), Phase 22 complete (4 plans: 01=4min, 02=2min, 03=4min, 04=2min), Phase 23 complete (01=2min, 02=2min, 03=1min, 04=1.5min, 05=2.9min, 06=2min, 07=3.8min, 08=2min), Phase 24 in progress (01=3min, 02=1min, 03=2min, 04=2min)
 
 **Project Totals:**
 - Milestones shipped: 9 (v1.0, v1.1, v1.2, v2.0, v2.1, v2.2, v2.3, v2.4, v2.5)
 - Total phases: 23 completed (phase 24 in progress)
-- Total plans: 96 complete
-- Total LOC: ~13,625 TypeScript
+- Total plans: 97 complete
+- Total LOC: ~13,900 TypeScript
 
 ## Completed Milestones
 
@@ -200,6 +200,12 @@ v3.0 key decisions:
 - Instant loss: Timer reaching 0 immediately triggers game over for that player
 - End condition: Timer expiry OR questions exhausted (winner = most time remaining)
 
+24-04 decisions (Game orchestrator):
+- BeatTheChaserGame uses local phase state management for teacher-side control
+- Questions split: first 10 for Cash Builder, remaining for Timed Battle
+- State updates broadcast to student view via onStateUpdate callback
+- Final times tracked separately for game-over result display
+
 All decisions logged in PROJECT.md Key Decisions table.
 
 ### Pending Todos
@@ -212,11 +218,11 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-01-23 16:45:44 UTC
-Stopped at: Completed 24-03-PLAN.md (Timed Battle phase)
+Last session: 2026-01-24 04:50:38 UTC
+Stopped at: Completed 24-04-PLAN.md (Game Orchestrator)
 Resume file: None
-Next: 24-04-PLAN.md (Result Screen)
+Next: 24-05-PLAN.md (Student View)
 
 ---
 *State initialized: 2026-01-18*
-*Last updated: 2026-01-23 - Phase 24 plan 03 complete (Timed Battle phase)*
+*Last updated: 2026-01-24 - Phase 24 plan 04 complete (Game Orchestrator)*
