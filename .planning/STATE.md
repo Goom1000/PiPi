@@ -28,13 +28,13 @@ Progress: █████░░░░░░░░░░░░░░░░ 23% (v
 - v2.3: 4 plans, 2 days
 - v2.4: 9 plans, 2 days
 - v2.5: 2 plans, 1 day
-- v3.0: Phase 20 complete (3 plans, 43min), Phase 21 complete (4 plans, 15min), Phase 22 complete (4 plans: 01=4min, 02=2min, 03=4min, 04=2min), Phase 23 in progress (01=2min, 02=2min, 03=1min)
+- v3.0: Phase 20 complete (3 plans, 43min), Phase 21 complete (4 plans, 15min), Phase 22 complete (4 plans: 01=4min, 02=2min, 03=4min, 04=2min), Phase 23 in progress (01=2min, 02=2min, 03=1min, 04=1.5min)
 
 **Project Totals:**
 - Milestones shipped: 9 (v1.0, v1.1, v1.2, v2.0, v2.1, v2.2, v2.3, v2.4, v2.5)
 - Total phases: 22 completed (phase 23 in progress, phases 24-26 planned)
-- Total plans: 88 complete
-- Total LOC: ~11,860 TypeScript
+- Total plans: 89 complete
+- Total LOC: ~12,215 TypeScript
 
 ## Completed Milestones
 
@@ -147,6 +147,13 @@ v3.0 key decisions:
 - Timer urgency styling activates at 10 seconds (red, pulse)
 - Full-screen green/red flash animations for answer feedback
 
+23-04 decisions (Offer selection and voting):
+- Teacher manually edits offer amounts and positions before starting vote
+- Vote tallies calculated on-demand via getVoteCount(index) filtering votes Map
+- Majority winner via tallies.indexOf(Math.max(...tallies)) - ties go to first offer
+- VotingWidget hidden (returns null) when not in voting mode
+- Optional name input on VotingWidget if studentName prop not provided
+
 All decisions logged in PROJECT.md Key Decisions table.
 
 ### Pending Todos
@@ -159,10 +166,10 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-01-23 10:54:07 UTC
-Stopped at: Completed 23-03-PLAN.md (Cash Builder round)
+Last session: 2026-01-23 10:54:19 UTC
+Stopped at: Completed 23-04-PLAN.md (Offer selection and voting)
 Resume file: None
-Next: 23-04 - Offer selection phase
+Next: 23-05 - Head-to-Head chase phase
 
 ---
 *State initialized: 2026-01-18*
