@@ -130,11 +130,11 @@ Plans:
 **Plans**: 5 plans
 
 Plans:
-- [ ] 24-01-PLAN.md - Type extensions & setup modal
-- [ ] 24-02-PLAN.md - Cash Builder phase (time accumulation)
-- [ ] 24-03-PLAN.md - Timed Battle phase (dual timers)
-- [ ] 24-04-PLAN.md - Game orchestrator & integration
-- [ ] 24-05-PLAN.md - Student view for all phases
+- [x] 24-01-PLAN.md - Type extensions & setup modal
+- [x] 24-02-PLAN.md - Cash Builder phase (time accumulation)
+- [x] 24-03-PLAN.md - Timed Battle phase (dual timers)
+- [x] 24-04-PLAN.md - Game orchestrator & integration
+- [x] 24-05-PLAN.md - Student view for all phases
 
 ### Phase 25: Competition Modes
 
@@ -178,6 +178,6 @@ Phases execute in numeric order: 20 -> 21 -> 22 -> 23 -> 24 -> 25 -> 26
 | 21. Millionaire Game | 4/4 | Complete | 2026-01-23 |
 | 22. AI Integration | 4/4 | Complete | 2026-01-23 |
 | 23. The Chase | 8/8 | Complete | 2026-01-23 |
-| 24. Beat the Chaser | 0/5 | Ready | - |
+| 24. Beat the Chaser | 5/5 | Complete | 2026-01-24 |
 | 25. Competition Modes | 0/TBD | Not started | - |
 | 26. Student View Integration | 0/TBD | Not started | - |
