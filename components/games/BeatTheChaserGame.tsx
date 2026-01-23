@@ -63,6 +63,22 @@ const BeatTheChaserGame: React.FC<BeatTheChaserGameProps> = ({
     });
   }, [updateState]);
 
+  // Show loading screen while questions are being generated
+  if (state.status === 'loading' || state.questions.length === 0) {
+    return (
+      <div className="w-full h-full bg-gradient-to-br from-blue-950 via-slate-900 to-red-950 flex flex-col items-center justify-center">
+        <div className="text-center">
+          <div className="text-6xl mb-6">⚡</div>
+          <h2 className="text-3xl font-black text-white mb-4">Beat the Chaser</h2>
+          <div className="flex items-center gap-3 text-emerald-400">
+            <div className="w-5 h-5 border-2 border-emerald-400 border-t-transparent rounded-full animate-spin"></div>
+            <span className="text-lg font-bold">Generating questions...</span>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   // Render based on phase
   switch (localPhase) {
     case 'setup':
