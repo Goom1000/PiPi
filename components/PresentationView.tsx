@@ -16,6 +16,7 @@ import { useToast, ToastContainer } from './Toast';
 import GameMenu from './games/GameMenu';
 import GameContainer from './games/GameContainer';
 import { MONEY_TREE_CONFIGS, getSafeHavenAmount } from './games/millionaire/millionaireConfig';
+import { CONTESTANT_START_TIME, BEAT_THE_CHASER_DIFFICULTY } from './games/beat-the-chaser/beatTheChaserConfig';
 import CompetitionModeSection from './games/shared/CompetitionModeSection';
 import ScoreOverlay from './games/shared/ScoreOverlay';
 
@@ -340,17 +341,20 @@ const PresentationView: React.FC<PresentationViewProps> = ({ slides, onExit, stu
     isAIControlled: boolean,
     compMode?: CompetitionMode
   ): BeatTheChaserState => {
+    // Get chaser's time based on difficulty (dim chaser gets more time, genius gets less)
+    const chaserConfig = BEAT_THE_CHASER_DIFFICULTY[difficulty];
+
     return {
       gameType: 'beat-the-chaser',
       status: 'playing',
       questions,
       currentQuestionIndex: 0,
-      phase: 'setup',
+      phase: 'timed-battle',  // Skip cash builder - go straight to the battle
       accumulatedTime: 0,
       cashBuilderQuestionsAnswered: 0,
       cashBuilderCorrectAnswers: 0,
-      contestantTime: 0,
-      chaserTime: 0,
+      contestantTime: CONTESTANT_START_TIME,  // Fixed 45 seconds for student
+      chaserTime: chaserConfig.chaserTime,    // Varies by difficulty
       activePlayer: 'contestant',
       chaserDifficulty: difficulty,
       isAIControlled,
@@ -1743,7 +1747,8 @@ const PresentationView: React.FC<PresentationViewProps> = ({ slides, onExit, stu
         <div className="fixed inset-0 z-[200] bg-black/80 backdrop-blur-sm flex items-center justify-center animate-fade-in">
           <div className="bg-slate-800 rounded-2xl p-8 max-w-xl w-full border-2 border-emerald-400/30 shadow-2xl">
             <h3 className="text-3xl font-black text-white mb-2 text-center">Beat the Chaser</h3>
-            <p className="text-slate-300 text-center mb-6">Race against time to beat the chaser</p>
+            <p className="text-slate-300 text-center mb-2">You have <span className="text-emerald-400 font-bold">45 seconds</span> on your clock</p>
+            <p className="text-slate-400 text-center mb-6 text-sm">Choose your opponent wisely...</p>
 
             <CompetitionModeSection
               value={competitionMode}
@@ -1786,9 +1791,9 @@ const PresentationView: React.FC<PresentationViewProps> = ({ slides, onExit, stu
               </p>
             </div>
 
-            {/* Difficulty Selection */}
+            {/* Chaser Selection - framed as opponent choice */}
             <div className="mb-6">
-              <label className="text-sm font-bold text-slate-300 mb-3 block">Chaser Difficulty</label>
+              <label className="text-sm font-bold text-slate-300 mb-3 block">Choose Your Chaser</label>
               <div className="space-y-3">
                 <button
                   onClick={() => {
@@ -1803,10 +1808,10 @@ const PresentationView: React.FC<PresentationViewProps> = ({ slides, onExit, stu
                   }`}
                 >
                   <div className="flex items-center justify-between">
-                    <span>Easy</span>
-                    <span className="text-sm font-normal">More time, slower chaser</span>
+                    <span>🤪 The Dim Chaser</span>
+                    <span className="text-lg font-bold text-green-300">55 seconds</span>
                   </div>
-                  <p className="text-xs font-normal opacity-80 mt-1">Chaser gets less time and 60% accuracy</p>
+                  <p className="text-xs font-normal opacity-80 mt-1">Not very bright — needs lots of time and makes lots of mistakes</p>
                 </button>
                 <button
                   onClick={() => {
@@ -1821,10 +1826,10 @@ const PresentationView: React.FC<PresentationViewProps> = ({ slides, onExit, stu
                   }`}
                 >
                   <div className="flex items-center justify-between">
-                    <span>Medium</span>
-                    <span className="text-sm font-normal">Balanced challenge</span>
+                    <span>🧠 The Average Chaser</span>
+                    <span className="text-lg font-bold text-amber-300">45 seconds</span>
                   </div>
-                  <p className="text-xs font-normal opacity-80 mt-1">Equal time ratio and 75% accuracy</p>
+                  <p className="text-xs font-normal opacity-80 mt-1">Fairly clever — takes the same time as you with decent accuracy</p>
                 </button>
                 <button
                   onClick={() => {
@@ -1839,10 +1844,10 @@ const PresentationView: React.FC<PresentationViewProps> = ({ slides, onExit, stu
                   }`}
                 >
                   <div className="flex items-center justify-between">
-                    <span>Hard</span>
-                    <span className="text-sm font-normal">Less time, faster chaser</span>
+                    <span>🎓 The Genius Chaser</span>
+                    <span className="text-lg font-bold text-red-300">35 seconds</span>
                   </div>
-                  <p className="text-xs font-normal opacity-80 mt-1">Chaser gets more time and 90% accuracy</p>
+                  <p className="text-xs font-normal opacity-80 mt-1">Super smart — confident with less time and rarely gets it wrong</p>
                 </button>
               </div>
             </div>

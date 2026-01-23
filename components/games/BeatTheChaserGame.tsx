@@ -1,14 +1,8 @@
-import React, { useState, useCallback } from 'react';
-import { BeatTheChaserState, BeatTheChaserPhase, CompetitionMode } from '../../types';
-import SetupModal from './beat-the-chaser/SetupModal';
-import CashBuilderPhase from './beat-the-chaser/CashBuilderPhase';
+import React, { useState, useCallback, useEffect } from 'react';
+import { BeatTheChaserState, BeatTheChaserPhase } from '../../types';
 import TimedBattlePhase from './beat-the-chaser/TimedBattlePhase';
 import GameResult from './beat-the-chaser/GameResult';
-import {
-  BeatTheChaserDifficulty,
-  calculateChaserTime,
-  CASH_BUILDER_QUESTIONS
-} from './beat-the-chaser/beatTheChaserConfig';
+import { BeatTheChaserDifficulty } from './beat-the-chaser/beatTheChaserConfig';
 
 interface BeatTheChaserGameProps {
   state: BeatTheChaserState;
@@ -18,7 +12,7 @@ interface BeatTheChaserGameProps {
 
 /**
  * Main orchestrator for Beat the Chaser game.
- * Manages phase transitions: Setup -> Cash Builder -> Timed Battle -> Game Over
+ * Simplified flow: Timed Battle -> Game Over (no Cash Builder)
  * Broadcasts state updates to student view via onStateUpdate callback.
  */
 const BeatTheChaserGame: React.FC<BeatTheChaserGameProps> = ({
@@ -26,57 +20,21 @@ const BeatTheChaserGame: React.FC<BeatTheChaserGameProps> = ({
   onClose,
   onStateUpdate
 }) => {
-  // Local phase state (teacher-side management)
-  const [localPhase, setLocalPhase] = useState<BeatTheChaserPhase>('setup');
-  const [difficulty, setDifficulty] = useState<BeatTheChaserDifficulty>('medium');
-  const [isAIControlled, setIsAIControlled] = useState(true);
-  const [accumulatedTime, setAccumulatedTime] = useState(0);
-  const [chaserTime, setChaserTime] = useState(0);
+  // Local phase state - initialize from state.phase
+  const [localPhase, setLocalPhase] = useState<BeatTheChaserPhase>(state.phase);
   const [winner, setWinner] = useState<'contestant' | 'chaser' | null>(null);
   const [finalContestantTime, setFinalContestantTime] = useState(0);
   const [finalChaserTime, setFinalChaserTime] = useState(0);
+
+  // Sync local phase with state phase when state changes
+  useEffect(() => {
+    setLocalPhase(state.phase);
+  }, [state.phase]);
 
   // Update state and broadcast
   const updateState = useCallback((updates: Partial<BeatTheChaserState>) => {
     onStateUpdate?.(updates);
   }, [onStateUpdate]);
-
-  // Setup complete -> Start Cash Builder
-  const handleSetupComplete = useCallback((
-    selectedDifficulty: BeatTheChaserDifficulty,
-    aiControlled: boolean,
-    compMode?: CompetitionMode
-  ) => {
-    setDifficulty(selectedDifficulty);
-    setIsAIControlled(aiControlled);
-    setLocalPhase('cash-builder');
-
-    updateState({
-      phase: 'cash-builder',
-      chaserDifficulty: selectedDifficulty,
-      isAIControlled: aiControlled,
-      accumulatedTime: 0,
-      cashBuilderQuestionsAnswered: 0,
-      cashBuilderCorrectAnswers: 0,
-      competitionMode: compMode
-    });
-  }, [updateState]);
-
-  // Cash Builder complete -> Start Timed Battle
-  const handleCashBuilderComplete = useCallback((time: number) => {
-    setAccumulatedTime(time);
-    const calculatedChaserTime = calculateChaserTime(time, difficulty);
-    setChaserTime(calculatedChaserTime);
-    setLocalPhase('timed-battle');
-
-    updateState({
-      phase: 'timed-battle',
-      accumulatedTime: time,
-      contestantTime: time,
-      chaserTime: calculatedChaserTime,
-      activePlayer: 'contestant'
-    });
-  }, [difficulty, updateState]);
 
   // Timed Battle complete -> Game Over
   const handleTimedBattleComplete = useCallback((gameWinner: 'contestant' | 'chaser') => {
@@ -108,34 +66,16 @@ const BeatTheChaserGame: React.FC<BeatTheChaserGameProps> = ({
   // Render based on phase
   switch (localPhase) {
     case 'setup':
-      return (
-        <SetupModal
-          onStart={handleSetupComplete}
-          onCancel={onClose}
-        />
-      );
-
     case 'cash-builder':
-      // Use first CASH_BUILDER_QUESTIONS for Cash Builder
-      const cashBuilderQuestions = state.questions.slice(0, CASH_BUILDER_QUESTIONS);
-      return (
-        <CashBuilderPhase
-          questions={cashBuilderQuestions}
-          onComplete={handleCashBuilderComplete}
-          onExit={onClose}
-        />
-      );
-
     case 'timed-battle':
-      // Use remaining questions for Timed Battle
-      const battleQuestions = state.questions.slice(CASH_BUILDER_QUESTIONS);
+      // All these phases now go straight to timed battle
       return (
         <TimedBattlePhase
-          contestantStartTime={accumulatedTime}
-          chaserStartTime={chaserTime}
-          difficulty={difficulty}
-          isAIControlled={isAIControlled}
-          questions={battleQuestions}
+          contestantStartTime={state.contestantTime}
+          chaserStartTime={state.chaserTime}
+          difficulty={state.chaserDifficulty as BeatTheChaserDifficulty}
+          isAIControlled={state.isAIControlled}
+          questions={state.questions}
           onComplete={handleTimedBattleComplete}
           onExit={onClose}
           onStateUpdate={handleTimedBattleStateUpdate}
