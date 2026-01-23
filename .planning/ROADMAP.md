@@ -2,15 +2,15 @@
 
 ## Milestones
 
-- ✅ **v2.5 Rebrand to Cue** - Phases 1-19 (shipped 2026-01-23)
-- 🚧 **v3.0 Quiz Game Variety** - Phases 20-26 (in progress)
+- **v2.5 Rebrand to Cue** - Phases 1-19 (shipped 2026-01-23)
+- **v3.0 Quiz Game Variety** - Phases 20-26 (in progress)
 
 ## Overview
 
 v3.0 transforms Cue from a single-game quiz tool into a multi-game platform with TV show-style formats. The journey starts by establishing a unified game architecture that prevents state silos and code duplication, then proves the framework by refactoring the existing quiz and building the simplest new game (Millionaire). Once patterns are validated, we extend AI generation for game-specific question needs, implement timer-based games (The Chase, Beat the Chaser), add competition modes, and ensure seamless synchronization across teacher and student views.
 
 <details>
-<summary>✅ v2.5 Rebrand to Cue (Phases 1-19) - SHIPPED 2026-01-23</summary>
+<summary>v2.5 Rebrand to Cue (Phases 1-19) - SHIPPED 2026-01-23</summary>
 
 ### Phase 19: Rebrand to Cue
 **Goal**: Complete rebrand from PiPi to Cue with backward compatibility
@@ -22,7 +22,7 @@ Plans:
 
 </details>
 
-## 🚧 v3.0 Quiz Game Variety (In Progress)
+## v3.0 Quiz Game Variety (In Progress)
 
 **Milestone Goal:** Add The Chase, Beat the Chaser, and Who Wants to Be a Millionaire game formats with unified architecture, AI-generated questions, and competition modes.
 
@@ -40,9 +40,9 @@ Plans:
 **Plans**: 3 plans
 
 Plans:
-- [x] 20-01-PLAN.md — Type system & game menu dropdown
-- [x] 20-02-PLAN.md — Game container & Quick Quiz refactor
-- [x] 20-03-PLAN.md — Integration & CSS animations
+- [x] 20-01-PLAN.md - Type system & game menu dropdown
+- [x] 20-02-PLAN.md - Game container & Quick Quiz refactor
+- [x] 20-03-PLAN.md - Integration & CSS animations
 
 ### Phase 21: Millionaire Game
 
@@ -61,10 +61,10 @@ Plans:
 **Plans**: 4 plans
 
 Plans:
-- [x] 21-01-PLAN.md — Type extensions & money tree component
-- [x] 21-02-PLAN.md — Question display & game flow
-- [x] 21-03-PLAN.md — Lifeline system with AI phone-a-friend
-- [x] 21-04-PLAN.md — Student view & celebration animations
+- [x] 21-01-PLAN.md - Type extensions & money tree component
+- [x] 21-02-PLAN.md - Question display & game flow
+- [x] 21-03-PLAN.md - Lifeline system with AI phone-a-friend
+- [x] 21-04-PLAN.md - Student view & celebration animations
 
 ### Phase 22: AI Integration
 
@@ -80,10 +80,10 @@ Plans:
 **Plans**: 4 plans
 
 Plans:
-- [x] 22-01-PLAN.md — Game question types & interface extension
-- [x] 22-02-PLAN.md — Gemini provider implementation
-- [x] 22-03-PLAN.md — Claude provider implementation
-- [x] 22-04-PLAN.md — Game launch integration with auto-retry
+- [x] 22-01-PLAN.md - Game question types & interface extension
+- [x] 22-02-PLAN.md - Gemini provider implementation
+- [x] 22-03-PLAN.md - Claude provider implementation
+- [x] 22-04-PLAN.md - Game launch integration with auto-retry
 
 ### Phase 23: The Chase
 
@@ -104,14 +104,14 @@ Plans:
 **Plans**: 8 plans
 
 Plans:
-- [x] 23-01-PLAN.md — TheChaseState types & useTimer hook
-- [x] 23-02-PLAN.md — GameBoard component & useChaserAI hook
-- [x] 23-03-PLAN.md — Cash Builder round with 60s timer
-- [x] 23-04-PLAN.md — Offer Selection with class voting
-- [x] 23-05-PLAN.md — Head-to-Head chase mechanics
-- [x] 23-06-PLAN.md — Final Chase with pushback mechanic
-- [x] 23-07-PLAN.md — TheChaseGame orchestrator & integration
-- [x] 23-08-PLAN.md — Student view for all Chase phases
+- [x] 23-01-PLAN.md - TheChaseState types & useTimer hook
+- [x] 23-02-PLAN.md - GameBoard component & useChaserAI hook
+- [x] 23-03-PLAN.md - Cash Builder round with 60s timer
+- [x] 23-04-PLAN.md - Offer Selection with class voting
+- [x] 23-05-PLAN.md - Head-to-Head chase mechanics
+- [x] 23-06-PLAN.md - Final Chase with pushback mechanic
+- [x] 23-07-PLAN.md - TheChaseGame orchestrator & integration
+- [x] 23-08-PLAN.md - Student view for all Chase phases
 
 ### Phase 24: Beat the Chaser
 
@@ -127,11 +127,14 @@ Plans:
   6. Correct answer during chaser's turn adds time to contestant's clock
   7. Contestant wins if chaser's timer expires first
   8. Chaser wins if contestant's timer expires first
-**Plans**: TBD
+**Plans**: 5 plans
 
 Plans:
-- [ ] 24-01: TBD
-- [ ] 24-02: TBD
+- [ ] 24-01-PLAN.md - Type extensions & setup modal
+- [ ] 24-02-PLAN.md - Cash Builder phase (time accumulation)
+- [ ] 24-03-PLAN.md - Timed Battle phase (dual timers)
+- [ ] 24-04-PLAN.md - Game orchestrator & integration
+- [ ] 24-05-PLAN.md - Student view for all phases
 
 ### Phase 25: Competition Modes
 
@@ -167,14 +170,14 @@ Plans:
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 20 → 21 → 22 → 23 → 24 → 25 → 26
+Phases execute in numeric order: 20 -> 21 -> 22 -> 23 -> 24 -> 25 -> 26
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 20. Game Foundation & Type System | 3/3 | ✓ Complete | 2026-01-23 |
-| 21. Millionaire Game | 4/4 | ✓ Complete | 2026-01-23 |
-| 22. AI Integration | 4/4 | ✓ Complete | 2026-01-23 |
-| 23. The Chase | 8/8 | ✓ Complete | 2026-01-23 |
-| 24. Beat the Chaser | 0/TBD | Not started | - |
+| 20. Game Foundation & Type System | 3/3 | Complete | 2026-01-23 |
+| 21. Millionaire Game | 4/4 | Complete | 2026-01-23 |
+| 22. AI Integration | 4/4 | Complete | 2026-01-23 |
+| 23. The Chase | 8/8 | Complete | 2026-01-23 |
+| 24. Beat the Chaser | 0/5 | Ready | - |
 | 25. Competition Modes | 0/TBD | Not started | - |
 | 26. Student View Integration | 0/TBD | Not started | - |
