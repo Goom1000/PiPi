@@ -104,14 +104,14 @@ Plans:
 **Plans**: 8 plans
 
 Plans:
-- [ ] 23-01-PLAN.md — TheChaseState types & useTimer hook
-- [ ] 23-02-PLAN.md — GameBoard component & useChaserAI hook
-- [ ] 23-03-PLAN.md — Cash Builder round with 60s timer
-- [ ] 23-04-PLAN.md — Offer Selection with class voting
-- [ ] 23-05-PLAN.md — Head-to-Head chase mechanics
-- [ ] 23-06-PLAN.md — Final Chase with pushback mechanic
-- [ ] 23-07-PLAN.md — TheChaseGame orchestrator & integration
-- [ ] 23-08-PLAN.md — Student view for all Chase phases
+- [x] 23-01-PLAN.md — TheChaseState types & useTimer hook
+- [x] 23-02-PLAN.md — GameBoard component & useChaserAI hook
+- [x] 23-03-PLAN.md — Cash Builder round with 60s timer
+- [x] 23-04-PLAN.md — Offer Selection with class voting
+- [x] 23-05-PLAN.md — Head-to-Head chase mechanics
+- [x] 23-06-PLAN.md — Final Chase with pushback mechanic
+- [x] 23-07-PLAN.md — TheChaseGame orchestrator & integration
+- [x] 23-08-PLAN.md — Student view for all Chase phases
 
 ### Phase 24: Beat the Chaser
 
@@ -174,7 +174,7 @@ Phases execute in numeric order: 20 → 21 → 22 → 23 → 24 → 25 → 26
 | 20. Game Foundation & Type System | 3/3 | ✓ Complete | 2026-01-23 |
 | 21. Millionaire Game | 4/4 | ✓ Complete | 2026-01-23 |
 | 22. AI Integration | 4/4 | ✓ Complete | 2026-01-23 |
-| 23. The Chase | 0/8 | Not started | - |
+| 23. The Chase | 8/8 | ✓ Complete | 2026-01-23 |
 | 24. Beat the Chaser | 0/TBD | Not started | - |
 | 25. Competition Modes | 0/TBD | Not started | - |
 | 26. Student View Integration | 0/TBD | Not started | - |
