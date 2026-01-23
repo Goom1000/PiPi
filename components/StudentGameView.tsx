@@ -1,5 +1,5 @@
 import React from 'react';
-import { GameState, MillionaireState, TheChaseState, assertNever } from '../types';
+import { GameState, MillionaireState, TheChaseState, BeatTheChaserState, assertNever } from '../types';
 import GameSplash from './games/shared/GameSplash';
 import ResultScreen from './games/shared/ResultScreen';
 import MoneyTree from './games/millionaire/MoneyTree';
@@ -67,7 +67,11 @@ const StudentGameView: React.FC<StudentGameViewProps> = ({ gameState }) => {
     return <TheChaseStudentView state={gameState} />;
   }
 
-  // Placeholder games (beat-the-chaser)
+  if (gameState.gameType === 'beat-the-chaser') {
+    return <BeatTheChaserStudentView state={gameState} />;
+  }
+
+  // Fallback for any future placeholder games
   return <PlaceholderStudentView gameType={gameState.gameType} />;
 };
 
@@ -541,6 +545,246 @@ const TheChaseStudentView: React.FC<{ state: TheChaseState }> = ({ state }) => {
   return (
     <div className="h-screen w-screen bg-slate-900 flex items-center justify-center">
       <p className="text-white text-xl">Preparing game...</p>
+    </div>
+  );
+};
+
+// Beat the Chaser student view component
+const BeatTheChaserStudentView: React.FC<{ state: BeatTheChaserState }> = ({ state }) => {
+  const currentQuestion = state.questions[state.currentQuestionIndex];
+
+  // Format time helper
+  const formatTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  };
+
+  // Cash Builder phase - show time bank
+  if (state.phase === 'cash-builder') {
+    return (
+      <div className="h-screen w-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex flex-col items-center justify-center p-6 font-poppins text-white">
+        {/* Time Bank Display */}
+        <div className="text-center mb-12">
+          <h2 className="text-3xl font-black text-green-400 uppercase tracking-widest mb-4">
+            Cash Builder
+          </h2>
+          <div className="bg-slate-800/60 p-8 rounded-2xl border-2 border-green-500/30">
+            <div className="text-sm text-slate-400 uppercase tracking-wider mb-2">Time Bank</div>
+            <div className="text-8xl font-black text-green-400">
+              {state.accumulatedTime}s
+            </div>
+            <div className="text-slate-500 mt-2">
+              {state.cashBuilderCorrectAnswers} correct answers
+            </div>
+          </div>
+        </div>
+
+        {/* Current Question */}
+        {currentQuestion && (
+          <div className="w-full max-w-4xl">
+            <div className="bg-slate-800/60 p-8 rounded-2xl border-2 border-slate-600 mb-6">
+              <p className="text-3xl font-bold text-center">
+                {currentQuestion.question}
+              </p>
+            </div>
+
+            {/* Answer options */}
+            <div className="grid grid-cols-2 gap-4">
+              {currentQuestion.options.map((opt, idx) => {
+                const isAnswer = state.contestantAnswer === idx;
+                const isCorrect = idx === currentQuestion.correctAnswerIndex;
+
+                return (
+                  <div
+                    key={idx}
+                    className={`
+                      p-6 rounded-xl border-2 transition-all text-xl font-bold
+                      ${isAnswer ? 'bg-blue-500 border-blue-400 text-white' : 'bg-slate-700/50 border-slate-600 text-white'}
+                    `}
+                  >
+                    {opt}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  // Timed Battle phase - show dual timers
+  if (state.phase === 'timed-battle') {
+    const isUrgent = (time: number) => time <= 10;
+    const isContestantActive = state.activePlayer === 'contestant';
+
+    return (
+      <div className="h-screen w-screen bg-gradient-to-br from-blue-950 via-slate-900 to-red-950 flex flex-col items-center justify-center p-6 font-poppins text-white">
+        {/* Dual Timers */}
+        <div className="flex gap-6 md:gap-12 mb-8 w-full max-w-5xl">
+          {/* Contestant Timer */}
+          <div className={`flex-1 p-6 md:p-8 rounded-3xl transition-all duration-300 ${
+            isContestantActive
+              ? 'bg-blue-900/60 ring-4 ring-yellow-400 scale-105'
+              : 'bg-blue-900/30 opacity-50 scale-95'
+          }`}>
+            <div className="text-center">
+              <div className="text-sm uppercase tracking-wider text-blue-300 mb-2">Contestant</div>
+              <div className={`text-6xl md:text-8xl font-black ${
+                isUrgent(state.contestantTime) ? 'text-red-500 animate-pulse' : 'text-white'
+              }`}>
+                {formatTime(state.contestantTime)}
+              </div>
+              {isContestantActive && (
+                <div className="mt-3 text-sm font-bold text-yellow-400 animate-bounce">
+                  YOUR TURN
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* VS Divider */}
+          <div className="flex items-center">
+            <div className="text-4xl md:text-5xl font-black text-slate-500">VS</div>
+          </div>
+
+          {/* Chaser Timer */}
+          <div className={`flex-1 p-6 md:p-8 rounded-3xl transition-all duration-300 ${
+            !isContestantActive
+              ? 'bg-red-900/60 ring-4 ring-yellow-400 scale-105'
+              : 'bg-red-900/30 opacity-50 scale-95'
+          }`}>
+            <div className="text-center">
+              <div className="text-sm uppercase tracking-wider text-red-300 mb-2">Chaser</div>
+              <div className={`text-6xl md:text-8xl font-black ${
+                isUrgent(state.chaserTime) ? 'text-red-500 animate-pulse' : 'text-white'
+              }`}>
+                {formatTime(state.chaserTime)}
+              </div>
+              {!isContestantActive && (
+                <div className="mt-3 text-sm font-bold text-red-400 animate-bounce">
+                  CHASER'S TURN
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Current Question */}
+        {currentQuestion && (
+          <div className="w-full max-w-4xl">
+            <div className="bg-slate-800/60 p-6 rounded-2xl border-2 border-slate-600 mb-4">
+              <div className="text-xs text-slate-400 uppercase tracking-wider mb-2 text-center">
+                Question {state.currentQuestionIndex + 1}
+              </div>
+              <p className="text-2xl font-bold text-center">
+                {currentQuestion.question}
+              </p>
+            </div>
+
+            {/* Answer options */}
+            <div className="grid grid-cols-2 gap-3">
+              {currentQuestion.options.map((opt, idx) => {
+                const isContestantAnswer = state.contestantAnswer === idx;
+                const isChaserAnswer = state.chaserAnswer === idx;
+                const isCorrect = idx === currentQuestion.correctAnswerIndex;
+
+                return (
+                  <div
+                    key={idx}
+                    className={`
+                      p-4 rounded-xl border-2 transition-all font-bold text-lg
+                      ${isContestantAnswer ? 'bg-blue-500 border-blue-400 text-white' : ''}
+                      ${isChaserAnswer ? 'bg-red-500 border-red-400 text-white' : ''}
+                      ${!isContestantAnswer && !isChaserAnswer ? 'bg-slate-700/50 border-slate-600 text-white' : ''}
+                    `}
+                  >
+                    {opt}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        {/* Time bonus indicator */}
+        {state.showTimeBonusEffect && (
+          <div className="fixed inset-0 pointer-events-none z-50 flex items-center justify-center">
+            <div className="text-9xl font-black text-green-400 animate-bounce"
+              style={{ textShadow: '0 0 40px rgba(74, 222, 128, 0.8)' }}>
+              +5s
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  // Game Over phase - show result
+  if (state.phase === 'game-over') {
+    const contestantWon = state.winner === 'contestant';
+
+    return (
+      <div className={`h-screen w-screen flex flex-col items-center justify-center p-6 font-poppins text-white ${
+        contestantWon
+          ? 'bg-gradient-to-br from-green-900 via-slate-900 to-green-900'
+          : 'bg-gradient-to-br from-red-900 via-slate-900 to-red-900'
+      }`}>
+        {/* Result */}
+        <div className="text-center mb-12">
+          <h1 className={`text-8xl md:text-9xl font-black mb-4 ${
+            contestantWon ? 'text-green-400' : 'text-red-400'
+          }`}>
+            {contestantWon ? 'VICTORY!' : 'DEFEATED!'}
+          </h1>
+          <p className="text-3xl text-white">
+            {contestantWon
+              ? 'You beat the chaser!'
+              : 'The chaser caught you!'
+            }
+          </p>
+        </div>
+
+        {/* Final Times */}
+        <div className="flex gap-12">
+          <div className={`text-center p-8 rounded-2xl ${
+            contestantWon ? 'bg-blue-900/50 border-2 border-blue-500' : 'bg-slate-800/50'
+          }`}>
+            <div className={`text-7xl font-bold mb-2 ${
+              contestantWon ? 'text-blue-400' : 'text-slate-400'
+            }`}>
+              {state.contestantTime}s
+            </div>
+            <div className="text-slate-300 uppercase tracking-wider">Contestant</div>
+          </div>
+
+          <div className="flex items-center">
+            <div className="text-5xl font-bold text-slate-500">vs</div>
+          </div>
+
+          <div className={`text-center p-8 rounded-2xl ${
+            !contestantWon ? 'bg-red-900/50 border-2 border-red-500' : 'bg-slate-800/50'
+          }`}>
+            <div className={`text-7xl font-bold mb-2 ${
+              !contestantWon ? 'text-red-400' : 'text-slate-400'
+            }`}>
+              {state.chaserTime}s
+            </div>
+            <div className="text-slate-300 uppercase tracking-wider">Chaser</div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Setup phase or unknown - show waiting state
+  return (
+    <div className="h-screen w-screen bg-slate-900 flex items-center justify-center font-poppins">
+      <div className="text-center">
+        <GameSplash gameType="beat-the-chaser" />
+        <p className="text-xl text-white/60 mt-8">Waiting for teacher...</p>
+      </div>
     </div>
   );
 };
