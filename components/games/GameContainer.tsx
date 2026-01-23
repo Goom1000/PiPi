@@ -12,6 +12,10 @@ interface GameContainerProps {
   onRevealAnswer: () => void;
   onNextQuestion: () => void;
   onRestart?: () => void;
+  // Millionaire-specific handlers
+  onMillionaireSelectOption?: (idx: number) => void;
+  onMillionaireLockIn?: () => void;
+  onMillionaireNext?: () => void;
 }
 
 /**
@@ -24,6 +28,9 @@ const GameContainer: React.FC<GameContainerProps> = ({
   onRevealAnswer,
   onNextQuestion,
   onRestart,
+  onMillionaireSelectOption,
+  onMillionaireLockIn,
+  onMillionaireNext,
 }) => {
   // Show splash screen during loading
   if (state.status === 'loading' || state.status === 'splash') {
@@ -66,6 +73,10 @@ const GameContainer: React.FC<GameContainerProps> = ({
         <MillionaireGame
           state={state}
           onClose={onClose}
+          onSelectOption={onMillionaireSelectOption}
+          onLockIn={onMillionaireLockIn}
+          onNextQuestion={onMillionaireNext}
+          onRestart={onRestart}
         />
       );
 

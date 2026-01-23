@@ -15,6 +15,7 @@ import NextSlidePreview from './NextSlidePreview';
 import { useToast, ToastContainer } from './Toast';
 import GameMenu from './games/GameMenu';
 import GameContainer from './games/GameContainer';
+import { MONEY_TREE_CONFIGS, getSafeHavenAmount } from './games/millionaire/millionaireConfig';
 
 // Fisher-Yates shuffle - unbiased O(n) randomization
 function shuffleArray<T>(array: T[]): T[] {
@@ -107,6 +108,7 @@ const PresentationView: React.FC<PresentationViewProps> = ({ slides, onExit, stu
   const [activeGame, setActiveGame] = useState<ActiveGameState>(null);
   const [pendingGameType, setPendingGameType] = useState<GameType | null>(null);
   const gameWasOpenRef = useRef(false);
+  const [showMillionaireSetup, setShowMillionaireSetup] = useState(false);
 
   // Question Generation State
   const [quickQuestion, setQuickQuestion] = useState<{
@@ -254,6 +256,32 @@ const PresentationView: React.FC<PresentationViewProps> = ({ slides, onExit, stu
     isAnswerRevealed: false,
   }), []);
 
+  const createMillionaireState = useCallback((
+    questions: QuizQuestion[],
+    questionCount: 3 | 5 | 10
+  ): MillionaireState => {
+    const config = MONEY_TREE_CONFIGS[questionCount];
+    return {
+      gameType: 'millionaire',
+      status: 'playing',
+      questions,
+      currentQuestionIndex: 0,
+      selectedOption: null,
+      lifelines: {
+        fiftyFifty: true,
+        phoneAFriend: true,
+        askTheAudience: true,
+      },
+      prizeLadder: config.prizes,
+      currentPrize: 0,
+      eliminatedOptions: [],
+      audiencePoll: null,
+      phoneHint: null,
+      safeHavenAmount: 0,
+      questionCount,
+    };
+  }, []);
+
   const createPlaceholderState = useCallback((gameType: GameType): GameState => {
     const base = {
       status: 'splash' as const,
@@ -304,6 +332,51 @@ const PresentationView: React.FC<PresentationViewProps> = ({ slides, onExit, stu
     setPendingGameType(null);
   }, [provider, slides, currentIndex, createQuickQuizState, onRequestAI, onError]);
 
+  // Launch Millionaire (async question generation with question count)
+  const launchMillionaire = useCallback(async (questionCount: 3 | 5 | 10) => {
+    if (!provider) {
+      onRequestAI('start the Millionaire game');
+      return;
+    }
+
+    // Close setup modal
+    setShowMillionaireSetup(false);
+
+    // Set loading state with question count
+    setActiveGame({
+      gameType: 'millionaire',
+      status: 'loading',
+      questions: [],
+      currentQuestionIndex: 0,
+      selectedOption: null,
+      lifelines: {
+        fiftyFifty: true,
+        phoneAFriend: true,
+        askTheAudience: true,
+      },
+      prizeLadder: [],
+      currentPrize: 0,
+      eliminatedOptions: [],
+      audiencePoll: null,
+      phoneHint: null,
+      safeHavenAmount: 0,
+      questionCount,
+    });
+
+    try {
+      const questions = await provider.generateImpromptuQuiz(slides, currentIndex, questionCount);
+      setActiveGame(createMillionaireState(questions, questionCount));
+    } catch (e) {
+      console.error(e);
+      if (e instanceof AIProviderError) {
+        onError('Quiz Generation Failed', e.userMessage);
+      } else {
+        onError('Quiz Generation Failed', 'An unexpected error occurred');
+      }
+      setActiveGame(null);
+    }
+  }, [provider, slides, currentIndex, createMillionaireState, onRequestAI, onError]);
+
   // Game selection handler with confirmation dialog
   const handleSelectGame = useCallback((gameType: GameType) => {
     // If game is active and not finished, confirm switch
@@ -316,6 +389,9 @@ const PresentationView: React.FC<PresentationViewProps> = ({ slides, onExit, stu
       // Launch Quick Quiz - needs to generate questions first
       setPendingGameType('quick-quiz');
       launchQuickQuiz();
+    } else if (gameType === 'millionaire') {
+      // Show question count selection modal
+      setShowMillionaireSetup(true);
     } else {
       // Launch placeholder game directly
       setActiveGame(createPlaceholderState(gameType));
@@ -354,6 +430,59 @@ const PresentationView: React.FC<PresentationViewProps> = ({ slides, onExit, stu
       launchQuickQuiz();
     }
   }, [activeGame, launchQuickQuiz]);
+
+  // Millionaire-specific control handlers
+  const handleMillionaireSelectOption = useCallback((idx: number) => {
+    if (activeGame?.gameType === 'millionaire' && activeGame.status === 'playing') {
+      setActiveGame(prev => prev ? { ...prev, selectedOption: idx } : null);
+    }
+  }, [activeGame]);
+
+  const handleMillionaireLockIn = useCallback(() => {
+    if (activeGame?.gameType === 'millionaire' && activeGame.selectedOption !== null) {
+      setActiveGame(prev => prev ? { ...prev, status: 'reveal' as const } : null);
+    }
+  }, [activeGame]);
+
+  const handleMillionaireNext = useCallback(() => {
+    if (activeGame?.gameType !== 'millionaire') return;
+    const state = activeGame;
+    const currentQuestion = state.questions[state.currentQuestionIndex];
+    const isCorrect = state.selectedOption === currentQuestion.correctAnswerIndex;
+
+    if (isCorrect) {
+      // Advance to next question or victory
+      if (state.currentQuestionIndex < state.questions.length - 1) {
+        const config = MONEY_TREE_CONFIGS[state.questionCount];
+        const newIndex = state.currentQuestionIndex + 1;
+        setActiveGame({
+          ...state,
+          currentQuestionIndex: newIndex,
+          selectedOption: null,
+          status: 'playing',
+          currentPrize: state.prizeLadder[state.currentQuestionIndex],
+          safeHavenAmount: getSafeHavenAmount(newIndex, config),
+          eliminatedOptions: [],
+          audiencePoll: null,
+          phoneHint: null,
+        });
+      } else {
+        // Victory!
+        setActiveGame({
+          ...state,
+          status: 'result',
+          currentPrize: state.prizeLadder[state.currentQuestionIndex],
+        });
+      }
+    } else {
+      // Wrong answer - game over, fall to safe haven
+      setActiveGame({
+        ...state,
+        status: 'result',
+        currentPrize: state.safeHavenAmount,
+      });
+    }
+  }, [activeGame]);
 
   const handleGenerateQuestion = async (level: 'A' | 'B' | 'C' | 'D' | 'E', studentName?: string) => {
       if (!provider) {
@@ -675,6 +804,9 @@ const PresentationView: React.FC<PresentationViewProps> = ({ slides, onExit, stu
               onRevealAnswer={handleRevealAnswer}
               onNextQuestion={handleNextQuestion}
               onRestart={handleRestartGame}
+              onMillionaireSelectOption={handleMillionaireSelectOption}
+              onMillionaireLockIn={handleMillionaireLockIn}
+              onMillionaireNext={handleMillionaireNext}
             />
           </div>,
           document.body
@@ -987,6 +1119,62 @@ const PresentationView: React.FC<PresentationViewProps> = ({ slides, onExit, stu
 
       {/* Toast notifications for reconnection feedback */}
       <ToastContainer toasts={toasts} removeToast={removeToast} />
+
+      {/* Millionaire Setup Modal */}
+      {showMillionaireSetup && (
+        <div className="fixed inset-0 z-[200] bg-black/80 backdrop-blur-sm flex items-center justify-center animate-fade-in">
+          <div className="bg-slate-800 rounded-2xl p-8 max-w-md w-full border-2 border-indigo-400/30 shadow-2xl">
+            <h3 className="text-3xl font-black text-white mb-2 text-center">Millionaire</h3>
+            <p className="text-slate-300 text-center mb-6">How many questions?</p>
+            <div className="space-y-3">
+              <button
+                onClick={() => launchMillionaire(3)}
+                disabled={!isAIAvailable}
+                className={`w-full py-4 text-xl font-bold rounded-xl transition-all ${
+                  isAIAvailable
+                    ? 'bg-amber-600 hover:bg-amber-500 text-white hover:scale-105'
+                    : 'bg-slate-700 text-slate-500 cursor-not-allowed'
+                }`}
+              >
+                3 Questions
+              </button>
+              <button
+                onClick={() => launchMillionaire(5)}
+                disabled={!isAIAvailable}
+                className={`w-full py-4 text-xl font-bold rounded-xl transition-all ${
+                  isAIAvailable
+                    ? 'bg-amber-600 hover:bg-amber-500 text-white hover:scale-105'
+                    : 'bg-slate-700 text-slate-500 cursor-not-allowed'
+                }`}
+              >
+                5 Questions
+              </button>
+              <button
+                onClick={() => launchMillionaire(10)}
+                disabled={!isAIAvailable}
+                className={`w-full py-4 text-xl font-bold rounded-xl transition-all ${
+                  isAIAvailable
+                    ? 'bg-amber-600 hover:bg-amber-500 text-white hover:scale-105'
+                    : 'bg-slate-700 text-slate-500 cursor-not-allowed'
+                }`}
+              >
+                10 Questions
+              </button>
+            </div>
+            {!isAIAvailable && (
+              <p className="text-sm text-amber-400 text-center mt-4">
+                Add an API key in Settings to enable
+              </p>
+            )}
+            <button
+              onClick={() => setShowMillionaireSetup(false)}
+              className="w-full mt-4 py-2 text-sm text-slate-400 hover:text-white transition-colors"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Permission Recovery Modal */}
       {showRecoveryModal && (
