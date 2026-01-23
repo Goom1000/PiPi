@@ -54,6 +54,7 @@ export interface BaseGameState {
   status: GameStatus;
   questions: QuizQuestion[];
   currentQuestionIndex: number;
+  competitionMode?: CompetitionMode;  // Optional for backward compatibility
 }
 
 // Quick Quiz state (Kahoot-style)
