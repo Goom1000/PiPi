@@ -147,10 +147,14 @@ Plans:
   3. Competition mode selection appears before starting any game
   4. Score display shows individual student name in individual mode
   5. Score display shows team names and team scores in team mode
-**Plans**: TBD
+**Plans**: 5 plans
 
 Plans:
-- [ ] 25-01: TBD
+- [ ] 25-01-PLAN.md — Type system & team name generator
+- [ ] 25-02-PLAN.md — CompetitionModeSection shared component
+- [ ] 25-03-PLAN.md — Score display components (teacher & student)
+- [ ] 25-04-PLAN.md — Setup modal integration (all 4 games)
+- [ ] 25-05-PLAN.md — Orchestrator & score tracking integration
 
 ### Phase 26: Student View Integration
 
@@ -179,5 +183,5 @@ Phases execute in numeric order: 20 -> 21 -> 22 -> 23 -> 24 -> 25 -> 26
 | 22. AI Integration | 4/4 | Complete | 2026-01-23 |
 | 23. The Chase | 8/8 | Complete | 2026-01-23 |
 | 24. Beat the Chaser | 5/5 | Complete | 2026-01-24 |
-| 25. Competition Modes | 0/TBD | Not started | - |
+| 25. Competition Modes | 0/5 | Not started | - |
 | 26. Student View Integration | 0/TBD | Not started | - |
