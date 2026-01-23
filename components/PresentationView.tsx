@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import { createPortal } from 'react-dom';
-import { Slide, PresentationMessage, BROADCAST_CHANNEL_NAME, GameSyncState, GradeLevel, StudentWithGrade } from '../types';
+import { Slide, PresentationMessage, BROADCAST_CHANNEL_NAME, GameState, GameType, QuickQuizState, ActiveGameState, MillionaireState, TheChaseState, BeatTheChaserState, GradeLevel, StudentWithGrade } from '../types';
 import Button from './Button';
 import { MarkdownText, SlideContentRenderer } from './SlideRenderers';
 import { QuizQuestion } from '../services/geminiService';
@@ -13,6 +13,8 @@ import ConnectionStatus from './ConnectionStatus';
 import PermissionRecovery from './PermissionRecovery';
 import NextSlidePreview from './NextSlidePreview';
 import { useToast, ToastContainer } from './Toast';
+import GameMenu from './games/GameMenu';
+import GameContainer from './games/GameContainer';
 
 // Fisher-Yates shuffle - unbiased O(n) randomization
 function shuffleArray<T>(array: T[]): T[] {
@@ -82,215 +84,6 @@ function advanceCycling(
   };
 }
 
-// --- QUIZ GAME MODAL COMPONENT ---
-const QuizOverlay: React.FC<{
-    slides: Slide[];
-    currentIndex: number;
-    onClose: () => void;
-    provider: AIProviderInterface | null;
-    onError: (title: string, message: string) => void;
-    onRequestAI: (featureName: string) => void;
-    onGameStateChange: (state: GameSyncState | null) => void;
-}> = ({ slides, currentIndex, onClose, provider, onError, onRequestAI, onGameStateChange }) => {
-    const [mode, setMode] = useState<'setup' | 'loading' | 'play' | 'summary'>('setup');
-    const [numQuestions, setNumQuestions] = useState(4);
-    const [questions, setQuestions] = useState<QuizQuestion[]>([]);
-    const [qIndex, setQIndex] = useState(0);
-    const [reveal, setReveal] = useState(false);
-
-    // Report game state changes to parent for broadcast
-    useEffect(() => {
-        // Only report syncable modes (not 'setup' which is teacher-only)
-        if (mode === 'loading' || mode === 'play' || mode === 'summary') {
-            onGameStateChange({
-                mode,
-                questions,
-                currentQuestionIndex: qIndex,
-                isAnswerRevealed: reveal
-            });
-        }
-    }, [mode, questions, qIndex, reveal, onGameStateChange]);
-
-    // Report null when closing (cleanup)
-    useEffect(() => {
-        return () => onGameStateChange(null);
-    }, [onGameStateChange]);
-
-    const handleStart = async () => {
-        if (!provider) {
-            onRequestAI('start the quiz game');
-            onClose();
-            return;
-        }
-        setMode('loading');
-        try {
-            const data = await provider.generateImpromptuQuiz(slides, currentIndex, numQuestions);
-            setQuestions(data);
-            setMode('play');
-        } catch (e) {
-            console.error(e);
-            if (e instanceof AIProviderError) {
-                onError('Quiz Generation Failed', e.userMessage);
-            } else {
-                onError('Error', 'Could not generate quiz. Please try again.');
-            }
-            onClose();
-        }
-    };
-
-    const handleNext = () => {
-        if (qIndex < questions.length - 1) {
-            setQIndex(prev => prev + 1);
-            setReveal(false);
-        } else {
-            setMode('summary');
-        }
-    };
-
-    const renderShape = (idx: number) => {
-        // 0: Triangle, 1: Diamond, 2: Circle, 3: Square
-        const classes = "w-6 h-6 md:w-10 md:h-10 text-white/80";
-        if (idx === 0) return <svg className={classes} viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L2 22h20L12 2z"/></svg>;
-        if (idx === 1) return <svg className={classes} viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l10 10-10 10L2 12 12 2z"/></svg>;
-        if (idx === 2) return <svg className={classes} viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="10"/></svg>;
-        return <svg className={classes} viewBox="0 0 24 24" fill="currentColor"><rect x="3" y="3" width="18" height="18"/></svg>;
-    };
-
-    const bgColors = [
-        "bg-red-600 border-red-800", // Triangle
-        "bg-blue-600 border-blue-800", // Diamond
-        "bg-amber-500 border-amber-700", // Circle
-        "bg-green-600 border-green-800"  // Square
-    ];
-
-    return (
-        <div className="absolute inset-0 z-[100] bg-slate-900/95 backdrop-blur-md flex items-center justify-center p-6 animate-fade-in font-poppins text-white">
-            <button onClick={onClose} className="absolute top-6 right-6 p-2 bg-white/10 hover:bg-white/20 rounded-full transition-colors z-50">
-                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
-            </button>
-
-            {mode === 'setup' && (
-                <div className="max-w-md w-full bg-white dark:bg-slate-800 rounded-3xl p-8 shadow-2xl text-center border-4 border-indigo-500">
-                    <div className="w-20 h-20 bg-indigo-100 rounded-full flex items-center justify-center mx-auto mb-6 text-4xl shadow-inner">
-                        🎮
-                    </div>
-                    <h2 className="text-3xl font-black text-slate-800 dark:text-white mb-2 font-fredoka uppercase tracking-wide">Game Time!</h2>
-                    <p className="text-slate-500 dark:text-slate-400 mb-8">Generate a quick quiz based on what the students have learned so far.</p>
-                    
-                    <div className="mb-8">
-                        <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">Number of Questions</label>
-                        <div className="flex justify-center gap-3">
-                            {[3, 5, 8].map(n => (
-                                <button 
-                                    key={n}
-                                    onClick={() => setNumQuestions(n)}
-                                    className={`w-16 h-12 rounded-xl font-bold text-lg border-b-4 active:border-b-0 active:translate-y-1 transition-all ${numQuestions === n ? 'bg-indigo-600 text-white border-indigo-800' : 'bg-slate-100 text-slate-600 border-slate-300 dark:bg-slate-700 dark:text-slate-300 dark:border-slate-900'}`}
-                                >
-                                    {n}
-                                </button>
-                            ))}
-                        </div>
-                    </div>
-
-                    <button 
-                        onClick={handleStart}
-                        className="w-full py-4 bg-green-500 hover:bg-green-400 text-white font-black text-xl rounded-2xl border-b-[6px] border-green-700 active:border-b-0 active:translate-y-1.5 transition-all shadow-xl uppercase tracking-wider"
-                    >
-                        Start Quiz
-                    </button>
-                </div>
-            )}
-
-            {mode === 'loading' && (
-                 <div className="text-center">
-                     <div className="relative w-24 h-24 mx-auto mb-8">
-                         <div className="absolute inset-0 border-8 border-white/20 rounded-full"></div>
-                         <div className="absolute inset-0 border-8 border-t-indigo-500 border-l-transparent border-r-transparent border-b-transparent rounded-full animate-spin"></div>
-                         <div className="absolute inset-4 bg-indigo-600 rounded-full flex items-center justify-center text-3xl animate-pulse">🤖</div>
-                     </div>
-                     <h2 className="text-3xl font-bold font-fredoka animate-pulse">Creating Challenge...</h2>
-                     <p className="text-indigo-200 mt-2">Analyzing slides and preparing questions</p>
-                 </div>
-            )}
-
-            {mode === 'play' && questions.length > 0 && (
-                <div className="w-full max-w-6xl h-full flex flex-col justify-between py-6">
-                    <div className="text-center mb-6">
-                         <span className="inline-block px-4 py-1 bg-white/10 rounded-full text-sm font-bold uppercase tracking-widest mb-4">Question {qIndex + 1} of {questions.length}</span>
-                         <div className="bg-white text-slate-900 p-8 md:p-12 rounded-3xl shadow-2xl text-2xl md:text-4xl font-bold leading-tight min-h-[200px] flex items-center justify-center border-b-8 border-slate-200">
-                             {questions[qIndex].question}
-                         </div>
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-4 md:gap-6 flex-1 min-h-0">
-                        {questions[qIndex].options.map((opt, idx) => {
-                            const isCorrect = idx === questions[qIndex].correctAnswerIndex;
-                            const isDimmed = reveal && !isCorrect;
-
-                            return (
-                                <div 
-                                    key={idx}
-                                    className={`
-                                        relative rounded-2xl p-6 md:p-8 flex items-center shadow-lg border-b-8 transition-all duration-500
-                                        ${bgColors[idx]}
-                                        ${isDimmed ? 'opacity-20 grayscale' : 'opacity-100'}
-                                    `}
-                                >
-                                    <div className="absolute top-4 left-4 opacity-50">{renderShape(idx)}</div>
-                                    <span className="text-xl md:text-3xl font-bold text-white pl-12 md:pl-16 drop-shadow-md">{opt}</span>
-                                    {reveal && isCorrect && (
-                                        <div className="absolute right-4 top-1/2 -translate-y-1/2 bg-white text-green-600 p-2 rounded-full shadow-lg">
-                                            <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={4} d="M5 13l4 4L19 7" /></svg>
-                                        </div>
-                                    )}
-                                </div>
-                            );
-                        })}
-                    </div>
-
-                    <div className="mt-8 flex justify-center gap-4">
-                        {!reveal ? (
-                             <button 
-                                onClick={() => setReveal(true)}
-                                className="px-8 py-3 bg-white text-indigo-900 font-bold text-xl rounded-full shadow-lg hover:scale-105 transition-transform"
-                             >
-                                Reveal Answer
-                             </button>
-                        ) : (
-                            <div className="flex items-center gap-6 animate-fade-in w-full max-w-4xl">
-                                <div className="flex-1 bg-indigo-900/50 p-4 rounded-xl border border-indigo-500/30">
-                                    <span className="text-xs font-bold text-indigo-300 uppercase block mb-1">Explanation</span>
-                                    <p className="text-lg">{questions[qIndex].explanation}</p>
-                                </div>
-                                <button 
-                                    onClick={handleNext}
-                                    className="px-8 py-4 bg-indigo-500 hover:bg-indigo-400 text-white font-bold text-xl rounded-2xl border-b-4 border-indigo-700 active:translate-y-1 active:border-b-0 transition-all shrink-0"
-                                >
-                                    Next Question ➔
-                                </button>
-                            </div>
-                        )}
-                    </div>
-                </div>
-            )}
-
-            {mode === 'summary' && (
-                <div className="text-center animate-fade-in">
-                    <div className="text-8xl mb-6 animate-bounce">🏆</div>
-                    <h2 className="text-5xl font-black font-fredoka mb-4">Quiz Complete!</h2>
-                    <p className="text-2xl text-indigo-200 mb-10">Great job reviewing the lesson.</p>
-                    <button 
-                        onClick={onClose}
-                        className="px-10 py-4 bg-white text-indigo-900 font-bold text-xl rounded-2xl shadow-xl hover:scale-105 transition-transform"
-                    >
-                        Back to Lesson
-                    </button>
-                </div>
-            )}
-        </div>
-    );
-};
-
 interface PresentationViewProps {
   slides: Slide[];
   onExit: () => void;
@@ -311,8 +104,8 @@ const PresentationView: React.FC<PresentationViewProps> = ({ slides, onExit, stu
   const [showPreview, setShowPreview] = useState(false);
 
   // Game/Quiz State
-  const [isQuizModalOpen, setIsQuizModalOpen] = useState(false);
-  const [gameState, setGameState] = useState<GameSyncState | null>(null);
+  const [activeGame, setActiveGame] = useState<ActiveGameState>(null);
+  const [pendingGameType, setPendingGameType] = useState<GameType | null>(null);
   const gameWasOpenRef = useRef(false);
 
   // Question Generation State
@@ -406,14 +199,14 @@ const PresentationView: React.FC<PresentationViewProps> = ({ slides, onExit, stu
         payload: { currentIndex, visibleBullets, slides }
       });
       // If game is active, also send game state
-      if (gameState) {
+      if (activeGame) {
         postMessage({
           type: 'GAME_STATE_UPDATE',
-          payload: gameState
+          payload: activeGame
         });
       }
     }
-  }, [lastMessage, currentIndex, visibleBullets, slides, postMessage, gameState]);
+  }, [lastMessage, currentIndex, visibleBullets, slides, postMessage, activeGame]);
 
   // Broadcast state changes to student window
   useEffect(() => {
@@ -425,17 +218,17 @@ const PresentationView: React.FC<PresentationViewProps> = ({ slides, onExit, stu
 
   // Broadcast game state changes to student window
   useEffect(() => {
-    if (gameState) {
+    if (activeGame) {
       gameWasOpenRef.current = true;
       postMessage({
         type: 'GAME_STATE_UPDATE',
-        payload: gameState
+        payload: activeGame
       });
     } else if (gameWasOpenRef.current) {
       postMessage({ type: 'GAME_CLOSE' });
       gameWasOpenRef.current = false;
     }
-  }, [gameState, postMessage]);
+  }, [activeGame, postMessage]);
 
   // Track connection state for potential future use
   const prevConnectedRef = useRef<boolean | null>(null);
@@ -451,6 +244,116 @@ const PresentationView: React.FC<PresentationViewProps> = ({ slides, onExit, stu
   const handleCloseStudent = useCallback(() => {
     postMessage({ type: 'CLOSE_STUDENT' });
   }, [postMessage]);
+
+  // Game state factory functions
+  const createQuickQuizState = useCallback((questions: QuizQuestion[]): QuickQuizState => ({
+    gameType: 'quick-quiz',
+    status: 'playing',
+    questions,
+    currentQuestionIndex: 0,
+    isAnswerRevealed: false,
+  }), []);
+
+  const createPlaceholderState = useCallback((gameType: GameType): GameState => {
+    const base = {
+      status: 'splash' as const,
+      questions: [],
+      currentQuestionIndex: 0,
+    };
+    switch (gameType) {
+      case 'quick-quiz':
+        return { ...base, gameType: 'quick-quiz', isAnswerRevealed: false };
+      case 'millionaire':
+        return { ...base, gameType: 'millionaire', selectedOption: null, lifelines: { fiftyFifty: true, phoneAFriend: true, askTheAudience: true }, prizeLadder: [], currentPrize: 0 };
+      case 'the-chase':
+        return { ...base, gameType: 'the-chase', chaserPosition: 0, contestantPosition: 0, isChasing: false };
+      case 'beat-the-chaser':
+        return { ...base, gameType: 'beat-the-chaser', contestantTime: 0, chaserTime: 0, activePlayer: 'contestant' };
+    }
+  }, []);
+
+  // Launch Quick Quiz (async question generation)
+  const launchQuickQuiz = useCallback(async () => {
+    if (!provider) {
+      onRequestAI('start the quiz game');
+      setPendingGameType(null);
+      return;
+    }
+
+    // Set loading state
+    setActiveGame({
+      gameType: 'quick-quiz',
+      status: 'loading',
+      questions: [],
+      currentQuestionIndex: 0,
+      isAnswerRevealed: false,
+    });
+
+    try {
+      const questions = await provider.generateImpromptuQuiz(slides, currentIndex, 5);
+      setActiveGame(createQuickQuizState(questions));
+    } catch (e) {
+      console.error(e);
+      if (e instanceof AIProviderError) {
+        onError('Quiz Generation Failed', e.userMessage);
+      } else {
+        onError('Error', 'Could not generate quiz. Please try again.');
+      }
+      setActiveGame(null);
+    }
+    setPendingGameType(null);
+  }, [provider, slides, currentIndex, createQuickQuizState, onRequestAI, onError]);
+
+  // Game selection handler with confirmation dialog
+  const handleSelectGame = useCallback((gameType: GameType) => {
+    // If game is active and not finished, confirm switch
+    if (activeGame && activeGame.status !== 'result') {
+      const confirmed = window.confirm('A game is in progress. Switch to a different game?');
+      if (!confirmed) return;
+    }
+
+    if (gameType === 'quick-quiz') {
+      // Launch Quick Quiz - needs to generate questions first
+      setPendingGameType('quick-quiz');
+      launchQuickQuiz();
+    } else {
+      // Launch placeholder game directly
+      setActiveGame(createPlaceholderState(gameType));
+    }
+  }, [activeGame, launchQuickQuiz, createPlaceholderState]);
+
+  // Game control handlers
+  const handleRevealAnswer = useCallback(() => {
+    if (activeGame?.gameType === 'quick-quiz') {
+      setActiveGame(prev => prev ? { ...prev, isAnswerRevealed: true, status: 'reveal' as const } : null);
+    }
+  }, [activeGame]);
+
+  const handleNextQuestion = useCallback(() => {
+    if (activeGame?.gameType === 'quick-quiz') {
+      const state = activeGame as QuickQuizState;
+      if (state.currentQuestionIndex < state.questions.length - 1) {
+        setActiveGame({
+          ...state,
+          currentQuestionIndex: state.currentQuestionIndex + 1,
+          isAnswerRevealed: false,
+          status: 'playing',
+        });
+      } else {
+        setActiveGame({ ...state, status: 'result' });
+      }
+    }
+  }, [activeGame]);
+
+  const handleCloseGame = useCallback(() => {
+    setActiveGame(null);
+  }, []);
+
+  const handleRestartGame = useCallback(() => {
+    if (activeGame?.gameType === 'quick-quiz') {
+      launchQuickQuiz();
+    }
+  }, [activeGame, launchQuickQuiz]);
 
   const handleGenerateQuestion = async (level: 'A' | 'B' | 'C' | 'D' | 'E', studentName?: string) => {
       if (!provider) {
@@ -601,15 +504,12 @@ const PresentationView: React.FC<PresentationViewProps> = ({ slides, onExit, stu
                  slides={slides}
                />
 
-               {/* QUIZ BUTTON */}
+               {/* GAME MENU */}
                <div className="relative">
-                 <button
-                     onClick={() => setIsQuizModalOpen(true)}
-                     className={`px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-colors border bg-indigo-600 border-indigo-500 hover:bg-indigo-500 text-white shadow-lg shadow-indigo-500/30 flex items-center gap-2 ${!isAIAvailable ? 'opacity-50' : ''}`}
-                     title={!isAIAvailable ? 'Add API key in Settings to enable' : undefined}
-                 >
-                     <span>🎮</span> Game Mode
-                 </button>
+                 <GameMenu
+                     onSelectGame={handleSelectGame}
+                     disabled={!isAIAvailable && pendingGameType === null}
+                 />
                  {!isAIAvailable && (
                    <span className="absolute -top-1 -right-1 w-4 h-4 bg-slate-500 rounded-full flex items-center justify-center">
                      <svg className="w-2.5 h-2.5 text-white" viewBox="0 0 20 20" fill="currentColor">
@@ -756,17 +656,27 @@ const PresentationView: React.FC<PresentationViewProps> = ({ slides, onExit, stu
           </div>
       </div>
 
-      {/* QUIZ OVERLAY PORTAL */}
-      {isQuizModalOpen && createPortal(
-          <QuizOverlay
-              slides={slides}
-              currentIndex={currentIndex}
-              onClose={() => setIsQuizModalOpen(false)}
-              provider={provider}
-              onError={onError}
-              onRequestAI={onRequestAI}
-              onGameStateChange={setGameState}
-          />,
+      {/* GAME MODAL */}
+      {activeGame && createPortal(
+          <div className="absolute inset-0 z-[100] bg-slate-900/95 backdrop-blur-md flex items-center justify-center animate-crossfade-in font-poppins">
+            {/* Close button */}
+            <button
+              onClick={handleCloseGame}
+              className="absolute top-6 right-6 p-2 bg-white/10 hover:bg-white/20 rounded-full transition-colors z-50"
+            >
+              <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+
+            <GameContainer
+              state={activeGame}
+              onClose={handleCloseGame}
+              onRevealAnswer={handleRevealAnswer}
+              onNextQuestion={handleNextQuestion}
+              onRestart={handleRestartGame}
+            />
+          </div>,
           document.body
       )}
 
