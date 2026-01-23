@@ -132,6 +132,49 @@
       .animate-crossfade-out {
         animation: crossfadeOut 0.3s ease-in forwards;
       }
+
+      /* Millionaire theme animations */
+      @keyframes millionaireGlow {
+        0%, 100% { box-shadow: 0 0 20px rgba(99, 102, 241, 0.5); }
+        50% { box-shadow: 0 0 40px rgba(99, 102, 241, 0.8); }
+      }
+      .animate-millionaire-glow { animation: millionaireGlow 2s ease-in-out infinite; }
+
+      @keyframes wrongAnswerFlash {
+        0% { background-color: inherit; transform: scale(1); }
+        20% { background-color: #dc2626; transform: scale(1.05); }
+        40% { background-color: inherit; transform: scale(1); }
+        60% { background-color: #dc2626; transform: scale(1.03); }
+        100% { background-color: #dc2626; transform: scale(1); opacity: 0.7; }
+      }
+      .animate-wrong-answer { animation: wrongAnswerFlash 1.5s ease-out forwards; }
+
+      @keyframes safeHavenCelebration {
+        0% { transform: scale(1); opacity: 1; }
+        50% { transform: scale(1.1); box-shadow: 0 0 60px rgba(245, 158, 11, 0.9); }
+        100% { transform: scale(1); box-shadow: 0 0 30px rgba(245, 158, 11, 0.5); }
+      }
+      .animate-safe-haven { animation: safeHavenCelebration 2s ease-out; }
+
+      @keyframes confettiFall {
+        0% { transform: translateY(-100vh) rotate(0deg); opacity: 1; }
+        100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+      }
+      .confetti-piece {
+        position: fixed;
+        width: 10px;
+        height: 10px;
+        top: 0;
+        animation: confettiFall 3s ease-out forwards;
+        pointer-events: none;
+      }
+
+      @keyframes answerRevealPulse {
+        0% { transform: scale(1); opacity: 0.6; }
+        50% { transform: scale(1.02); opacity: 1; }
+        100% { transform: scale(1); opacity: 1; }
+      }
+      .animate-answer-reveal { animation: answerRevealPulse 0.3s ease-out forwards; }
     </style>
   <script type="importmap">
 {
