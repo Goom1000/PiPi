@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-01-22)
 ## Current Position
 
 Phase: 20 of 26 (Game Foundation & Type System)
-Plan: Ready to plan
-Status: Ready to plan
-Last activity: 2026-01-23 — Roadmap created for v3.0 milestone
+Plan: 1 of 3
+Status: In progress
+Last activity: 2026-01-23 — Completed 20-01-PLAN.md (Game type system and menu)
 
-Progress: ░░░░░░░░░░░░░░░░░░░░ 0% (v3.0 Quiz Game Variety)
+Progress: █░░░░░░░░░░░░░░░░░░░ 5% (v3.0 Quiz Game Variety)
 
 ## Performance Metrics
 
@@ -28,12 +28,12 @@ Progress: ░░░░░░░░░░░░░░░░░░░░ 0% (v3.0 
 - v2.3: 4 plans, 2 days
 - v2.4: 9 plans, 2 days
 - v2.5: 2 plans, 1 day
-- v3.0: 0 plans (in progress)
+- v3.0: 1 plan (in progress)
 
 **Project Totals:**
 - Milestones shipped: 9 (v1.0, v1.1, v1.2, v2.0, v2.1, v2.2, v2.3, v2.4, v2.5)
 - Total phases: 19 completed (phases 20-26 planned)
-- Total plans: 66 complete
+- Total plans: 67 complete
 - Total LOC: ~9,400 TypeScript
 
 ## Completed Milestones
@@ -58,6 +58,13 @@ v3.0 key decisions:
 - Atomic BroadcastChannel state snapshots (no incremental actions)
 - Zero new runtime dependencies (React 19, Vite, Tailwind sufficient)
 
+20-01 decisions (Game type system):
+- Use discriminated unions with gameType literal for type-safe game state handling
+- Keep GameSyncState for backward compatibility until Plan 02 refactoring
+- PresentationMessage GAME_STATE_UPDATE now uses unified GameState type
+- Discriminated unions pattern: Each game state extends BaseGameState with unique gameType literal for exhaustive type narrowing
+- assertNever helper for compile-time exhaustiveness checking in switch statements
+
 All decisions logged in PROJECT.md Key Decisions table.
 
 ### Pending Todos
@@ -71,10 +78,10 @@ None.
 ## Session Continuity
 
 Last session: 2026-01-23
-Stopped at: Roadmap created for v3.0, ready to plan Phase 20
+Stopped at: Completed 20-01-PLAN.md (Game type system and menu)
 Resume file: None
-Next: `/gsd:plan-phase 20`
+Next: Continue with 20-02-PLAN.md (Quick Quiz refactor) or 20-03-PLAN.md (Toolbar integration)
 
 ---
 *State initialized: 2026-01-18*
-*Last updated: 2026-01-23 - v3.0 roadmap created*
+*Last updated: 2026-01-23 - Completed 20-01 (game type system)*
