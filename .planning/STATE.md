@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-01-22)
 ## Current Position
 
 Phase: 22 of 26 (AI Integration)
-Plan: 1 of 4 (In progress)
+Plan: 2 of 4 complete
 Status: In progress
-Last activity: 2026-01-23 - Completed 22-01-PLAN.md (Game question type system)
+Last activity: 2026-01-23 - Completed 22-02-PLAN.md (Gemini game question generation)
 
-Progress: █████░░░░░░░░░░░░░░░░ 17% (v3.0 Quiz Game Variety)
+Progress: █████░░░░░░░░░░░░░░░░ 18% (v3.0 Quiz Game Variety)
 
 ## Performance Metrics
 
@@ -28,7 +28,7 @@ Progress: █████░░░░░░░░░░░░░░░░ 17% (v
 - v2.3: 4 plans, 2 days
 - v2.4: 9 plans, 2 days
 - v2.5: 2 plans, 1 day
-- v3.0: Phase 20 complete (3 plans, 43min), Phase 21 complete (4 plans, 15min), Phase 22 plan 01 (4min)
+- v3.0: Phase 20 complete (3 plans, 43min), Phase 21 complete (4 plans, 15min), Phase 22 plan 01 (4min), plan 02 (2min)
 
 **Project Totals:**
 - Milestones shipped: 9 (v1.0, v1.1, v1.2, v2.0, v2.1, v2.2, v2.3, v2.4, v2.5)
@@ -109,6 +109,13 @@ v3.0 key decisions:
 - Stub implementations throw 'not yet implemented' errors for type-safe provider contracts
 - Bloom's difficulty mapping: easy=Remember/Understand, medium=Apply/Analyze, hard=Evaluate/Create
 
+22-02 decisions (Gemini game question generation):
+- Millionaire uses Bloom's taxonomy for progressive difficulty across question count
+- 3-question: 1 easy, 1 medium, 1 hard; 5-question: 2 easy, 2 medium, 1 hard; 10-question: 3 easy, 3 medium, 4 hard
+- Chase/Beat the Chaser uses consistent difficulty from BLOOM_DIFFICULTY_MAP
+- Content constraint in prompts prevents hallucination (questions only from slides)
+- Returns empty array on error - caller (Plan 04) handles retries
+
 All decisions logged in PROJECT.md Key Decisions table.
 
 ### Pending Todos
@@ -121,10 +128,10 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-01-23 11:13:00 UTC
-Stopped at: Completed 22-01-PLAN.md (Game question type system)
+Last session: 2026-01-23 09:20:04 UTC
+Stopped at: Completed 22-02-PLAN.md (Gemini game question generation)
 Resume file: None
-Next: Phase 22-02 - Gemini game question implementation
+Next: Phase 22-03 - Claude game question implementation
 
 ---
 *State initialized: 2026-01-18*
