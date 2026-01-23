@@ -10,9 +10,9 @@ See: .planning/PROJECT.md (updated 2026-01-22)
 ## Current Position
 
 Phase: 20 of 26 (Game Foundation & Type System)
-Plan: 1 of 3
+Plan: 2 of 3
 Status: In progress
-Last activity: 2026-01-23 — Completed 20-01-PLAN.md (Game type system and menu)
+Last activity: 2026-01-23 — Completed 20-02-PLAN.md (GameContainer router and Quick Quiz refactor)
 
 Progress: █░░░░░░░░░░░░░░░░░░░ 5% (v3.0 Quiz Game Variety)
 
@@ -28,13 +28,13 @@ Progress: █░░░░░░░░░░░░░░░░░░░ 5% (v3.0 
 - v2.3: 4 plans, 2 days
 - v2.4: 9 plans, 2 days
 - v2.5: 2 plans, 1 day
-- v3.0: 1 plan (in progress)
+- v3.0: 2 plans (in progress)
 
 **Project Totals:**
 - Milestones shipped: 9 (v1.0, v1.1, v1.2, v2.0, v2.1, v2.2, v2.3, v2.4, v2.5)
 - Total phases: 19 completed (phases 20-26 planned)
-- Total plans: 67 complete
-- Total LOC: ~9,400 TypeScript
+- Total plans: 68 complete
+- Total LOC: ~9,700 TypeScript
 
 ## Completed Milestones
 
@@ -65,6 +65,12 @@ v3.0 key decisions:
 - Discriminated unions pattern: Each game state extends BaseGameState with unique gameType literal for exhaustive type narrowing
 - assertNever helper for compile-time exhaustiveness checking in switch statements
 
+20-02 decisions (GameContainer router):
+- GameContainer uses exhaustive switch without assertNever in default case (TypeScript non-strict mode limitation)
+- QuickQuizGame preserves exact UI from QuizOverlay play mode (Kahoot-style)
+- Placeholder games show specific phase numbers ("Coming in Phase N") for clarity
+- Shared GameSplash and ResultScreen components serve all game types
+
 All decisions logged in PROJECT.md Key Decisions table.
 
 ### Pending Todos
@@ -78,10 +84,10 @@ None.
 ## Session Continuity
 
 Last session: 2026-01-23
-Stopped at: Completed 20-01-PLAN.md (Game type system and menu)
+Stopped at: Completed 20-02-PLAN.md (GameContainer router and Quick Quiz refactor)
 Resume file: None
-Next: Continue with 20-02-PLAN.md (Quick Quiz refactor) or 20-03-PLAN.md (Toolbar integration)
+Next: Continue with 20-03-PLAN.md (Toolbar integration)
 
 ---
 *State initialized: 2026-01-18*
-*Last updated: 2026-01-23 - Completed 20-01 (game type system)*
+*Last updated: 2026-01-23 - Completed 20-02 (GameContainer router)*
