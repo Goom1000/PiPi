@@ -73,15 +73,17 @@ Plans:
 **Requirements**: AI-01, AI-02, AI-03, AI-04
 **Success Criteria** (what must be TRUE):
   1. Teacher generates questions from current lesson slide content
-  2. Teacher selects target difficulty (A-E grade level) and questions match that difficulty
-  3. Millionaire game receives 15 questions with progressive difficulty (easy to hard)
-  4. Chase game receives rapid-fire questions at consistent medium difficulty
+  2. Teacher selects target difficulty (Easy/Medium/Hard presets) and questions match that difficulty
+  3. Millionaire game receives questions with progressive difficulty (easy to hard)
+  4. Chase game receives rapid-fire questions at consistent selected difficulty
   5. All questions include 1 correct answer and 3 plausible wrong answers
-**Plans**: TBD
+**Plans**: 4 plans
 
 Plans:
-- [ ] 22-01: TBD
-- [ ] 22-02: TBD
+- [ ] 22-01-PLAN.md — Game question types & interface extension
+- [ ] 22-02-PLAN.md — Gemini provider implementation
+- [ ] 22-03-PLAN.md — Claude provider implementation
+- [ ] 22-04-PLAN.md — Game launch integration with auto-retry
 
 ### Phase 23: The Chase
 
@@ -165,7 +167,7 @@ Phases execute in numeric order: 20 → 21 → 22 → 23 → 24 → 25 → 26
 |-------|----------------|--------|-----------|
 | 20. Game Foundation & Type System | 3/3 | ✓ Complete | 2026-01-23 |
 | 21. Millionaire Game | 4/4 | ✓ Complete | 2026-01-23 |
-| 22. AI Integration | 0/TBD | Not started | - |
+| 22. AI Integration | 0/4 | Not started | - |
 | 23. The Chase | 0/TBD | Not started | - |
 | 24. Beat the Chaser | 0/TBD | Not started | - |
 | 25. Competition Modes | 0/TBD | Not started | - |
