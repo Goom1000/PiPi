@@ -1,10 +1,9 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { QuizQuestion } from '../../../services/geminiService';
 import { useTimer } from '../../../hooks/useTimer';
 import { useChaserAI } from '../../../hooks/useChaserAI';
 import DualTimerDisplay from './DualTimerDisplay';
-import TimeBonusEffect from './TimeBonusEffect';
-import { TIME_BONUS_AMOUNT, getChaserThinkingTime, BeatTheChaserDifficulty } from './beatTheChaserConfig';
+import { getChaserThinkingTime, BeatTheChaserDifficulty } from './beatTheChaserConfig';
 
 interface TimedBattlePhaseProps {
   contestantStartTime: number;
@@ -21,7 +20,7 @@ interface TimedBattlePhaseProps {
   }) => void;
 }
 
-type TurnPhase = 'contestant-answering' | 'contestant-feedback' | 'chaser-thinking' | 'chaser-feedback' | 'time-bonus';
+type TurnPhase = 'answering' | 'feedback-correct' | 'feedback-wrong' | 'thinking';
 
 const TimedBattlePhase: React.FC<TimedBattlePhaseProps> = ({
   contestantStartTime,
@@ -33,30 +32,38 @@ const TimedBattlePhase: React.FC<TimedBattlePhaseProps> = ({
   onExit,
   onStateUpdate
 }) => {
-  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  // Split questions: even indices for contestant, odd for chaser
+  const contestantQuestions = useMemo(() =>
+    questions.filter((_, i) => i % 2 === 0), [questions]);
+  const chaserQuestions = useMemo(() =>
+    questions.filter((_, i) => i % 2 === 1), [questions]);
+
+  const [contestantQIndex, setContestantQIndex] = useState(0);
+  const [chaserQIndex, setChaserQIndex] = useState(0);
   const [activePlayer, setActivePlayer] = useState<'contestant' | 'chaser'>('contestant');
-  const [turnPhase, setTurnPhase] = useState<TurnPhase>('contestant-answering');
-  const [contestantAnswer, setContestantAnswer] = useState<number | null>(null);
-  const [chaserAnswer, setChaserAnswer] = useState<number | null>(null);
-  const [showTimeBonus, setShowTimeBonus] = useState(false);
+  const [turnPhase, setTurnPhase] = useState<TurnPhase>('answering');
+  const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
   const [gameEnded, setGameEnded] = useState(false);
 
-  // Get chaser AI hook - use minimal delay since we handle thinking time dynamically
-  const { getChaserAnswer, isThinking } = useChaserAI({
+  // Get chaser AI hook
+  const { getChaserAnswer } = useChaserAI({
     difficulty,
-    thinkingDelayMs: 0  // We handle thinking delay manually for variable timing
+    thinkingDelayMs: 0  // We handle thinking delay manually
   });
 
-  const currentQuestion = questions[currentQuestionIndex];
+  // Current question based on active player
+  const currentQuestion = activePlayer === 'contestant'
+    ? contestantQuestions[contestantQIndex]
+    : chaserQuestions[chaserQIndex];
 
   // Contestant timer - only runs during contestant's turn
   const contestantTimer = useTimer({
     initialSeconds: contestantStartTime,
-    autoStart: true, // Start immediately (contestant goes first)
+    autoStart: true,
     onComplete: () => {
       if (!gameEnded) {
         setGameEnded(true);
-        onComplete('chaser'); // Contestant timer expired = chaser wins
+        onComplete('chaser');
       }
     }
   });
@@ -68,7 +75,7 @@ const TimedBattlePhase: React.FC<TimedBattlePhaseProps> = ({
     onComplete: () => {
       if (!gameEnded) {
         setGameEnded(true);
-        onComplete('contestant'); // Chaser timer expired = contestant wins
+        onComplete('contestant');
       }
     }
   });
@@ -82,107 +89,185 @@ const TimedBattlePhase: React.FC<TimedBattlePhaseProps> = ({
     });
   }, [contestantTimer.timeRemaining, chaserTimer.timeRemaining, activePlayer, onStateUpdate]);
 
-  // Handle contestant answer
-  const handleContestantAnswer = useCallback(async (selectedIndex: number) => {
-    if (turnPhase !== 'contestant-answering' || gameEnded) return;
+  // Handle answer (works for both contestant and chaser)
+  const handleAnswer = useCallback(async (selectedIndex: number) => {
+    if (turnPhase !== 'answering' || gameEnded) return;
 
-    contestantTimer.pause();
-    setContestantAnswer(selectedIndex);
-    setTurnPhase('contestant-feedback');
-
-    const isCorrect = selectedIndex === currentQuestion.correctAnswerIndex;
-
-    // Brief feedback (800ms)
-    await new Promise(resolve => setTimeout(resolve, 800));
-
-    // Switch to chaser's turn regardless of answer
-    setActivePlayer('chaser');
-    setTurnPhase('chaser-thinking');
-
-    // Start chaser's timer
-    chaserTimer.start();
-
-    // Handle chaser's turn (AI or manual)
-    if (isAIControlled) {
-      // Simulate chaser "thinking" - timer runs during this delay
-      // Longer delay = more time drains from chaser's clock = fairer for students
-      const thinkingTime = getChaserThinkingTime(difficulty);
-      await new Promise(resolve => setTimeout(resolve, thinkingTime));
-
-      const chaserIdx = await getChaserAnswer(currentQuestion);
-      handleChaserAnswer(chaserIdx, true); // Skip phase check since we just set it
+    // Pause active timer during feedback
+    if (activePlayer === 'contestant') {
+      contestantTimer.pause();
+    } else {
+      chaserTimer.pause();
     }
-    // If manual control, wait for teacher to click answer
-  }, [turnPhase, gameEnded, currentQuestion, contestantTimer, chaserTimer, isAIControlled, getChaserAnswer, difficulty]);
 
-  // Handle chaser answer
-  // Note: skipPhaseCheck is used when called directly from handleContestantAnswer
-  // because React state updates are async and turnPhase may not have updated yet
-  const handleChaserAnswer = useCallback(async (selectedIndex: number, skipPhaseCheck = false) => {
-    if (!skipPhaseCheck && turnPhase !== 'chaser-thinking') return;
+    setSelectedAnswer(selectedIndex);
+    const isCorrect = selectedIndex === currentQuestion?.correctAnswerIndex;
+
+    if (isCorrect) {
+      setTurnPhase('feedback-correct');
+      await new Promise(resolve => setTimeout(resolve, 800));
+
+      // Switch to other player
+      if (activePlayer === 'contestant') {
+        // Check if chaser has questions left
+        if (chaserQIndex >= chaserQuestions.length) {
+          setGameEnded(true);
+          onComplete('contestant'); // Chaser ran out of questions
+          return;
+        }
+        setActivePlayer('chaser');
+        contestantTimer.pause();
+        chaserTimer.start();
+
+        // If AI controlled, trigger chaser's turn
+        if (isAIControlled) {
+          setTurnPhase('thinking');
+          setSelectedAnswer(null);
+
+          const thinkingTime = getChaserThinkingTime(difficulty);
+          await new Promise(resolve => setTimeout(resolve, thinkingTime));
+
+          const chaserIdx = await getChaserAnswer(chaserQuestions[chaserQIndex]);
+          handleChaserAIAnswer(chaserIdx);
+        } else {
+          setTurnPhase('answering');
+          setSelectedAnswer(null);
+        }
+      } else {
+        // Chaser got it right, switch to contestant
+        if (contestantQIndex >= contestantQuestions.length) {
+          setGameEnded(true);
+          onComplete('chaser'); // Contestant ran out of questions
+          return;
+        }
+        setActivePlayer('contestant');
+        chaserTimer.pause();
+        contestantTimer.start();
+        setTurnPhase('answering');
+        setSelectedAnswer(null);
+      }
+    } else {
+      // Wrong answer - stay on turn, next question
+      setTurnPhase('feedback-wrong');
+      await new Promise(resolve => setTimeout(resolve, 800));
+
+      if (activePlayer === 'contestant') {
+        const nextIdx = contestantQIndex + 1;
+        if (nextIdx >= contestantQuestions.length) {
+          setGameEnded(true);
+          onComplete('chaser'); // Ran out of questions
+          return;
+        }
+        setContestantQIndex(nextIdx);
+        contestantTimer.start(); // Resume timer
+      } else {
+        const nextIdx = chaserQIndex + 1;
+        if (nextIdx >= chaserQuestions.length) {
+          setGameEnded(true);
+          onComplete('contestant'); // Chaser ran out of questions
+          return;
+        }
+        setChaserQIndex(nextIdx);
+        chaserTimer.start(); // Resume timer
+
+        // If AI, continue answering
+        if (isAIControlled) {
+          setTurnPhase('thinking');
+          setSelectedAnswer(null);
+
+          const thinkingTime = getChaserThinkingTime(difficulty);
+          await new Promise(resolve => setTimeout(resolve, thinkingTime));
+
+          const chaserIdx = await getChaserAnswer(chaserQuestions[nextIdx]);
+          handleChaserAIAnswer(chaserIdx);
+          return;
+        }
+      }
+
+      setTurnPhase('answering');
+      setSelectedAnswer(null);
+    }
+  }, [turnPhase, gameEnded, activePlayer, currentQuestion, contestantTimer, chaserTimer,
+      contestantQIndex, chaserQIndex, contestantQuestions, chaserQuestions,
+      isAIControlled, getChaserAnswer, difficulty, onComplete]);
+
+  // Separate handler for AI chaser answers to avoid recursion issues
+  const handleChaserAIAnswer = useCallback(async (selectedIndex: number) => {
     if (gameEnded) return;
 
     chaserTimer.pause();
-    setChaserAnswer(selectedIndex);
-    setTurnPhase('chaser-feedback');
+    setSelectedAnswer(selectedIndex);
+    const isCorrect = selectedIndex === chaserQuestions[chaserQIndex]?.correctAnswerIndex;
 
-    const isCorrect = selectedIndex === currentQuestion.correctAnswerIndex;
-
-    // If chaser got it wrong, contestant gets time bonus
-    if (!isCorrect) {
-      setTurnPhase('time-bonus');
-      setShowTimeBonus(true);
-
-      // Add time to contestant's clock
-      const newTime = Math.min(contestantTimer.timeRemaining + TIME_BONUS_AMOUNT, 120); // Cap at 2 min
-      contestantTimer.reset(newTime);
-
-      // Wait for animation
-      await new Promise(resolve => setTimeout(resolve, 1200));
-      setShowTimeBonus(false);
-    } else {
-      // Brief feedback (800ms)
+    if (isCorrect) {
+      setTurnPhase('feedback-correct');
       await new Promise(resolve => setTimeout(resolve, 800));
-    }
 
-    // Move to next question
-    if (currentQuestionIndex < questions.length - 1) {
-      setCurrentQuestionIndex(prev => prev + 1);
-      setContestantAnswer(null);
-      setChaserAnswer(null);
+      // Switch to contestant
+      if (contestantQIndex >= contestantQuestions.length) {
+        setGameEnded(true);
+        onComplete('chaser');
+        return;
+      }
       setActivePlayer('contestant');
-      setTurnPhase('contestant-answering');
+      chaserTimer.pause();
       contestantTimer.start();
+      setTurnPhase('answering');
+      setSelectedAnswer(null);
     } else {
-      // Out of questions - compare timers
-      const winner = contestantTimer.timeRemaining >= chaserTimer.timeRemaining
-        ? 'contestant'
-        : 'chaser';
-      setGameEnded(true);
-      onComplete(winner);
-    }
-  }, [turnPhase, gameEnded, currentQuestion, currentQuestionIndex, questions.length, contestantTimer, chaserTimer, onComplete]);
+      // Wrong - chaser stays on turn
+      setTurnPhase('feedback-wrong');
+      await new Promise(resolve => setTimeout(resolve, 800));
 
-  // Keyboard shortcuts (1-4) for contestant turn
+      const nextIdx = chaserQIndex + 1;
+      if (nextIdx >= chaserQuestions.length) {
+        setGameEnded(true);
+        onComplete('contestant');
+        return;
+      }
+      setChaserQIndex(nextIdx);
+      chaserTimer.start();
+
+      // Continue AI answering
+      setTurnPhase('thinking');
+      setSelectedAnswer(null);
+
+      const thinkingTime = getChaserThinkingTime(difficulty);
+      await new Promise(resolve => setTimeout(resolve, thinkingTime));
+
+      const chaserIdx = await getChaserAnswer(chaserQuestions[nextIdx]);
+      handleChaserAIAnswer(chaserIdx);
+    }
+  }, [gameEnded, chaserQIndex, chaserQuestions, contestantQIndex, contestantQuestions,
+      chaserTimer, contestantTimer, getChaserAnswer, difficulty, onComplete]);
+
+  // Keyboard shortcuts (1-4)
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (turnPhase === 'contestant-answering' && e.key >= '1' && e.key <= '4') {
-        handleContestantAnswer(parseInt(e.key) - 1);
-      }
-      // Manual chaser control
-      if (!isAIControlled && turnPhase === 'chaser-thinking' && e.key >= '1' && e.key <= '4') {
-        handleChaserAnswer(parseInt(e.key) - 1);
+      if (turnPhase === 'answering' && e.key >= '1' && e.key <= '4') {
+        handleAnswer(parseInt(e.key) - 1);
       }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [turnPhase, handleContestantAnswer, handleChaserAnswer, isAIControlled]);
+  }, [turnPhase, handleAnswer]);
+
+  // Get feedback message
+  const getFeedbackMessage = () => {
+    if (turnPhase === 'thinking') {
+      return activePlayer === 'chaser' ? 'Chaser is thinking...' : '';
+    }
+    if (turnPhase === 'feedback-correct') {
+      return activePlayer === 'contestant' ? '✓ Correct!' : '✓ Chaser Correct!';
+    }
+    if (turnPhase === 'feedback-wrong') {
+      return activePlayer === 'contestant' ? '✗ Wrong - Try Again!' : '✗ Chaser Wrong!';
+    }
+    return activePlayer === 'contestant' ? 'Your Turn - Answer!' : 'Chaser\'s Turn';
+  };
 
   return (
     <div className="w-full h-full bg-gradient-to-br from-blue-950 via-slate-900 to-red-950 flex flex-col p-6">
-      {/* Time Bonus Effect */}
-      <TimeBonusEffect show={showTimeBonus} amount={TIME_BONUS_AMOUNT} />
-
       {/* Dual Timer Display */}
       <DualTimerDisplay
         contestantTime={contestantTimer.timeRemaining}
@@ -197,15 +282,7 @@ const TimedBattlePhase: React.FC<TimedBattlePhaseProps> = ({
             ? 'bg-blue-500/30 text-blue-300'
             : 'bg-red-500/30 text-red-300'
         }`}>
-          {turnPhase === 'contestant-answering' && 'Contestant - Answer Now!'}
-          {turnPhase === 'contestant-feedback' && (
-            contestantAnswer === currentQuestion?.correctAnswerIndex ? 'Correct!' : 'Incorrect'
-          )}
-          {turnPhase === 'chaser-thinking' && (isThinking ? 'Chaser is thinking...' : 'Chaser - Answer Now!')}
-          {turnPhase === 'chaser-feedback' && (
-            chaserAnswer === currentQuestion?.correctAnswerIndex ? 'Chaser Correct' : 'Chaser Incorrect'
-          )}
-          {turnPhase === 'time-bonus' && 'Time Bonus!'}
+          {getFeedbackMessage()}
         </span>
       </div>
 
@@ -214,7 +291,9 @@ const TimedBattlePhase: React.FC<TimedBattlePhaseProps> = ({
         {/* Question */}
         <div className="bg-slate-800/60 p-6 md:p-8 rounded-2xl border-2 border-slate-600 mb-6">
           <div className="text-xs text-slate-400 uppercase tracking-wider mb-2">
-            Question {currentQuestionIndex + 1} of {questions.length}
+            {activePlayer === 'contestant' ? 'Your' : 'Chaser\'s'} Question {
+              activePlayer === 'contestant' ? contestantQIndex + 1 : chaserQIndex + 1
+            }
           </div>
           <p className="text-xl md:text-2xl font-bold text-white leading-relaxed text-center">
             {currentQuestion?.question}
@@ -224,29 +303,26 @@ const TimedBattlePhase: React.FC<TimedBattlePhaseProps> = ({
         {/* Answer Options - 2x2 Grid */}
         <div className="grid grid-cols-2 gap-4">
           {currentQuestion?.options.map((option, idx) => {
-            const isContestantAnswer = contestantAnswer === idx;
-            const isChaserAnswer = chaserAnswer === idx;
+            const isSelected = selectedAnswer === idx;
             const isCorrect = idx === currentQuestion.correctAnswerIndex;
-            const showResult = turnPhase === 'contestant-feedback' ||
-                              turnPhase === 'chaser-feedback' ||
-                              turnPhase === 'time-bonus';
+            const showResult = turnPhase === 'feedback-correct' || turnPhase === 'feedback-wrong';
 
             return (
               <button
                 key={idx}
                 onClick={() => {
-                  if (turnPhase === 'contestant-answering') handleContestantAnswer(idx);
-                  if (!isAIControlled && turnPhase === 'chaser-thinking') handleChaserAnswer(idx);
+                  if (turnPhase === 'answering' && (activePlayer === 'contestant' || !isAIControlled)) {
+                    handleAnswer(idx);
+                  }
                 }}
-                disabled={turnPhase !== 'contestant-answering' && (isAIControlled || turnPhase !== 'chaser-thinking')}
+                disabled={turnPhase !== 'answering' || (activePlayer === 'chaser' && isAIControlled)}
                 className={`
                   p-5 rounded-xl text-left font-bold text-lg transition-all duration-150 border-2
-                  ${isContestantAnswer && !showResult ? 'bg-blue-500 border-blue-400 text-white' : ''}
-                  ${isChaserAnswer && turnPhase !== 'contestant-feedback' && !showResult ? 'bg-red-500 border-red-400 text-white' : ''}
-                  ${!isContestantAnswer && !isChaserAnswer ? 'bg-slate-700 border-slate-600 text-white hover:bg-slate-600 hover:border-slate-500' : ''}
+                  ${isSelected && !showResult ? (activePlayer === 'contestant' ? 'bg-blue-500 border-blue-400' : 'bg-red-500 border-red-400') + ' text-white' : ''}
+                  ${!isSelected && !showResult ? 'bg-slate-700 border-slate-600 text-white hover:bg-slate-600 hover:border-slate-500' : ''}
                   ${showResult && isCorrect ? 'bg-green-600 border-green-400 text-white' : ''}
-                  ${showResult && !isCorrect && (isContestantAnswer || isChaserAnswer) ? 'bg-slate-700/50 border-slate-600 opacity-50' : ''}
-                  ${showResult && !isCorrect && !isContestantAnswer && !isChaserAnswer ? 'opacity-30' : ''}
+                  ${showResult && !isCorrect && isSelected ? 'bg-red-800 border-red-600 text-white opacity-70' : ''}
+                  ${showResult && !isCorrect && !isSelected ? 'opacity-30' : ''}
                 `}
               >
                 <span className="text-slate-400 mr-3">{idx + 1}.</span>
@@ -258,8 +334,8 @@ const TimedBattlePhase: React.FC<TimedBattlePhaseProps> = ({
 
         {/* Keyboard hint */}
         <p className="text-center text-slate-500 text-sm mt-4">
-          {turnPhase === 'contestant-answering' && 'Press 1-4 to answer'}
-          {!isAIControlled && turnPhase === 'chaser-thinking' && 'Press 1-4 for chaser answer'}
+          {turnPhase === 'answering' && activePlayer === 'contestant' && 'Press 1-4 to answer'}
+          {turnPhase === 'answering' && activePlayer === 'chaser' && !isAIControlled && 'Press 1-4 for chaser answer'}
         </p>
       </div>
 
