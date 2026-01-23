@@ -28,34 +28,34 @@ Requirements for the Quiz Game Variety milestone. Each maps to roadmap phases.
 
 ### The Chase
 
-- [ ] **CHASE-01**: Cash Builder round with quick-fire questions and running score
-- [ ] **CHASE-02**: 7-step game board showing contestant and chaser positions
-- [ ] **CHASE-03**: Three-offer system (higher/lower risk position choices)
-- [ ] **CHASE-04**: Head-to-Head round with countdown timer
-- [ ] **CHASE-05**: Contestant moves down one step on correct answer
-- [ ] **CHASE-06**: Chaser moves down one step on correct answer
-- [ ] **CHASE-07**: Contestant caught if chaser reaches same position
-- [ ] **CHASE-08**: Contestant wins if they reach home before being caught
-- [ ] **CHASE-09**: Chaser can be AI-controlled (answers based on difficulty) or teacher-controlled
-- [ ] **CHASE-10**: Final Chase round with pushback mechanic (correct answers push chaser back)
+- [x] **CHASE-01**: Cash Builder round with quick-fire questions and running score
+- [x] **CHASE-02**: 7-step game board showing contestant and chaser positions
+- [x] **CHASE-03**: Three-offer system (higher/lower risk position choices)
+- [x] **CHASE-04**: Head-to-Head round with countdown timer
+- [x] **CHASE-05**: Contestant moves down one step on correct answer
+- [x] **CHASE-06**: Chaser moves down one step on correct answer
+- [x] **CHASE-07**: Contestant caught if chaser reaches same position
+- [x] **CHASE-08**: Contestant wins if they reach home before being caught
+- [x] **CHASE-09**: Chaser can be AI-controlled (answers based on difficulty) or teacher-controlled
+- [x] **CHASE-10**: Final Chase round with pushback mechanic (correct answers push chaser back)
 
 ### Beat the Chaser
 
-- [ ] **BEAT-01**: Difficulty selection screen (Easy/Medium/Hard affects chaser timer allocation)
-- [ ] **BEAT-02**: Cash Builder phase to accumulate time on contestant's clock
-- [ ] **BEAT-03**: Timed battle with dual independent countdown timers displayed
-- [ ] **BEAT-04**: Contestant's timer runs during their turn answering
-- [ ] **BEAT-05**: Chaser's timer runs during their turn answering
-- [ ] **BEAT-06**: Catch-up mechanic: correct answer during chaser's turn adds time to contestant
-- [ ] **BEAT-07**: Contestant wins if chaser's timer expires first
-- [ ] **BEAT-08**: Chaser wins if contestant's timer expires first
+- [x] **BEAT-01**: Difficulty selection screen (Easy/Medium/Hard affects chaser timer allocation)
+- [x] **BEAT-02**: Cash Builder phase to accumulate time on contestant's clock
+- [x] **BEAT-03**: Timed battle with dual independent countdown timers displayed
+- [x] **BEAT-04**: Contestant's timer runs during their turn answering
+- [x] **BEAT-05**: Chaser's timer runs during their turn answering
+- [x] **BEAT-06**: Catch-up mechanic: correct answer during chaser's turn adds time to contestant
+- [x] **BEAT-07**: Contestant wins if chaser's timer expires first
+- [x] **BEAT-08**: Chaser wins if contestant's timer expires first
 
 ### Competition Modes
 
-- [ ] **COMP-01**: Individual student mode (single player represents class)
-- [ ] **COMP-02**: Team competition mode (class split into teams, scores tracked)
-- [ ] **COMP-03**: Teacher selects competition mode before starting game
-- [ ] **COMP-04**: Score display appropriate to mode (individual name or team names)
+- [x] **COMP-01**: Individual student mode (single player represents class)
+- [x] **COMP-02**: Team competition mode (class split into teams, scores tracked)
+- [x] **COMP-03**: Teacher selects competition mode before starting game
+- [x] **COMP-04**: Score display appropriate to mode (individual name or team names)
 
 ### AI Integration
 
@@ -118,28 +118,28 @@ Which phases cover which requirements. Updated during roadmap creation.
 | AI-02 | Phase 22 | Complete |
 | AI-03 | Phase 22 | Complete |
 | AI-04 | Phase 22 | Complete |
-| CHASE-01 | Phase 23 | Pending |
-| CHASE-02 | Phase 23 | Pending |
-| CHASE-03 | Phase 23 | Pending |
-| CHASE-04 | Phase 23 | Pending |
-| CHASE-05 | Phase 23 | Pending |
-| CHASE-06 | Phase 23 | Pending |
-| CHASE-07 | Phase 23 | Pending |
-| CHASE-08 | Phase 23 | Pending |
-| CHASE-09 | Phase 23 | Pending |
-| CHASE-10 | Phase 23 | Pending |
-| BEAT-01 | Phase 24 | Pending |
-| BEAT-02 | Phase 24 | Pending |
-| BEAT-03 | Phase 24 | Pending |
-| BEAT-04 | Phase 24 | Pending |
-| BEAT-05 | Phase 24 | Pending |
-| BEAT-06 | Phase 24 | Pending |
-| BEAT-07 | Phase 24 | Pending |
-| BEAT-08 | Phase 24 | Pending |
-| COMP-01 | Phase 25 | Pending |
-| COMP-02 | Phase 25 | Pending |
-| COMP-03 | Phase 25 | Pending |
-| COMP-04 | Phase 25 | Pending |
+| CHASE-01 | Phase 23 | Complete |
+| CHASE-02 | Phase 23 | Complete |
+| CHASE-03 | Phase 23 | Complete |
+| CHASE-04 | Phase 23 | Complete |
+| CHASE-05 | Phase 23 | Complete |
+| CHASE-06 | Phase 23 | Complete |
+| CHASE-07 | Phase 23 | Complete |
+| CHASE-08 | Phase 23 | Complete |
+| CHASE-09 | Phase 23 | Complete |
+| CHASE-10 | Phase 23 | Complete |
+| BEAT-01 | Phase 24 | Complete |
+| BEAT-02 | Phase 24 | Complete |
+| BEAT-03 | Phase 24 | Complete |
+| BEAT-04 | Phase 24 | Complete |
+| BEAT-05 | Phase 24 | Complete |
+| BEAT-06 | Phase 24 | Complete |
+| BEAT-07 | Phase 24 | Complete |
+| BEAT-08 | Phase 24 | Complete |
+| COMP-01 | Phase 25 | Complete |
+| COMP-02 | Phase 25 | Complete |
+| COMP-03 | Phase 25 | Complete |
+| COMP-04 | Phase 25 | Complete |
 | VIEW-01 | Phase 26 | Pending |
 | VIEW-02 | Phase 26 | Pending |
 | VIEW-03 | Phase 26 | Pending |
