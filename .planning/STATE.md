@@ -10,9 +10,9 @@ See: .planning/PROJECT.md (updated 2026-01-22)
 ## Current Position
 
 Phase: 23 of 26 (The Chase) - IN PROGRESS
-Plan: 4 of 7 complete
+Plan: 6 of 7 complete
 Status: In progress
-Last activity: 2026-01-23 - Completed 23-04-PLAN.md (Offer selection and voting)
+Last activity: 2026-01-23 - Completed 23-06-PLAN.md (Final Chase round)
 
 Progress: █████░░░░░░░░░░░░░░░░ 23% (v3.0 Quiz Game Variety)
 
@@ -28,12 +28,12 @@ Progress: █████░░░░░░░░░░░░░░░░ 23% (v
 - v2.3: 4 plans, 2 days
 - v2.4: 9 plans, 2 days
 - v2.5: 2 plans, 1 day
-- v3.0: Phase 20 complete (3 plans, 43min), Phase 21 complete (4 plans, 15min), Phase 22 complete (4 plans: 01=4min, 02=2min, 03=4min, 04=2min), Phase 23 in progress (01=2min, 02=2min, 03=1min, 04=1.5min)
+- v3.0: Phase 20 complete (3 plans, 43min), Phase 21 complete (4 plans, 15min), Phase 22 complete (4 plans: 01=4min, 02=2min, 03=4min, 04=2min), Phase 23 in progress (01=2min, 02=2min, 03=1min, 04=1.5min, 06=2min)
 
 **Project Totals:**
 - Milestones shipped: 9 (v1.0, v1.1, v1.2, v2.0, v2.1, v2.2, v2.3, v2.4, v2.5)
 - Total phases: 22 completed (phase 23 in progress, phases 24-26 planned)
-- Total plans: 89 complete
+- Total plans: 90 complete
 - Total LOC: ~12,215 TypeScript
 
 ## Completed Milestones
@@ -154,6 +154,14 @@ v3.0 key decisions:
 - VotingWidget hidden (returns null) when not in voting mode
 - Optional name input on VotingWidget if studentName prop not provided
 
+23-06 decisions (Final Chase round):
+- FinalPhase type is component-local for internal UI state management (separate from global ChasePhase)
+- Pushbacks increase effective lead by 1 - chaser must beat (contestantScore + pushbacksEarned) to win
+- 2-minute timers for both contestant and chaser phases with 10-second urgency threshold
+- Pushback opportunity pauses chaser timer until resolved
+- Contestant phase has keyboard shortcuts (1-4) for rapid answering
+- Auto-triggers AI chaser answers when entering chaser-round phase
+
 All decisions logged in PROJECT.md Key Decisions table.
 
 ### Pending Todos
@@ -166,10 +174,10 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-01-23 10:54:19 UTC
-Stopped at: Completed 23-04-PLAN.md (Offer selection and voting)
+Last session: 2026-01-23 10:59:53 UTC
+Stopped at: Completed 23-06-PLAN.md (Final Chase round)
 Resume file: None
-Next: 23-05 - Head-to-Head chase phase
+Next: 23-07 - Game orchestrator integration
 
 ---
 *State initialized: 2026-01-18*
