@@ -12,6 +12,40 @@ interface StudentGameViewProps {
   gameState: GameState;
 }
 
+// Phase and turn banner overlay for classroom visibility
+interface PhaseBannerProps {
+  phase: string;
+  turn?: 'contestant' | 'chaser';
+}
+
+const PhaseBanner: React.FC<PhaseBannerProps> = ({ phase, turn }) => {
+  return (
+    <div className="fixed top-0 left-0 right-0 z-50 flex flex-col items-center pt-4 gap-2 pointer-events-none">
+      {/* Phase Label - always visible */}
+      <div className="px-6 py-2 bg-slate-900/90 backdrop-blur-sm rounded-full border-2 border-slate-600">
+        <span className="text-lg md:text-xl font-bold text-amber-400 uppercase tracking-widest">
+          {phase}
+        </span>
+      </div>
+
+      {/* Turn Banner - shown when applicable */}
+      {turn && (
+        <div
+          className={`
+            px-10 py-4 rounded-2xl text-2xl md:text-4xl font-black uppercase tracking-wide
+            shadow-2xl transition-all duration-500 animate-fade-in
+            ${turn === 'contestant'
+              ? 'bg-blue-600 text-white shadow-blue-500/50'
+              : 'bg-red-600 text-white shadow-red-500/50'}
+          `}
+        >
+          {turn === 'contestant' ? "CONTESTANT'S TURN" : "CHASER'S TURN"}
+        </div>
+      )}
+    </div>
+  );
+};
+
 /**
  * Read-only game display for student view.
  * Routes game state based on discriminated union type.
