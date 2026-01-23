@@ -12,7 +12,7 @@ See: .planning/PROJECT.md (updated 2026-01-22)
 Phase: 23 of 26 (The Chase) - IN PROGRESS
 Plan: 6 of 7 complete
 Status: In progress
-Last activity: 2026-01-23 - Completed 23-06-PLAN.md (Final Chase round)
+Last activity: 2026-01-23 - Completed 23-05-PLAN.md (Head-to-Head chase phase) and 23-06-PLAN.md (Final Chase round)
 
 Progress: █████░░░░░░░░░░░░░░░░ 23% (v3.0 Quiz Game Variety)
 
@@ -28,13 +28,13 @@ Progress: █████░░░░░░░░░░░░░░░░ 23% (v
 - v2.3: 4 plans, 2 days
 - v2.4: 9 plans, 2 days
 - v2.5: 2 plans, 1 day
-- v3.0: Phase 20 complete (3 plans, 43min), Phase 21 complete (4 plans, 15min), Phase 22 complete (4 plans: 01=4min, 02=2min, 03=4min, 04=2min), Phase 23 in progress (01=2min, 02=2min, 03=1min, 04=1.5min, 06=2min)
+- v3.0: Phase 20 complete (3 plans, 43min), Phase 21 complete (4 plans, 15min), Phase 22 complete (4 plans: 01=4min, 02=2min, 03=4min, 04=2min), Phase 23 in progress (01=2min, 02=2min, 03=1min, 04=1.5min, 05=2.9min, 06=2min)
 
 **Project Totals:**
 - Milestones shipped: 9 (v1.0, v1.1, v1.2, v2.0, v2.1, v2.2, v2.3, v2.4, v2.5)
 - Total phases: 22 completed (phase 23 in progress, phases 24-26 planned)
-- Total plans: 90 complete
-- Total LOC: ~12,215 TypeScript
+- Total plans: 91 complete
+- Total LOC: ~12,560 TypeScript
 
 ## Completed Milestones
 
@@ -154,6 +154,13 @@ v3.0 key decisions:
 - VotingWidget hidden (returns null) when not in voting mode
 - Optional name input on VotingWidget if studentName prop not provided
 
+23-05 decisions (Head-to-Head chase phase):
+- Turn phases use sequential state machine for clear gameplay flow control
+- Game end detection uses nested setState callbacks to ensure position updates complete
+- 600ms delay after position changes allows CSS animations to complete before checking game end
+- Victory/defeat overlays use 2-second delay before calling onComplete for celebration visibility
+- Turn indicator uses color-coded dots with pulse animation for active player clarity
+
 23-06 decisions (Final Chase round):
 - FinalPhase type is component-local for internal UI state management (separate from global ChasePhase)
 - Pushbacks increase effective lead by 1 - chaser must beat (contestantScore + pushbacksEarned) to win
@@ -174,8 +181,8 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-01-23 10:59:53 UTC
-Stopped at: Completed 23-06-PLAN.md (Final Chase round)
+Last session: 2026-01-23 11:00:22 UTC
+Stopped at: Completed 23-05-PLAN.md (Head-to-Head chase phase)
 Resume file: None
 Next: 23-07 - Game orchestrator integration
 
