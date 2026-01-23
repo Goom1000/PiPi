@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { Slide, PresentationMessage, BROADCAST_CHANNEL_NAME, GameSyncState } from '../types';
+import { Slide, PresentationMessage, BROADCAST_CHANNEL_NAME, GameState } from '../types';
 import useBroadcastSync from '../hooks/useBroadcastSync';
 import { SlideContentRenderer } from './SlideRenderers';
 import StudentGameView from './StudentGameView';
@@ -24,7 +24,7 @@ const StudentView: React.FC = () => {
   const [visibleBullets, setVisibleBullets] = useState(0);
   const [slides, setSlides] = useState<Slide[]>([]);
   const [connected, setConnected] = useState(false);
-  const [gameState, setGameState] = useState<GameSyncState | null>(null);
+  const [gameState, setGameState] = useState<GameState | null>(null);
   const [selectedStudent, setSelectedStudent] = useState<string | null>(null);
   const [isExiting, setIsExiting] = useState(false);
   const timerRef = useRef<number | null>(null);
