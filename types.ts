@@ -69,11 +69,52 @@ export interface MillionaireState extends BaseGameState {
   questionCount: 3 | 5 | 10; // Selected at game launch
 }
 
+// The Chase game phase union
+export type ChasePhase =
+  | 'cash-builder'
+  | 'offer-selection'
+  | 'head-to-head'
+  | 'final-chase-contestant'
+  | 'final-chase-chaser'
+  | 'game-over';
+
+// Chase offer structure for offer selection phase
+export interface ChaseOffer {
+  amount: number;      // Prize money
+  position: number;    // Starting position (1-5, where 3 is middle)
+  label: string;       // "High Offer (+2 steps)" etc
+}
+
 // The Chase state (outrun the chaser)
 export interface TheChaseState extends BaseGameState {
   gameType: 'the-chase';
-  chaserPosition: number;
-  contestantPosition: number;
+  phase: ChasePhase;
+  // Cash Builder state
+  cashBuilderScore: number;
+  cashBuilderTimeRemaining: number;
+  // Offer state
+  offers: ChaseOffer[];
+  selectedOfferIndex: number | null;
+  votes: Record<string, number>;  // studentName -> offerIndex
+  isVotingOpen: boolean;
+  // Head-to-Head state
+  contestantPosition: number;  // 0-6 (0=top, 6=home)
+  chaserPosition: number;      // 0-6
+  chaserDifficulty: 'easy' | 'medium' | 'hard';
+  isAIControlled: boolean;
+  isChaserThinking: boolean;
+  // Final Chase state
+  finalChaseContestantScore: number;  // Questions answered
+  finalChaseContestantTime: number;   // Seconds remaining
+  finalChaseChaserScore: number;
+  finalChaseChaserTime: number;
+  chaserTargetScore: number;  // Score needed to catch (contestant's final score)
+  // Question state
+  currentQuestionAnswered: boolean;
+  contestantAnswer: number | null;
+  chaserAnswer: number | null;
+  showChaserAnswer: boolean;
+  // Legacy backward compatibility fields
   isChasing: boolean;
 }
 
