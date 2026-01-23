@@ -209,7 +209,7 @@ const QuickQuizStudentView: React.FC<{ state: GameState }> = ({ state }) => {
                 className={`
                   relative rounded-2xl p-6 md:p-8 flex items-center shadow-lg border-b-8 transition-all duration-500
                   ${bgColors[idx]}
-                  ${isDimmed ? 'opacity-20 grayscale' : 'opacity-100'}
+                  ${isDimmed ? 'opacity-30 grayscale' : 'opacity-100'}
                   ${isAnswerRevealed && isCorrect ? 'animate-flash-correct' : ''}
                 `}
               >
