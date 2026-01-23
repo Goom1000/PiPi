@@ -50,6 +50,52 @@ export const BLOOM_DIFFICULTY_MAP = {
   }
 } as const;
 
+// Helper to build slide context for question generation
+export function buildSlideContext(slides: Slide[], currentIndex: number): SlideContext {
+  const relevantSlides = slides.slice(0, currentIndex + 1);
+  const cumulativeContent = relevantSlides
+    .map((s, i) => `Slide ${i + 1} (${s.title}): ${s.content.join('; ')}`)
+    .join('\n\n');
+
+  return {
+    lessonTopic: slides[0]?.title || 'Unknown Topic',
+    cumulativeContent,
+    currentSlideTitle: slides[currentIndex]?.title || 'Current Slide',
+    currentSlideContent: slides[currentIndex]?.content || []
+  };
+}
+
+// Helper for auto-retry with exponential backoff
+export async function withRetry<T>(
+  operation: () => Promise<T>,
+  maxRetries: number = 3,
+  initialDelay: number = 1000
+): Promise<T> {
+  let lastError: Error | undefined;
+
+  for (let attempt = 0; attempt < maxRetries; attempt++) {
+    try {
+      return await operation();
+    } catch (e) {
+      lastError = e as Error;
+
+      // Only retry on transient errors
+      if (e instanceof AIProviderError) {
+        const retryableCodes: AIErrorCode[] = ['NETWORK_ERROR', 'RATE_LIMIT', 'SERVER_ERROR'];
+        if (!retryableCodes.includes(e.code)) {
+          throw e; // Don't retry AUTH_ERROR, PARSE_ERROR, etc.
+        }
+      }
+
+      if (attempt < maxRetries - 1) {
+        await new Promise(resolve => setTimeout(resolve, initialDelay * Math.pow(2, attempt)));
+      }
+    }
+  }
+
+  throw lastError;
+}
+
 // Error codes for unified error handling across all providers
 export type AIErrorCode =
   | 'RATE_LIMIT'           // 429 - too many requests
