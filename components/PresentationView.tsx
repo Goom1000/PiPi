@@ -3,7 +3,7 @@ import { createPortal } from 'react-dom';
 import { Slide, PresentationMessage, BROADCAST_CHANNEL_NAME, GameState, GameType, QuickQuizState, ActiveGameState, MillionaireState, TheChaseState, BeatTheChaserState, GradeLevel, StudentWithGrade, CompetitionMode } from '../types';
 import Button from './Button';
 import { MarkdownText, SlideContentRenderer } from './SlideRenderers';
-import { QuizQuestion, generatePhoneAFriendHint } from '../services/geminiService';
+import { QuizQuestion, generatePhoneAFriendHint, VerbosityLevel } from '../services/geminiService';
 import { AIProviderInterface, AIProviderError, buildSlideContext, withRetry, GameQuestionRequest } from '../services/aiProvider';
 import useBroadcastSync from '../hooks/useBroadcastSync';
 import useWindowManagement from '../hooks/useWindowManagement';
@@ -139,6 +139,11 @@ const PresentationView: React.FC<PresentationViewProps> = ({ slides, onExit, stu
   );
   const [isCounterExpanded, setIsCounterExpanded] = useState(false);
 
+  // Verbosity control for teleprompter scripts
+  const [verbosityLevel, setVerbosityLevel] = useState<VerbosityLevel>('standard');
+  const [isRegenerating, setIsRegenerating] = useState(false);
+  const [regeneratedScript, setRegeneratedScript] = useState<string | null>(null);
+
   // Helper to manually mark student as asked (voluntary answers)
   const markStudentAsAsked = useCallback((studentName: string) => {
     setCyclingState(prev => ({
@@ -244,6 +249,12 @@ const PresentationView: React.FC<PresentationViewProps> = ({ slides, onExit, stu
       gameWasOpenRef.current = false;
     }
   }, [activeGame, postMessage]);
+
+  // Reset verbosity to standard when slide changes
+  useEffect(() => {
+    setVerbosityLevel('standard');
+    setRegeneratedScript(null);
+  }, [currentIndex]);
 
   // Track connection state for potential future use
   const prevConnectedRef = useRef<boolean | null>(null);
@@ -878,6 +889,45 @@ const PresentationView: React.FC<PresentationViewProps> = ({ slides, onExit, stu
           }
       } finally {
           setIsGeneratingQuestion(false);
+      }
+  };
+
+  // Handle verbosity level change - regenerate teleprompter if needed
+  const handleVerbosityChange = async (newLevel: VerbosityLevel) => {
+      if (newLevel === verbosityLevel) return;
+
+      // Standard mode uses original speakerNotes - no regeneration needed
+      if (newLevel === 'standard') {
+          setVerbosityLevel('standard');
+          setRegeneratedScript(null);
+          return;
+      }
+
+      // Concise/Detailed require AI regeneration
+      if (!provider) {
+          // No AI provider - can't regenerate
+          return;
+      }
+
+      setVerbosityLevel(newLevel);
+      setIsRegenerating(true);
+
+      try {
+          const newScript = await provider.regenerateTeleprompter(currentSlide, newLevel);
+          setRegeneratedScript(newScript);
+      } catch (error) {
+          console.error('Failed to regenerate teleprompter:', error);
+          // Revert to standard on error
+          setVerbosityLevel('standard');
+          setRegeneratedScript(null);
+          // Show error message if available
+          if (error instanceof AIProviderError) {
+              onError('Teleprompter Regeneration Failed', error.userMessage);
+          } else {
+              onError('Error', 'Could not regenerate teleprompter. Please try again.');
+          }
+      } finally {
+          setIsRegenerating(false);
       }
   };
 
