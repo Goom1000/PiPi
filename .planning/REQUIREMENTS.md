@@ -9,9 +9,9 @@ Requirements for Pedagogical Slide Types milestone. Each maps to roadmap phases.
 
 ### Single Teleprompter Regeneration
 
-- [ ] **REGEN-01**: User can regenerate teleprompter script for a single slide via button in teleprompter panel
-- [ ] **REGEN-02**: Regeneration respects current verbosity level selection (Concise/Standard/Detailed)
-- [ ] **REGEN-03**: Regeneration uses full slide context (surrounding slides) for coherent script
+- [x] **REGEN-01**: User can regenerate teleprompter script for a single slide via button in teleprompter panel
+- [x] **REGEN-02**: Regeneration respects current verbosity level selection (Concise/Standard/Detailed)
+- [x] **REGEN-03**: Regeneration uses full slide context (surrounding slides) for coherent script
 
 ### Elaborate Slides
 
@@ -79,9 +79,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| REGEN-01 | Phase 29 | Pending |
-| REGEN-02 | Phase 29 | Pending |
-| REGEN-03 | Phase 29 | Pending |
+| REGEN-01 | Phase 29 | Complete |
+| REGEN-02 | Phase 29 | Complete |
+| REGEN-03 | Phase 29 | Complete |
 | ELAB-01 | Phase 30 | Pending |
 | ELAB-02 | Phase 30 | Pending |
 | ELAB-03 | Phase 30 | Pending |

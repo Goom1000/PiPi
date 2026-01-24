@@ -46,7 +46,7 @@ Plans:
 **Plans**: 1 plan
 
 Plans:
-- [ ] 29-01: Extend AI provider signature and add Regen button UI
+- [x] 29-01: Extend AI provider signature and add Regen button UI
 
 #### Phase 30: Elaborate Slide Insertion
 **Goal**: Teachers can insert AI-generated depth content expanding on current slide
@@ -101,7 +101,7 @@ Phases execute in numeric order: 29 → 30 → 31 → 32
 |-------|----------------|--------|-----------|
 | 27. Verbosity UI | 1/1 | Complete | 2026-01-24 |
 | 28. Caching | 1/1 | Complete | 2026-01-25 |
-| 29. Single Regeneration | 0/1 | Planned | - |
+| 29. Single Regeneration | 1/1 | Complete | 2026-01-25 |
 | 30. Elaborate Slides | 0/? | Not started | - |
 | 31. Work Together Slides | 0/? | Not started | - |
 | 32. Class Challenge Slides | 0/? | Not started | - |
