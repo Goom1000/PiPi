@@ -2,19 +2,19 @@
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-01-24)
+See: .planning/PROJECT.md (updated 2026-01-25)
 
 **Core value:** Students see only the presentation; teachers see the teleprompter script
-**Current focus:** v3.1 Teleprompter Verbosity
+**Current focus:** Planning next milestone
 
 ## Current Position
 
-Phase: 28 - Caching & Backward Compatibility
-Plan: 1 of 1 (Verbosity Caching)
-Status: Phase complete
-Last activity: 2026-01-24 — Completed 28-01-PLAN.md
+Phase: Ready for next milestone
+Plan: N/A
+Status: v3.1 shipped
+Last activity: 2026-01-25 — Completed v3.1 milestone
 
-Progress: ███░░░░░░░░░░░░░░░░░░░░░░░░░ 3/84 (4%)
+Progress: ████████████████████████████ 28/28 phases complete
 
 ## Performance Metrics
 
@@ -31,13 +31,14 @@ Progress: ███░░░░░░░░░░░░░░░░░░░░�
 - v3.0: 33 plans, 2 days
 
 **Project Totals:**
-- Milestones shipped: 10 (v1.0, v1.1, v1.2, v2.0, v2.1, v2.2, v2.3, v2.4, v2.5, v3.0)
+- Milestones shipped: 11 (v1.0, v1.1, v1.2, v2.0, v2.1, v2.2, v2.3, v2.4, v2.5, v3.0, v3.1)
 - Total phases: 28 completed
-- Total plans: 86 complete
-- Total LOC: ~15,000 TypeScript
+- Total plans: 89 complete
+- Total LOC: ~17,000 TypeScript
 
 ## Completed Milestones
 
+- v3.1 Teleprompter Verbosity (2026-01-25) - 2 phases, 3 plans
 - v3.0 Quiz Game Variety (2026-01-24) - 7 phases, 33 plans
 - v2.5 Rebrand to Cue (2026-01-22) - 1 phase, 2 plans
 - v2.4 Targeted Questioning (2026-01-22) - 4 phases, 9 plans
@@ -53,27 +54,13 @@ Progress: ███░░░░░░░░░░░░░░░░░░░░�
 
 ### Decisions
 
-All v3.0 decisions archived to PROJECT.md Key Decisions table.
+All v3.1 decisions archived to PROJECT.md Key Decisions table.
 
-Key architectural decisions from v3.0:
-- Discriminated union game state architecture for type-safe routing
-- Atomic BroadcastChannel state snapshots (no incremental actions)
-- Bloom's taxonomy mapping for difficulty levels
-- Fisher-Yates shuffle for answer position randomization
-
-v3.1 Phase 27 (Verbosity UI & Generation):
+Key architectural decisions from v3.1:
 - Verbosity levels: concise (bullet-point prompts), standard (existing), detailed (full script)
-- Standard verbosity uses existing TELEPROMPTER_RULES for backward compatibility
-- Both Gemini and Claude providers implement regeneration with verbosity-specific rules
-- Verbosity selector positioned between header and content for visibility
-- Standard is default and resets automatically on slide change
-- Non-standard buttons disabled when AI provider unavailable
-
-v3.1 Phase 28 (Caching & Backward Compatibility):
 - Cache only concise/detailed (standard uses speakerNotes directly)
-- Clear cache when content or title changes (invalidation strategy)
-- Maintain verbosity selection during slide navigation
 - File format v2 with optional verbosityCache field (no migration logic needed)
+- Cache invalidation on content/title change
 
 ### Pending Todos
 
@@ -85,11 +72,11 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-01-24
-Stopped at: Completed 28-01-PLAN.md (Verbosity Caching) - Phase 28 complete
+Last session: 2026-01-25
+Stopped at: v3.1 milestone complete
 Resume file: None
-Next: v3.1 complete (Phases 27-28), check ROADMAP.md for next milestone
+Next: Start next milestone with `/gsd:new-milestone`
 
 ---
 *State initialized: 2026-01-18*
-*Last updated: 2026-01-24 - Phase 28 complete (1 plan)*
+*Last updated: 2026-01-25 - v3.1 milestone complete*

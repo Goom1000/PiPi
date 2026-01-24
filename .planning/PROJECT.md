@@ -4,13 +4,11 @@
 
 A presentation tool for teachers that transforms PDF lesson plans into interactive slideshows with AI-generated content, a teleprompter script for the teacher, and progressive bullet reveal. Teachers upload their existing lesson plans, select student age/grade level, and the AI creates an engaging presentation with speaker notes that guide the teacher through natural, conversational delivery.
 
-**v3.0 shipped:** Multi-game platform with TV show-style quiz games (Millionaire, Beat the Chaser), unified game architecture, AI question generation, and competition modes. Deployed at https://goom1000.github.io/Cue/
-
-**v3.1 in progress:** Teleprompter verbosity toggle — teachers can switch between Concise/Standard/Detailed mid-lesson.
+**v3.1 shipped:** Teleprompter verbosity toggle — teachers can switch between Concise/Standard/Detailed mid-lesson with per-slide caching for instant switch-back. Deployed at https://goom1000.github.io/Cue/
 
 ## Current State
 
-Shipped v3.0 with ~15,000 LOC TypeScript. Added 4 game formats (Quick Quiz, Millionaire, Beat the Chaser + disabled The Chase) with unified architecture preventing state silos. AI generates progressive-difficulty questions from lesson content. Team/individual competition modes with score tracking.
+Shipped v3.1 with ~17,000 LOC TypeScript. Added teleprompter verbosity toggle with three levels (Concise/Standard/Detailed), per-slide caching, file format v2 support, and backward compatibility. Previous v3.0 delivered multi-game quiz platform with 4 formats.
 
 ## Core Value
 
@@ -90,17 +88,19 @@ Students see only the presentation; teachers see the presentation plus a telepro
 - ✓ Individual vs team competition modes with score tracking — v3.0
 - ✓ AI question generation integrated with Bloom's taxonomy difficulty — v3.0
 - ✓ Game board synced to student view with answer reveal control — v3.0
+- ✓ Three-level verbosity toggle (Concise / Standard / Detailed) — v3.1
+- ✓ Verbosity selector in teleprompter panel header — v3.1
+- ✓ On-demand regeneration when verbosity changed — v3.1
+- ✓ Per-slide verbosity caching (instant switch-back) — v3.1
+- ✓ Loading indicator during regeneration — v3.1
+- ✓ Cache persistence in presentation state (survives refresh) — v3.1
+- ✓ Backward compatibility for v1 files (defaults to Standard) — v3.1
 
 ### Active
 
-**v3.1 Teleprompter Verbosity:**
-- [ ] Three-level verbosity toggle (Concise / Standard / Detailed)
-- [ ] Verbosity selector in teleprompter panel header
-- [ ] On-demand regeneration when verbosity changed
-- [ ] Per-slide verbosity caching (instant switch-back)
-- [ ] Loading indicator during regeneration
+(None — start next milestone with `/gsd:new-milestone`)
 
-### Deferred (v3.0+)
+### Deferred (v3.1+)
 
 - [ ] Elapsed time display showing presentation duration
 - [ ] Fullscreen recovery (auto re-enter if exited)
@@ -126,10 +126,16 @@ Students see only the presentation; teachers see the presentation plus a telepro
 
 ### Current State
 
-Shipped v3.0 with ~15,000 LOC TypeScript.
+Shipped v3.1 with ~17,000 LOC TypeScript.
 Tech stack: React 19, Vite, Gemini/Claude API, Tailwind CSS, react-rnd.
 Client-side only (no backend).
 Deployed at: https://goom1000.github.io/Cue/
+
+v3.1 delivered Teleprompter Verbosity:
+- Three-level verbosity toggle (Concise/Standard/Detailed)
+- AI regeneration for both Gemini and Claude providers
+- Per-slide caching with instant switch-back
+- File format v2 with backward compatibility
 
 v3.0 delivered Quiz Game Variety:
 - Unified game architecture with discriminated union types (GameState, GameType)
@@ -221,4 +227,4 @@ v3.0 delivered Quiz Game Variety:
 | The Chase disabled in UI | Code preserved but removed from menu per user preference | ✓ Good — v3.0 |
 
 ---
-*Last updated: 2026-01-24 after v3.1 milestone start*
+*Last updated: 2026-01-25 after v3.1 milestone*

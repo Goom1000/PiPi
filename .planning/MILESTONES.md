@@ -1,5 +1,33 @@
 # Project Milestones: Cue
 
+## v3.1 Teleprompter Verbosity (Shipped: 2026-01-25)
+
+**Delivered:** Three-level verbosity toggle in teleprompter panel allowing teachers to switch between Concise, Standard, and Detailed scripts mid-lesson with per-slide caching for instant switch-back.
+
+**Phases completed:** 27-28 (3 plans total)
+
+**Key accomplishments:**
+
+- Verbosity selector UI with three buttons (Concise/Standard/Detailed) in teleprompter panel
+- AI regeneration support for both Gemini and Claude providers with verbosity-specific rules
+- Per-slide verbosity caching with instant switch-back (no re-generation needed)
+- Cache persistence in .cue file format (v2) surviving browser refresh
+- Backward compatibility with v1 files (defaults to Standard verbosity)
+- Navigation persistence (verbosity selection survives slide changes)
+
+**Stats:**
+
+- 18 files created/modified
+- ~17,000 lines of TypeScript (project total)
+- 2 phases, 3 plans
+- 1 day (2026-01-24)
+
+**Git range:** `feat(27-01)` → `feat(28-01)`
+
+**What's next:** TBD with /gsd:new-milestone
+
+---
+
 ## v3.0 Quiz Game Variety (Shipped: 2026-01-24)
 
 **Delivered:** Transformed Cue from a single-game quiz tool into a multi-game platform with TV show-style formats (Who Wants to Be a Millionaire, Beat the Chaser), unified game architecture, AI-generated questions from lesson content, and individual/team competition modes.
