@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-01-24)
 ## Current Position
 
 Phase: 27 - Verbosity UI & Generation
-Plan: 1 of 2 (AI Service Layer)
-Status: In progress
-Last activity: 2026-01-24 — Completed 27-01-PLAN.md
+Plan: 2 of 2 (Verbosity UI Components)
+Status: Phase complete
+Last activity: 2026-01-24 — Completed 27-02-PLAN.md
 
-Progress: █░░░░░░░░░░░░░░░░░░░░░░░░░░░ 1/84 (1%)
+Progress: ██░░░░░░░░░░░░░░░░░░░░░░░░░░ 2/84 (2%)
 
 ## Performance Metrics
 
@@ -32,8 +32,8 @@ Progress: █░░░░░░░░░░░░░░░░░░░░░░�
 
 **Project Totals:**
 - Milestones shipped: 10 (v1.0, v1.1, v1.2, v2.0, v2.1, v2.2, v2.3, v2.4, v2.5, v3.0)
-- Total phases: 26 completed
-- Total plans: 84 complete (83 + 1 in progress)
+- Total phases: 27 completed
+- Total plans: 85 complete
 - Total LOC: ~15,000 TypeScript
 
 ## Completed Milestones
@@ -61,10 +61,13 @@ Key architectural decisions from v3.0:
 - Bloom's taxonomy mapping for difficulty levels
 - Fisher-Yates shuffle for answer position randomization
 
-v3.1 Phase 27 Plan 01 (AI Verbosity):
+v3.1 Phase 27 (Verbosity UI & Generation):
 - Verbosity levels: concise (bullet-point prompts), standard (existing), detailed (full script)
 - Standard verbosity uses existing TELEPROMPTER_RULES for backward compatibility
 - Both Gemini and Claude providers implement regeneration with verbosity-specific rules
+- Verbosity selector positioned between header and content for visibility
+- Standard is default and resets automatically on slide change
+- Non-standard buttons disabled when AI provider unavailable
 
 ### Pending Todos
 
@@ -77,10 +80,10 @@ None.
 ## Session Continuity
 
 Last session: 2026-01-24
-Stopped at: Completed 27-01-PLAN.md (AI Service Layer)
+Stopped at: Completed 27-02-PLAN.md (Verbosity UI Components) - Phase 27 complete
 Resume file: None
-Next: Plan 27-02 (Verbosity UI Components)
+Next: Phase 28 (per ROADMAP.md)
 
 ---
 *State initialized: 2026-01-18*
-*Last updated: 2026-01-24 - Plan 27-01 complete*
+*Last updated: 2026-01-24 - Phase 27 complete (2 plans)*
