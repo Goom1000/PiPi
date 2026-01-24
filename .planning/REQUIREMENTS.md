@@ -79,29 +79,35 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| REGEN-01 | TBD | Pending |
-| REGEN-02 | TBD | Pending |
-| REGEN-03 | TBD | Pending |
-| ELAB-01 | TBD | Pending |
-| ELAB-02 | TBD | Pending |
-| ELAB-03 | TBD | Pending |
-| ELAB-04 | TBD | Pending |
-| WORK-01 | TBD | Pending |
-| WORK-02 | TBD | Pending |
-| WORK-03 | TBD | Pending |
-| WORK-04 | TBD | Pending |
-| CHAL-01 | TBD | Pending |
-| CHAL-02 | TBD | Pending |
-| CHAL-03 | TBD | Pending |
-| CHAL-04 | TBD | Pending |
-| CHAL-05 | TBD | Pending |
-| CHAL-06 | TBD | Pending |
+| REGEN-01 | Phase 29 | Pending |
+| REGEN-02 | Phase 29 | Pending |
+| REGEN-03 | Phase 29 | Pending |
+| ELAB-01 | Phase 30 | Pending |
+| ELAB-02 | Phase 30 | Pending |
+| ELAB-03 | Phase 30 | Pending |
+| ELAB-04 | Phase 30 | Pending |
+| WORK-01 | Phase 31 | Pending |
+| WORK-02 | Phase 31 | Pending |
+| WORK-03 | Phase 31 | Pending |
+| WORK-04 | Phase 31 | Pending |
+| CHAL-01 | Phase 32 | Pending |
+| CHAL-02 | Phase 32 | Pending |
+| CHAL-03 | Phase 32 | Pending |
+| CHAL-04 | Phase 32 | Pending |
+| CHAL-05 | Phase 32 | Pending |
+| CHAL-06 | Phase 32 | Pending |
 
 **Coverage:**
 - v3.2 requirements: 17 total
-- Mapped to phases: 0
-- Unmapped: 17 ⚠️
+- Mapped to phases: 17
+- Unmapped: 0 ✓
+
+**Phase Distribution:**
+- Phase 29 (Single Regeneration): 3 requirements
+- Phase 30 (Elaborate Slides): 4 requirements
+- Phase 31 (Work Together Slides): 4 requirements
+- Phase 32 (Class Challenge Slides): 6 requirements
 
 ---
 *Requirements defined: 2026-01-25*
-*Last updated: 2026-01-25 after initial definition*
+*Last updated: 2026-01-25 after roadmap creation (100% coverage)*

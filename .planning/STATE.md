@@ -5,78 +5,70 @@
 See: .planning/PROJECT.md (updated 2026-01-25)
 
 **Core value:** Students see only the presentation; teachers see the teleprompter script
-**Current focus:** v3.2 Pedagogical Slide Types
+**Current focus:** Phase 29 - Single Teleprompter Regeneration
 
 ## Current Position
 
-Phase: Not started (defining requirements)
-Plan: —
-Status: Defining requirements
-Last activity: 2026-01-25 — Milestone v3.2 started
+Phase: 29 of 32 (Single Teleprompter Regeneration)
+Plan: Not yet planned
+Status: Ready to plan
+Last activity: 2026-01-25 - v3.2 roadmap created with 4 phases
 
-Progress: ░░░░░░░░░░░░░░░░░░░░░░░░░░░░ 0% (new milestone)
+Progress: ░░░░░░░░░░░░░░░░░░░░░░░░░░░░ 0% (v3.2 milestone: 0/4 phases)
 
 ## Performance Metrics
 
 **Velocity:**
-- v1.0: 6 plans, 1 day
-- v1.1: 3 plans, 8 hours
-- v1.2: 5 plans, 1 day
-- v2.0: 11 plans, 1 day
-- v2.1: 2 plans, 4 hours
-- v2.2: 8 plans, 1 day
-- v2.3: 4 plans, 2 days
-- v2.4: 9 plans, 2 days
-- v2.5: 2 plans, 1 day
-- v3.0: 33 plans, 2 days
-
-**Project Totals:**
-- Milestones shipped: 11 (v1.0, v1.1, v1.2, v2.0, v2.1, v2.2, v2.3, v2.4, v2.5, v3.0, v3.1)
-- Total phases: 28 completed
-- Total plans: 89 complete
+- Milestones shipped: 11 (v1.0 through v3.1)
+- Total phases completed: 28
+- Total plans completed: 89
 - Total LOC: ~17,000 TypeScript
 
-## Completed Milestones
+**v3.2 Milestone:**
+- Phases planned: 4 (29-32)
+- Requirements: 17 total (REGEN: 3, ELAB: 4, WORK: 4, CHAL: 6)
+- Coverage: 100% (all requirements mapped to phases)
+- Depth: Comprehensive (4 natural delivery boundaries)
 
-- v3.1 Teleprompter Verbosity (2026-01-25) - 2 phases, 3 plans
-- v3.0 Quiz Game Variety (2026-01-24) - 7 phases, 33 plans
-- v2.5 Rebrand to Cue (2026-01-22) - 1 phase, 2 plans
-- v2.4 Targeted Questioning (2026-01-22) - 4 phases, 9 plans
-- v2.3 Bug Fixes (2026-01-21) - 3 phases, 4 plans
-- v2.2 Flexible Upload & Class Bank (2026-01-20) - 4 phases, 8 plans
-- v2.1 Landing Page & Branding (2026-01-19) - 2 phases, 2 plans
-- v2.0 Shareable Presentations (2026-01-19) - 5 phases, 11 plans
-- v1.2 Permission Flow Fix (2026-01-18) - 2 phases, 5 plans
-- v1.1 Draggable Preview Window (2026-01-18) - 2 phases, 3 plans
-- v1.0 Dual-Monitor Student View (2026-01-18) - 3 phases, 6 plans
+**Recent Milestones:**
+- v3.1: 2 phases, 3 plans, 1 day (2026-01-25)
+- v3.0: 7 phases, 33 plans, 2 days (2026-01-24)
+- v2.5: 1 phase, 2 plans, 1 day (2026-01-22)
 
 ## Accumulated Context
 
 ### Decisions
 
-All v3.1 decisions archived to PROJECT.md Key Decisions table.
+Decisions are logged in PROJECT.md Key Decisions table.
+Recent decisions affecting current work:
 
-Key architectural decisions from v3.1:
-- Verbosity levels: concise (bullet-point prompts), standard (existing), detailed (full script)
-- Cache only concise/detailed (standard uses speakerNotes directly)
-- File format v2 with optional verbosityCache field (no migration logic needed)
-- Cache invalidation on content/title change
+- **Phase 28**: Per-slide verbosity caching with file format v2 - Cache structure exists for v3.2 single regeneration to extend
+- **Phase 27**: Three-level verbosity toggle (Concise/Standard/Detailed) - Single regeneration must respect current level
+- **v3.0**: BroadcastChannel atomic snapshots for game state - Pattern proven for Class Challenge live sync (Phase 32)
+- **v2.0**: Strategy pattern for AI providers - Extension point ready for Elaborate/Work Together generation methods
 
 ### Pending Todos
 
-Check `.planning/todos/pending/` for ideas captured during development.
+None yet.
 
 ### Blockers/Concerns
 
-None.
+None yet.
+
+**v3.2 Research Context:**
+- All 4 phases have HIGH confidence implementation paths (no external research needed during planning)
+- Zero new dependencies required (React 19 + existing Gemini/Claude providers)
+- Phase ordering optimized: low complexity → established patterns → novel pattern
+- Critical pitfalls documented: cache invalidation conflicts, BroadcastChannel race conditions, AI context degradation
 
 ## Session Continuity
 
 Last session: 2026-01-25
-Stopped at: Defining v3.2 requirements
+Stopped at: Roadmap created for v3.2 milestone (4 phases, 17 requirements, 100% coverage)
 Resume file: None
-Next: Complete requirements and roadmap
+
+**Next step:** `/gsd:plan-phase 29` to begin Single Teleprompter Regeneration
 
 ---
 *State initialized: 2026-01-18*
-*Last updated: 2026-01-25 - v3.2 milestone started*
+*Last updated: 2026-01-25 - v3.2 roadmap created*
