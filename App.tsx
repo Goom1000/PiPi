@@ -315,7 +315,24 @@ function App() {
   };
 
   const handleUpdateSlide = useCallback((id: string, updates: Partial<Slide>) => {
-    setSlides(prev => prev.map(s => s.id === id ? { ...s, ...updates } : s));
+    setSlides(prev => prev.map(s => {
+      if (s.id !== id) return s;
+
+      // Detect if content changed (invalidates verbosity cache)
+      const contentChanged = updates.content !== undefined || updates.title !== undefined;
+
+      // Special case: if only updating verbosityCache, preserve it
+      const isOnlyCacheUpdate = Object.keys(updates).length === 1 && updates.verbosityCache !== undefined;
+
+      return {
+        ...s,
+        ...updates,
+        // Clear cache if content changed, unless this IS a cache update
+        verbosityCache: contentChanged && !isOnlyCacheUpdate
+          ? undefined
+          : (updates.verbosityCache ?? s.verbosityCache),
+      };
+    }));
   }, []);
 
   const handleDeleteSlide = useCallback((id: string) => {
@@ -730,6 +747,7 @@ function App() {
         provider={provider}
         onError={handleComponentError}
         onRequestAI={handleRequestAI}
+        onUpdateSlide={handleUpdateSlide}
       />
     );
   }

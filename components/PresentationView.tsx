@@ -97,9 +97,10 @@ interface PresentationViewProps {
   provider: AIProviderInterface | null;
   onError: (title: string, message: string) => void;
   onRequestAI: (featureName: string) => void;
+  onUpdateSlide: (id: string, updates: Partial<Slide>) => void;
 }
 
-const PresentationView: React.FC<PresentationViewProps> = ({ slides, onExit, studentNames, studentData, initialSlideIndex = 0, provider, onError, onRequestAI }) => {
+const PresentationView: React.FC<PresentationViewProps> = ({ slides, onExit, studentNames, studentData, initialSlideIndex = 0, provider, onError, onRequestAI, onUpdateSlide }) => {
   const isAIAvailable = provider !== null;
   const [currentIndex, setCurrentIndex] = useState(initialSlideIndex);
   const [visibleBullets, setVisibleBullets] = useState(0);
@@ -250,11 +251,16 @@ const PresentationView: React.FC<PresentationViewProps> = ({ slides, onExit, stu
     }
   }, [activeGame, postMessage]);
 
-  // Reset verbosity to standard when slide changes
+  // Maintain verbosity on slide navigation, update display from cache
   useEffect(() => {
-    setVerbosityLevel('standard');
-    setRegeneratedScript(null);
-  }, [currentIndex]);
+    if (verbosityLevel === 'standard') {
+      setRegeneratedScript(null);
+    } else {
+      // Use cache if available, null otherwise (will need regeneration on click)
+      const cached = currentSlide.verbosityCache?.[verbosityLevel];
+      setRegeneratedScript(cached || null);
+    }
+  }, [currentIndex, currentSlide.verbosityCache, verbosityLevel]);
 
   // Track connection state for potential future use
   const prevConnectedRef = useRef<boolean | null>(null);
@@ -892,35 +898,49 @@ const PresentationView: React.FC<PresentationViewProps> = ({ slides, onExit, stu
       }
   };
 
-  // Handle verbosity level change - regenerate teleprompter if needed
+  // Handle verbosity level change - check cache first, regenerate only if needed
   const handleVerbosityChange = async (newLevel: VerbosityLevel) => {
       if (newLevel === verbosityLevel) return;
+      setVerbosityLevel(newLevel);
 
-      // Standard mode uses original speakerNotes - no regeneration needed
+      // Standard uses speakerNotes directly - no cache needed
       if (newLevel === 'standard') {
+          setRegeneratedScript(null);
+          return;
+      }
+
+      // Check cache for instant switch
+      const cached = currentSlide.verbosityCache?.[newLevel];
+      if (cached) {
+          setRegeneratedScript(cached);
+          return;  // Instant switch from cache
+      }
+
+      // No cache - need to regenerate
+      if (!provider) {
+          // No AI provider - can't regenerate, stay at standard
           setVerbosityLevel('standard');
           setRegeneratedScript(null);
           return;
       }
 
-      // Concise/Detailed require AI regeneration
-      if (!provider) {
-          // No AI provider - can't regenerate
-          return;
-      }
-
-      setVerbosityLevel(newLevel);
       setIsRegenerating(true);
 
       try {
           const newScript = await provider.regenerateTeleprompter(currentSlide, newLevel);
           setRegeneratedScript(newScript);
+
+          // Persist to slide cache (triggers auto-save)
+          onUpdateSlide(currentSlide.id, {
+              verbosityCache: {
+                  ...currentSlide.verbosityCache,
+                  [newLevel]: newScript,
+              },
+          });
       } catch (error) {
           console.error('Failed to regenerate teleprompter:', error);
-          // Revert to standard on error
           setVerbosityLevel('standard');
           setRegeneratedScript(null);
-          // Show error message if available
           if (error instanceof AIProviderError) {
               onError('Teleprompter Regeneration Failed', error.userMessage);
           } else {
