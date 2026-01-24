@@ -983,7 +983,8 @@ const PresentationView: React.FC<PresentationViewProps> = ({ slides, onExit, stu
   }, [slides, studentNames]);
 
   const currentScriptSegment = useMemo(() => {
-      const rawScript = currentSlide.speakerNotes || "";
+      // If we have a regenerated script (concise/detailed), use it
+      const rawScript = regeneratedScript || currentSlide.speakerNotes || "";
       const segments = rawScript.split('👉');
       
       if (showFullScript) return rawScript || "No notes available.";
@@ -1016,7 +1017,7 @@ const PresentationView: React.FC<PresentationViewProps> = ({ slides, onExit, stu
 
       return `${studentName} READS:\n"${bulletText}"\n\nTEACHER ELABORATES:\n${aiNote}`;
 
-  }, [currentSlide.speakerNotes, visibleBullets, showFullScript, studentAssignments, currentIndex, currentSlide.content, currentSlide.title]);
+  }, [currentSlide.speakerNotes, visibleBullets, showFullScript, studentAssignments, currentIndex, currentSlide.content, currentSlide.title, regeneratedScript]);
 
   const handleNext = () => {
     if (visibleBullets < totalBullets) setVisibleBullets(prev => prev + 1);
@@ -1272,6 +1273,28 @@ const PresentationView: React.FC<PresentationViewProps> = ({ slides, onExit, stu
                    </div>
                </div>
 
+               {/* Verbosity Selector */}
+               <div className="flex justify-center items-center gap-2 px-3 py-2 border-b border-slate-700 bg-slate-800/30">
+                   <span className="text-[9px] font-bold text-slate-500 uppercase tracking-widest mr-2">Script Style</span>
+                   {(['concise', 'standard', 'detailed'] as const).map(level => (
+                       <button
+                           key={level}
+                           onClick={() => handleVerbosityChange(level)}
+                           disabled={isRegenerating || (!isAIAvailable && level !== 'standard')}
+                           className={`px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider rounded-lg transition-all ${
+                               verbosityLevel === level
+                                   ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/20'
+                                   : 'bg-slate-700 text-slate-400 hover:text-white hover:bg-slate-600'
+                           } ${(isRegenerating || (!isAIAvailable && level !== 'standard')) && verbosityLevel !== level ? 'opacity-50 cursor-not-allowed' : ''}`}
+                       >
+                           {level}
+                       </button>
+                   ))}
+                   {isRegenerating && (
+                       <div className="w-4 h-4 border-2 border-indigo-400 border-t-transparent rounded-full animate-spin ml-2" />
+                   )}
+               </div>
+
                <div className="flex-1 overflow-y-auto p-6 bg-[#0f172a] min-h-0 relative">
                    {currentSlide.hasQuestionFlag && (
                         <div className="mb-8 bg-amber-500 text-slate-900 rounded-xl p-4 shadow-[0_0_25px_rgba(245,158,11,0.3)] flex items-center gap-4 animate-fade-in border-2 border-amber-400">
@@ -1285,7 +1308,15 @@ const PresentationView: React.FC<PresentationViewProps> = ({ slides, onExit, stu
                         </div>
                    )}
 
-                   <div className="text-xl md:text-2xl leading-relaxed font-sans text-slate-100 animate-fade-in whitespace-pre-wrap">
+                   <div className="text-xl md:text-2xl leading-relaxed font-sans text-slate-100 animate-fade-in whitespace-pre-wrap relative">
+                       {isRegenerating && (
+                           <div className="absolute inset-0 bg-slate-900/80 flex items-center justify-center rounded-lg">
+                               <div className="flex items-center gap-3 text-indigo-400">
+                                   <div className="w-6 h-6 border-2 border-indigo-400 border-t-transparent rounded-full animate-spin" />
+                                   <span className="text-sm font-medium">Regenerating script...</span>
+                               </div>
+                           </div>
+                       )}
                        <MarkdownText text={currentScriptSegment} />
                    </div>
                </div>
