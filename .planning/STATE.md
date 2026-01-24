@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-01-24)
 
 **Core value:** Students see only the presentation; teachers see the teleprompter script
-**Current focus:** Planning next milestone
+**Current focus:** v3.1 Teleprompter Verbosity
 
 ## Current Position
 
-Phase: Not started
-Plan: Not started
-Status: Ready to plan
-Last activity: 2026-01-24 - v3.0 milestone complete
+Phase: Not started (defining requirements)
+Plan: —
+Status: Defining requirements
+Last activity: 2026-01-24 — Milestone v3.1 started
 
-Progress: ████████████████████████████ 100% (v3.0 shipped)
+Progress: ░░░░░░░░░░░░░░░░░░░░░░░░░░░░ 0%
 
 ## Performance Metrics
 
@@ -72,10 +72,10 @@ None.
 ## Session Continuity
 
 Last session: 2026-01-24
-Stopped at: Completed v3.0 milestone
+Stopped at: Started v3.1 milestone
 Resume file: None
-Next: /gsd:new-milestone for v3.1 or new direction
+Next: Define requirements, then create roadmap
 
 ---
 *State initialized: 2026-01-18*
-*Last updated: 2026-01-24 - v3.0 milestone shipped*
+*Last updated: 2026-01-24 - v3.1 milestone started*

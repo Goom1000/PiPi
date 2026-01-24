@@ -6,6 +6,8 @@ A presentation tool for teachers that transforms PDF lesson plans into interacti
 
 **v3.0 shipped:** Multi-game platform with TV show-style quiz games (Millionaire, Beat the Chaser), unified game architecture, AI question generation, and competition modes. Deployed at https://goom1000.github.io/Cue/
 
+**v3.1 in progress:** Teleprompter verbosity toggle — teachers can switch between Concise/Standard/Detailed mid-lesson.
+
 ## Current State
 
 Shipped v3.0 with ~15,000 LOC TypeScript. Added 4 game formats (Quick Quiz, Millionaire, Beat the Chaser + disabled The Chase) with unified architecture preventing state silos. AI generates progressive-difficulty questions from lesson content. Team/individual competition modes with score tracking.
@@ -91,7 +93,12 @@ Students see only the presentation; teachers see the presentation plus a telepro
 
 ### Active
 
-(None — define with /gsd:new-milestone)
+**v3.1 Teleprompter Verbosity:**
+- [ ] Three-level verbosity toggle (Concise / Standard / Detailed)
+- [ ] Verbosity selector in teleprompter panel header
+- [ ] On-demand regeneration when verbosity changed
+- [ ] Per-slide verbosity caching (instant switch-back)
+- [ ] Loading indicator during regeneration
 
 ### Deferred (v3.0+)
 
@@ -214,4 +221,4 @@ v3.0 delivered Quiz Game Variety:
 | The Chase disabled in UI | Code preserved but removed from menu per user preference | ✓ Good — v3.0 |
 
 ---
-*Last updated: 2026-01-24 after v3.0 milestone*
+*Last updated: 2026-01-24 after v3.1 milestone start*
