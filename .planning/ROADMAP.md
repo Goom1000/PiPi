@@ -43,6 +43,11 @@ Plans:
 
 **Dependencies:** Phase 27 (UI and generation must work first)
 
+**Plans:** 1 plan
+
+Plans:
+- [ ] 28-01-PLAN.md — Add per-slide verbosity caching with file format support
+
 **Requirements:**
 - VERB-09: Generated versions are cached per slide (instant switch-back)
 - VERB-10: Cache persists in presentation state (survives refresh)
@@ -62,10 +67,10 @@ Plans:
 | Phase | Name | Status | Plans |
 |-------|------|--------|-------|
 | 27 | Verbosity UI & Generation | ✓ Complete | 2/2 |
-| 28 | Caching & Backward Compatibility | Pending | 0/? |
+| 28 | Caching & Backward Compatibility | Ready | 0/1 |
 
 **Milestone Progress:** 1/2 phases complete
 
 ---
 *Roadmap created: 2026-01-24*
-*Last updated: 2026-01-24 — Phase 27 complete*
+*Last updated: 2026-01-24 — Phase 28 planned (1 plan)*
