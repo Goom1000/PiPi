@@ -46,9 +46,12 @@ function migrateFile(data: CueFile): CueFile {
 
   if (fromVersion < CURRENT_FILE_VERSION) {
     console.log(`Migrating file from version ${fromVersion} to ${CURRENT_FILE_VERSION}`);
-    // Version 1 is current - no migration needed yet
-    // Future: Add migration logic here as schema evolves
-    // e.g., if (fromVersion === 1) { return migrateV1toV2(data); }
+    // v1 -> v2: Added verbosityCache to Slide interface
+    // No action needed - optional field defaults to undefined
+    if (fromVersion === 1) {
+      // Slides without verbosityCache will have it as undefined
+      // This is correct behavior - cache is populated on-demand
+    }
   }
 
   return {

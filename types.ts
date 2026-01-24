@@ -12,6 +12,12 @@ export interface Slide {
   theme?: 'default' | 'purple' | 'blue' | 'green' | 'warm';
   backgroundColor?: string;
   hasQuestionFlag?: boolean;
+  // Verbosity cache for on-demand regenerated scripts
+  // Standard is speakerNotes; only cache concise/detailed
+  verbosityCache?: {
+    concise?: string;
+    detailed?: string;
+  };
 }
 
 // BroadcastChannel configuration for dual-window sync
@@ -227,7 +233,7 @@ export const DEFAULT_SETTINGS: Settings = {
 };
 
 // File format version - increment on breaking changes
-export const CURRENT_FILE_VERSION = 1;
+export const CURRENT_FILE_VERSION = 2;
 
 // Content structure stored in .cue files
 export interface CueFileContent {
