@@ -206,7 +206,9 @@ export interface AIProviderInterface {
   // Regenerate teleprompter script at specified verbosity level
   regenerateTeleprompter(
     slide: Slide,
-    verbosity: VerbosityLevel
+    verbosity: VerbosityLevel,
+    prevSlide?: Slide,
+    nextSlide?: Slide
   ): Promise<string>;
 }
 

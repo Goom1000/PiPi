@@ -134,9 +134,9 @@ export class GeminiProvider implements AIProviderInterface {
     }
   }
 
-  async regenerateTeleprompter(slide: Slide, verbosity: VerbosityLevel): Promise<string> {
+  async regenerateTeleprompter(slide: Slide, verbosity: VerbosityLevel, prevSlide?: Slide, nextSlide?: Slide): Promise<string> {
     try {
-      return await geminiRegenerateTeleprompter(this.apiKey, slide, verbosity);
+      return await geminiRegenerateTeleprompter(this.apiKey, slide, verbosity, prevSlide, nextSlide);
     } catch (error) {
       throw this.wrapError(error);
     }

@@ -861,7 +861,9 @@ export type VerbosityLevel = 'concise' | 'standard' | 'detailed';
 export const regenerateTeleprompter = async (
     apiKey: string,
     slide: Slide,
-    verbosity: VerbosityLevel
+    verbosity: VerbosityLevel,
+    prevSlide?: Slide,
+    nextSlide?: Slide
 ): Promise<string> => {
     const ai = new GoogleGenAI({ apiKey });
     const model = "gemini-3-flash-preview";
@@ -872,9 +874,30 @@ export const regenerateTeleprompter = async (
         ? TELEPROMPTER_RULES_DETAILED
         : TELEPROMPTER_RULES; // standard - existing behavior
 
+    // Build context section for surrounding slides
+    const contextLines: string[] = [];
+    if (prevSlide) {
+        contextLines.push(`- Previous slide: "${prevSlide.title}" covered: ${prevSlide.content.slice(0, 2).join('; ')}`);
+    } else {
+        contextLines.push('- This is the first slide in the presentation.');
+    }
+    if (nextSlide) {
+        contextLines.push(`- Next slide: "${nextSlide.title}" will cover: ${nextSlide.content.slice(0, 2).join('; ')}`);
+    } else {
+        contextLines.push('- This is the last slide in the presentation.');
+    }
+
+    const contextSection = `
+CONTEXT FOR COHERENT FLOW:
+${contextLines.join('\n')}
+Ensure your script transitions naturally from what came before and sets up what comes next.
+`;
+
     const systemInstruction = `
 You are regenerating teleprompter notes for an existing slide.
 The slide has ${slide.content.length} bullet points.
+
+${contextSection}
 
 ${rules}
 

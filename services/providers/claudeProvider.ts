@@ -823,16 +823,37 @@ Key points: ${request.slideContext.currentSlideContent.join('; ')}`;
     }
   }
 
-  async regenerateTeleprompter(slide: Slide, verbosity: VerbosityLevel): Promise<string> {
+  async regenerateTeleprompter(slide: Slide, verbosity: VerbosityLevel, prevSlide?: Slide, nextSlide?: Slide): Promise<string> {
     const rules = verbosity === 'concise'
         ? TELEPROMPTER_RULES_CONCISE
         : verbosity === 'detailed'
         ? TELEPROMPTER_RULES_DETAILED
         : TELEPROMPTER_RULES; // standard
 
+    // Build context section for surrounding slides
+    const contextLines: string[] = [];
+    if (prevSlide) {
+        contextLines.push(`- Previous slide: "${prevSlide.title}" covered: ${prevSlide.content.slice(0, 2).join('; ')}`);
+    } else {
+        contextLines.push('- This is the first slide in the presentation.');
+    }
+    if (nextSlide) {
+        contextLines.push(`- Next slide: "${nextSlide.title}" will cover: ${nextSlide.content.slice(0, 2).join('; ')}`);
+    } else {
+        contextLines.push('- This is the last slide in the presentation.');
+    }
+
+    const contextSection = `
+CONTEXT FOR COHERENT FLOW:
+${contextLines.join('\n')}
+Ensure your script transitions naturally from what came before and sets up what comes next.
+`;
+
     const systemPrompt = `
 You are regenerating teleprompter notes for an existing slide.
 The slide has ${slide.content.length} bullet points.
+
+${contextSection}
 
 ${rules}
 
