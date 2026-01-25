@@ -12,7 +12,7 @@ See: .planning/PROJECT.md (updated 2026-01-26)
 Phase: 36 (Core Ask AI)
 Plan: 03 of 4 complete
 Status: In progress
-Last activity: 2026-01-26 — Completed 36-03-PLAN.md
+Last activity: 2026-01-26 — Completed 36-02-PLAN.md and 36-03-PLAN.md
 
 Progress: [███░░░░░░░] 30% (Phase 36-37, 3 of 10 plans complete)
 
@@ -49,10 +49,11 @@ Recent decisions affecting future work:
 - **36-01**: ChatContext includes gradeLevel field for age-appropriate AI responses
 - **36-01**: streamChat uses AsyncGenerator<string> pattern for streaming (not callbacks)
 - **36-01**: Context builder reuses pattern from buildSlideContext for consistency
+- **36-02**: Use gemini-2.0-flash-exp model for streaming chat
+- **36-02**: Plain prose responses (no markdown) for better teleprompter display
+- **36-02**: System prompt includes gradeLevel for age-appropriate language
 - **36-03**: Claude streaming uses manual SSE parsing (EventSource doesn't support POST)
 - **36-03**: Buffer strategy handles partial chunks split across network reads
-- **36-03**: System prompt includes gradeLevel for age-appropriate language
-- **36-03**: Plain prose responses (no markdown) for better teleprompter display
 
 ### Pending Todos
 
@@ -65,11 +66,11 @@ None.
 ## Session Continuity
 
 Last session: 2026-01-26
-Stopped at: Completed 36-03-PLAN.md (Claude streaming implementation)
+Stopped at: Completed 36-02-PLAN.md (Gemini streaming) and 36-03-PLAN.md (Claude streaming)
 Resume file: None
 
-**Next step:** Execute 36-02 (Gemini streaming implementation)
+**Next step:** Execute 36-04 (Ask AI UI integration)
 
 ---
 *State initialized: 2026-01-18*
-*Last updated: 2026-01-26 — v3.4 Ask AI milestone started*
+*Last updated: 2026-01-26 — v3.4 Ask AI milestone in progress*
