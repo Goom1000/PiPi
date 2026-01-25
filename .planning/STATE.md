@@ -9,20 +9,20 @@ See: .planning/PROJECT.md (updated 2026-01-25)
 
 ## Current Position
 
-Phase: 33 of 35 (Upfront Verbosity Selection)
+Phase: 34 of 35 (Deck-wide Verbosity Toggle)
 Plan: 1 of 1 complete
 Status: Phase complete
-Last activity: 2026-01-25 - Completed 33-01-PLAN.md (Upfront Verbosity Selection)
+Last activity: 2026-01-25 - Completed 34-01-PLAN.md (Deck-wide Verbosity Toggle)
 
-Progress: [███░░░░░░░] 33% (1/3 phases in v3.3)
+Progress: [██████░░░░] 67% (2/3 phases in v3.3)
 
 ## Performance Metrics
 
 **Velocity:**
 - Milestones shipped: 13 (v1.0 through v3.2)
-- Total phases completed: 33
-- Total plans completed: 98
-- Total LOC: ~18,200 TypeScript
+- Total phases completed: 34
+- Total plans completed: 99
+- Total LOC: ~18,400 TypeScript
 
 **v3.2 Milestone (shipped):**
 - Phases: 4 (29-32)
@@ -43,6 +43,8 @@ Progress: [███░░░░░░░] 33% (1/3 phases in v3.3)
 Decisions are logged in PROJECT.md Key Decisions table.
 Recent decisions affecting future work:
 
+- **v3.3-34**: Deck-wide verbosity replaces per-slide selector; removed single-slide Regen button
+- **v3.3-34**: AbortController pattern for batch operation cancellation with snapshot rollback
 - **v3.3**: Optional verbosity field in GenerationInput with 'standard' default (backward compatibility)
 - **v3.2**: Context-aware AI generation pattern established (surrounding slides for coherence)
 - **v3.1**: Per-slide verbosity caching pattern (verbosityCache in slide state)
@@ -59,11 +61,11 @@ None.
 ## Session Continuity
 
 Last session: 2026-01-25
-Stopped at: Completed 33-01-PLAN.md
+Stopped at: Completed 34-01-PLAN.md
 Resume file: None
 
-**Next step:** `/gsd:plan-phase 34` (Deck-wide Verbosity Toggle)
+**Next step:** `/gsd:plan-phase 35` (Polish and Refinements)
 
 ---
 *State initialized: 2026-01-18*
-*Last updated: 2026-01-25 - Completed Phase 33 Plan 01*
+*Last updated: 2026-01-25 - Completed Phase 34 Plan 01*
