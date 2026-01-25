@@ -13,7 +13,7 @@ v3.3 extends the per-slide verbosity toggle from v3.1 to work deck-wide. Users s
 
 - [x] **Phase 33: Upfront Verbosity Selection** - Verbosity selector on landing page during upload
 - [x] **Phase 34: Deck-wide Verbosity Toggle** - Change verbosity for entire deck with confirmation
-- [ ] **Phase 35: Persistence** - Save/load deck verbosity level with backward compatibility
+- [x] **Phase 35: Persistence** - Save/load deck verbosity level with backward compatibility
 
 ## Phase Details
 
@@ -56,7 +56,7 @@ Plans:
 **Plans**: 1 plan
 
 Plans:
-- [ ] 35-01-PLAN.md — Extend file format to v3 with deckVerbosity + wire save/load
+- [x] 35-01-PLAN.md — Extend file format to v3 with deckVerbosity + wire save/load
 
 ## Progress
 
@@ -64,8 +64,8 @@ Plans:
 |-------|-----------|----------------|--------|-----------|
 | 33. Upfront Verbosity Selection | v3.3 | 1/1 | ✓ Complete | 2026-01-25 |
 | 34. Deck-wide Verbosity Toggle | v3.3 | 1/1 | ✓ Complete | 2026-01-25 |
-| 35. Persistence | v3.3 | 0/1 | Not started | - |
+| 35. Persistence | v3.3 | 1/1 | ✓ Complete | 2026-01-26 |
 
 ---
 *Created: 2026-01-25*
-*Last updated: 2026-01-25 — Phase 35 planned*
+*Last updated: 2026-01-26 — Phase 35 complete, v3.3 milestone complete*

@@ -23,9 +23,9 @@ Requirements for deck-wide verbosity. Extends v3.1 per-slide verbosity to apply 
 
 ### Persistence
 
-- [ ] **PERS-01**: Deck verbosity level persists in .cue save file
-- [ ] **PERS-02**: Loading a .cue file restores the saved verbosity level
-- [ ] **PERS-03**: Backward compatibility with v2 files (default to Standard)
+- [x] **PERS-01**: Deck verbosity level persists in .cue save file
+- [x] **PERS-02**: Loading a .cue file restores the saved verbosity level
+- [x] **PERS-03**: Backward compatibility with v2 files (default to Standard)
 
 ## Future Requirements
 
@@ -61,9 +61,9 @@ Deferred to later milestones.
 | DECK-03 | 34 | Complete |
 | DECK-04 | 34 | Complete |
 | DECK-05 | 34 | Complete |
-| PERS-01 | 35 | Pending |
-| PERS-02 | 35 | Pending |
-| PERS-03 | 35 | Pending |
+| PERS-01 | 35 | Complete |
+| PERS-02 | 35 | Complete |
+| PERS-03 | 35 | Complete |
 
 **Coverage:**
 - v3.3 requirements: 11 total
@@ -72,4 +72,4 @@ Deferred to later milestones.
 
 ---
 *Requirements defined: 2026-01-25*
-*Last updated: 2026-01-25 — Phase 34 requirements complete*
+*Last updated: 2026-01-26 — Phase 35 requirements complete*
