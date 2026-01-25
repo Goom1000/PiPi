@@ -359,7 +359,28 @@ function App() {
 
       console.log('[App] generationInput.verbosity:', generationInput.verbosity);
 
-      const generatedSlides = await provider.generateLessonSlides(generationInput);
+      let generatedSlides = await provider.generateLessonSlides(generationInput);
+
+      // Post-generation verbosity fix: Gemini's JSON mode ignores verbosity in system instruction
+      // If non-standard verbosity was requested, regenerate speakerNotes using text-based approach
+      if (deckVerbosity !== 'standard') {
+        console.log('[App] Non-standard verbosity requested, regenerating speakerNotes...');
+        const updatedSlides = [...generatedSlides];
+        for (let i = 0; i < updatedSlides.length; i++) {
+          const slide = updatedSlides[i];
+          const prevSlide = i > 0 ? updatedSlides[i - 1] : undefined;
+          const nextSlide = i < updatedSlides.length - 1 ? updatedSlides[i + 1] : undefined;
+          try {
+            const newSpeakerNotes = await provider.regenerateTeleprompter(slide, deckVerbosity, prevSlide, nextSlide);
+            updatedSlides[i] = { ...slide, speakerNotes: newSpeakerNotes };
+          } catch (err) {
+            console.error(`[App] Failed to regenerate speakerNotes for slide ${i}:`, err);
+            // Keep original speakerNotes on failure
+          }
+        }
+        generatedSlides = updatedSlides;
+      }
+
       setSlides(generatedSlides);
       setLessonTitle(generatedSlides[0]?.title || "New Lesson");
       setActiveSlideIndex(0);
