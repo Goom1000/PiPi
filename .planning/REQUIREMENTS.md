@@ -22,10 +22,10 @@ Requirements for Pedagogical Slide Types milestone. Each maps to roadmap phases.
 
 ### Work Together Slides
 
-- [ ] **WORK-01**: User can insert Work Together slide via "+" menu option
-- [ ] **WORK-02**: AI generates collaborative activity instructions for pairs (with group-of-3 alternative)
-- [ ] **WORK-03**: Activity uses only basic classroom resources (pen, paper, whiteboard)
-- [ ] **WORK-04**: Teleprompter shows facilitation notes for teacher
+- [x] **WORK-01**: User can insert Work Together slide via "+" menu option
+- [x] **WORK-02**: AI generates collaborative activity instructions for pairs (with group-of-3 alternative)
+- [x] **WORK-03**: Activity uses only basic classroom resources (pen, paper, whiteboard)
+- [x] **WORK-04**: Teleprompter shows facilitation notes for teacher
 
 ### Class Challenge Slides
 
@@ -86,10 +86,10 @@ Which phases cover which requirements. Updated during roadmap creation.
 | ELAB-02 | Phase 30 | Complete |
 | ELAB-03 | Phase 30 | Complete |
 | ELAB-04 | Phase 30 | Complete |
-| WORK-01 | Phase 31 | Pending |
-| WORK-02 | Phase 31 | Pending |
-| WORK-03 | Phase 31 | Pending |
-| WORK-04 | Phase 31 | Pending |
+| WORK-01 | Phase 31 | Complete |
+| WORK-02 | Phase 31 | Complete |
+| WORK-03 | Phase 31 | Complete |
+| WORK-04 | Phase 31 | Complete |
 | CHAL-01 | Phase 32 | Pending |
 | CHAL-02 | Phase 32 | Pending |
 | CHAL-03 | Phase 32 | Pending |

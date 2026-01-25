@@ -74,7 +74,7 @@ Plans:
 **Plans**: 1 plan
 
 Plans:
-- [ ] 31-01: Extend AI providers with generateWorkTogetherSlide, add WorkTogetherLayout renderer, and add Work Together button to InsertPoint
+- [x] 31-01: Extend AI providers with generateWorkTogetherSlide, add WorkTogetherLayout renderer, and add Work Together button to InsertPoint
 
 #### Phase 32: Class Challenge Interactive Slides
 **Goal**: Teachers can capture live student contributions visible to projector
@@ -103,7 +103,7 @@ Phases execute in numeric order: 29 → 30 → 31 → 32
 | 28. Caching | 1/1 | Complete | 2026-01-25 |
 | 29. Single Regeneration | 1/1 | Complete | 2026-01-25 |
 | 30. Elaborate Slides | 1/1 | Complete | 2026-01-25 |
-| 31. Work Together Slides | 0/1 | Planned | - |
+| 31. Work Together Slides | 1/1 | Complete | 2026-01-25 |
 | 32. Class Challenge Slides | 0/? | Not started | - |
 
 ---
