@@ -1,7 +1,7 @@
 
 import React, { useState, useCallback, useMemo, useRef, useEffect } from 'react';
 import { Slide, AppState, SavedClass, StudentPair } from './types';
-import { createAIProvider, AIProviderError, AIProviderInterface, GenerationInput, GenerationMode, AIErrorCode } from './services/aiProvider';
+import { createAIProvider, AIProviderError, AIProviderInterface, GenerationInput, GenerationMode, AIErrorCode, VerbosityLevel } from './services/aiProvider';
 import { useSettings } from './hooks/useSettings';
 import { useClassBank } from './hooks/useClassBank';
 import { exportToPowerPoint } from './services/pptxService';
@@ -200,6 +200,7 @@ function App() {
   const [showSettings, setShowSettings] = useState(false);
   
   const [autoGenerateImages, setAutoGenerateImages] = useState(true);
+  const [upfrontVerbosity, setUpfrontVerbosity] = useState<VerbosityLevel>('standard');
   const [studentNames, setStudentNames] = useState<string[]>([]);
   const [studentGrades, setStudentGrades] = useState<import('./types').StudentWithGrade[]>([]);
   const [nameInput, setNameInput] = useState('');
@@ -349,6 +350,7 @@ function App() {
         presentationText: existingPptText || undefined,
         presentationImages: existingPptImages.length > 0 ? existingPptImages : undefined,
         mode: uploadMode as GenerationMode, // Safe cast - we guard against 'none' above
+        verbosity: upfrontVerbosity,
       };
 
       const generatedSlides = await provider.generateLessonSlides(generationInput);
@@ -1222,6 +1224,42 @@ function App() {
                           {uploadMode === 'blend' && 'AI combines lesson content with your slides'}
                         </p>
                       </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Verbosity Selection */}
+                {uploadMode !== 'none' && (
+                  <div className="flex items-center justify-between bg-slate-50 dark:bg-slate-800 p-4 rounded-2xl border border-slate-100 dark:border-slate-700 mb-6">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 rounded-xl flex items-center justify-center shadow-sm">
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16m-7 6h7" />
+                        </svg>
+                      </div>
+                      <div>
+                        <p className="font-bold text-slate-700 dark:text-slate-300">Teleprompter Style</p>
+                        <p className="text-xs text-slate-500 dark:text-slate-500">
+                          {upfrontVerbosity === 'concise' && 'Brief prompts for experienced teachers'}
+                          {upfrontVerbosity === 'standard' && 'Balanced guidance with examples'}
+                          {upfrontVerbosity === 'detailed' && 'Full script you can read verbatim'}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex gap-1">
+                      {(['concise', 'standard', 'detailed'] as const).map(level => (
+                        <button
+                          key={level}
+                          onClick={() => setUpfrontVerbosity(level)}
+                          className={`px-3 py-1.5 text-xs font-bold uppercase tracking-wider rounded-lg transition-all ${
+                            upfrontVerbosity === level
+                              ? 'bg-indigo-600 dark:bg-amber-500 text-white shadow-lg'
+                              : 'bg-slate-200 dark:bg-slate-700 text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-white'
+                          }`}
+                        >
+                          {level}
+                        </button>
+                      ))}
                     </div>
                   </div>
                 )}
