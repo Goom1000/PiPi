@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-01-25)
 
 **Core value:** Students see only the presentation; teachers see the teleprompter script
-**Current focus:** Planning next milestone
+**Current focus:** v3.3 Deck-wide Verbosity
 
 ## Current Position
 
-Phase: 32 of 32 (v3.2 Complete)
-Plan: N/A
-Status: Ready for next milestone
-Last activity: 2026-01-25 - v3.2 milestone complete
+Phase: Not started (defining requirements)
+Plan: —
+Status: Defining requirements
+Last activity: 2026-01-25 — Milestone v3.3 started
 
-Progress: N/A (ready for /gsd:new-milestone)
+Progress: Defining requirements
 
 ## Performance Metrics
 
@@ -62,8 +62,8 @@ Last session: 2026-01-25
 Stopped at: v3.2 milestone archived
 Resume file: None
 
-**Next step:** `/gsd:new-milestone` to plan v3.3 or v4.0
+**Next step:** Define requirements and create roadmap
 
 ---
 *State initialized: 2026-01-18*
-*Last updated: 2026-01-25 - v3.2 milestone archived*
+*Last updated: 2026-01-25 — Milestone v3.3 started*

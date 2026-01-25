@@ -102,7 +102,13 @@ Students see only the presentation; teachers see the presentation plus a telepro
 
 ### Active
 
-(No active requirements — ready for next milestone)
+**v3.3: Deck-wide Verbosity**
+
+- [ ] Upfront verbosity selection on landing page during upload
+- [ ] Deck-wide verbosity toggle in presentation mode with confirmation dialog
+- [ ] Full regeneration of all slides when verbosity changes
+- [ ] Clear all per-slide caches on deck-wide verbosity change
+- [ ] Persist deck verbosity level in .cue save file
 
 ### Deferred (v3.1+)
 
@@ -237,4 +243,4 @@ v3.1 delivered Teleprompter Verbosity:
 | Contribution sync via STATE_UPDATE | Reuses existing BroadcastChannel message | ✓ Good — v3.2 |
 
 ---
-*Last updated: 2026-01-25 after v3.2 milestone complete*
+*Last updated: 2026-01-25 after v3.3 milestone started*
