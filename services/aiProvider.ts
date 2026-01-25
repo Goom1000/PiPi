@@ -193,6 +193,11 @@ export interface AIProviderInterface {
     sourceSlide: Slide,
     allSlides: Slide[]
   ): Promise<Slide>;
+  generateWorkTogetherSlide(
+    lessonTopic: string,
+    sourceSlide: Slide,
+    allSlides: Slide[]
+  ): Promise<Slide>;
   generateLessonResources(lessonText: string, slideContext: string): Promise<LessonResource[]>;
   generateImpromptuQuiz(
     slides: Slide[],

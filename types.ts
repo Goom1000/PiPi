@@ -8,7 +8,7 @@ export interface Slide {
   imagePrompt: string;
   imageUrl?: string;
   isGeneratingImage?: boolean;
-  layout?: 'split' | 'full-image' | 'center-text' | 'flowchart' | 'grid' | 'tile-overlap';
+  layout?: 'split' | 'full-image' | 'center-text' | 'flowchart' | 'grid' | 'tile-overlap' | 'work-together';
   theme?: 'default' | 'purple' | 'blue' | 'green' | 'warm';
   backgroundColor?: string;
   hasQuestionFlag?: boolean;
@@ -20,6 +20,15 @@ export interface Slide {
   };
   // Slide type indicator for UI badges (optional, defaults to standard)
   slideType?: 'standard' | 'elaborate' | 'work-together' | 'class-challenge';
+  // For Work Together slides: randomized student pairs
+  pairs?: StudentPair[];
+}
+
+// Student pairs for Work Together slides
+// Stored separately from content so shuffle doesn't require AI regeneration
+export interface StudentPair {
+  students: string[];      // 2 or 3 student names
+  isGroupOfThree?: boolean;
 }
 
 // BroadcastChannel configuration for dual-window sync
