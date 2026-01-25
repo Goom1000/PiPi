@@ -140,10 +140,27 @@ const PresentationView: React.FC<PresentationViewProps> = ({ slides, onExit, stu
   );
   const [isCounterExpanded, setIsCounterExpanded] = useState(false);
 
-  // Verbosity control for teleprompter scripts
-  const [verbosityLevel, setVerbosityLevel] = useState<VerbosityLevel>('standard');
-  const [isRegenerating, setIsRegenerating] = useState(false);
-  const [regeneratedScript, setRegeneratedScript] = useState<string | null>(null);
+  // Deck-wide verbosity control for teleprompter scripts
+  const [deckVerbosity, setDeckVerbosity] = useState<VerbosityLevel>('standard');
+  const [showVerbosityConfirm, setShowVerbosityConfirm] = useState(false);
+  const [pendingVerbosity, setPendingVerbosity] = useState<VerbosityLevel | null>(null);
+  const [batchState, setBatchState] = useState<{
+    isActive: boolean;
+    totalSlides: number;
+    completedSlides: number;
+    currentSlideIndex: number;
+    failedSlides: Set<string>;
+    abortController: AbortController | null;
+    snapshot: Array<{ id: string; speakerNotes: string | undefined; verbosityCache: Record<string, string> | undefined }> | null;
+  }>({
+    isActive: false,
+    totalSlides: 0,
+    completedSlides: 0,
+    currentSlideIndex: 0,
+    failedSlides: new Set(),
+    abortController: null,
+    snapshot: null,
+  });
 
   // Class Challenge state
   const [newContribution, setNewContribution] = useState('');
@@ -296,16 +313,8 @@ const PresentationView: React.FC<PresentationViewProps> = ({ slides, onExit, stu
     }
   }, [activeGame, postMessage]);
 
-  // Maintain verbosity on slide navigation, update display from cache
-  useEffect(() => {
-    if (verbosityLevel === 'standard') {
-      setRegeneratedScript(null);
-    } else {
-      // Use cache if available, null otherwise (will need regeneration on click)
-      const cached = currentSlide.verbosityCache?.[verbosityLevel];
-      setRegeneratedScript(cached || null);
-    }
-  }, [currentIndex, currentSlide.verbosityCache, verbosityLevel]);
+  // Note: With deck-wide verbosity, no per-slide effect needed
+  // The currentScriptSegment memo handles reading from cache based on deckVerbosity
 
   // Track connection state for potential future use
   const prevConnectedRef = useRef<boolean | null>(null);
@@ -943,120 +952,8 @@ const PresentationView: React.FC<PresentationViewProps> = ({ slides, onExit, stu
       }
   };
 
-  // Handle verbosity level change - check cache first, regenerate only if needed
-  const handleVerbosityChange = async (newLevel: VerbosityLevel) => {
-      if (newLevel === verbosityLevel) return;
-      setVerbosityLevel(newLevel);
-
-      // Standard uses speakerNotes directly - no cache needed
-      if (newLevel === 'standard') {
-          setRegeneratedScript(null);
-          return;
-      }
-
-      // Check cache for instant switch
-      const cached = currentSlide.verbosityCache?.[newLevel];
-      if (cached) {
-          setRegeneratedScript(cached);
-          return;  // Instant switch from cache
-      }
-
-      // No cache - need to regenerate
-      if (!provider) {
-          // No AI provider - can't regenerate, stay at standard
-          setVerbosityLevel('standard');
-          setRegeneratedScript(null);
-          return;
-      }
-
-      setIsRegenerating(true);
-
-      try {
-          const newScript = await provider.regenerateTeleprompter(currentSlide, newLevel);
-          setRegeneratedScript(newScript);
-
-          // Persist to slide cache (triggers auto-save)
-          onUpdateSlide(currentSlide.id, {
-              verbosityCache: {
-                  ...currentSlide.verbosityCache,
-                  [newLevel]: newScript,
-              },
-          });
-      } catch (error) {
-          console.error('Failed to regenerate teleprompter:', error);
-          setVerbosityLevel('standard');
-          setRegeneratedScript(null);
-          if (error instanceof AIProviderError) {
-              onError('Teleprompter Regeneration Failed', error.userMessage);
-          } else {
-              onError('Error', 'Could not regenerate teleprompter. Please try again.');
-          }
-      } finally {
-          setIsRegenerating(false);
-      }
-  };
-
-  // Handle explicit regeneration request (always regenerate, ignoring cache)
-  const handleRegenerateScript = async () => {
-      if (!provider) {
-          onRequestAI('regenerate teleprompter script');
-          return;
-      }
-
-      // Prevent regeneration on empty slides
-      if (currentSlide.content.length === 0) {
-          onError('Cannot Regenerate', 'Add bullet points to the slide before regenerating.');
-          return;
-      }
-
-      setIsRegenerating(true);
-
-      try {
-          // Context for coherence (REGEN-03)
-          const prevSlide = currentIndex > 0 ? slides[currentIndex - 1] : undefined;
-          const nextSlide = currentIndex < slides.length - 1 ? slides[currentIndex + 1] : undefined;
-
-          const newScript = await provider.regenerateTeleprompter(
-              currentSlide,
-              verbosityLevel,
-              prevSlide,
-              nextSlide
-          );
-
-          // Update display state
-          if (verbosityLevel === 'standard') {
-              setRegeneratedScript(null);  // Standard uses speakerNotes directly
-          } else {
-              setRegeneratedScript(newScript);
-          }
-
-          // Update slide data - different behavior based on verbosity level
-          if (verbosityLevel === 'standard') {
-              // Standard: update speakerNotes, clear cache (content effectively changed)
-              onUpdateSlide(currentSlide.id, {
-                  speakerNotes: newScript,
-                  verbosityCache: undefined,
-              });
-          } else {
-              // Concise/Detailed: update cache only
-              onUpdateSlide(currentSlide.id, {
-                  verbosityCache: {
-                      ...currentSlide.verbosityCache,
-                      [verbosityLevel]: newScript,
-                  },
-              });
-          }
-      } catch (error) {
-          console.error('Failed to regenerate teleprompter:', error);
-          if (error instanceof AIProviderError) {
-              onError('Regeneration Failed', error.userMessage);
-          } else {
-              onError('Error', 'Could not regenerate script. Please try again.');
-          }
-      } finally {
-          setIsRegenerating(false);
-      }
-  };
+  // Deck-wide verbosity change is handled via confirmation dialog + batch regeneration
+  // See handleConfirmDeckRegeneration below
 
   // --- Student Assignment Logic ---
   const studentAssignments = useMemo(() => {
@@ -1110,10 +1007,15 @@ const PresentationView: React.FC<PresentationViewProps> = ({ slides, onExit, stu
   }, [slides, studentNames]);
 
   const currentScriptSegment = useMemo(() => {
-      // If we have a regenerated script (concise/detailed), use it
-      const rawScript = regeneratedScript || currentSlide.speakerNotes || "";
+      // Determine raw script based on deck verbosity level
+      let rawScript: string;
+      if (deckVerbosity === 'standard') {
+          rawScript = currentSlide.speakerNotes || "";
+      } else {
+          rawScript = currentSlide.verbosityCache?.[deckVerbosity] || currentSlide.speakerNotes || "";
+      }
       const segments = rawScript.split('👉');
-      
+
       if (showFullScript) return rawScript || "No notes available.";
 
       // INTRO
@@ -1128,7 +1030,7 @@ const PresentationView: React.FC<PresentationViewProps> = ({ slides, onExit, stu
       // BULLET POINT
       const bulletIndex = visibleBullets - 1;
       const bulletText = (currentSlide.content[bulletIndex] || "").replace(/^\s*[\-\•\*\.]+\s*/, '');
-      
+
       // Get AI Note (Teacher part)
       let aiNote = segments[visibleBullets] || "Let's discuss this further.";
       aiNote = aiNote.replace(/👉/g, '').trim();
@@ -1136,7 +1038,7 @@ const PresentationView: React.FC<PresentationViewProps> = ({ slides, onExit, stu
       // Clean AI Note: Remove potential "Student Reads" hallucinations and strictly isolate Teacher Elaborates
       aiNote = aiNote.replace(/STUDENT READS?:?.*?(TEACHER ELABORATES?:?|$)/is, '$1').trim();
       aiNote = aiNote.replace(/TEACHER ELABORATES?:?/gi, '').trim();
-      aiNote = aiNote.replace(/STUDENT READS?:?/gi, '').trim(); 
+      aiNote = aiNote.replace(/STUDENT READS?:?/gi, '').trim();
 
       // Determine Student Name
       const nameKey = `${currentIndex}-${visibleBullets}`;
@@ -1144,7 +1046,7 @@ const PresentationView: React.FC<PresentationViewProps> = ({ slides, onExit, stu
 
       return `${studentName} READS:\n"${bulletText}"\n\nTEACHER ELABORATES:\n${aiNote}`;
 
-  }, [currentSlide.speakerNotes, visibleBullets, showFullScript, studentAssignments, currentIndex, currentSlide.content, currentSlide.title, regeneratedScript]);
+  }, [currentSlide.speakerNotes, currentSlide.verbosityCache, deckVerbosity, visibleBullets, showFullScript, studentAssignments, currentIndex, currentSlide.content, currentSlide.title]);
 
   const handleNext = () => {
     if (visibleBullets < totalBullets) setVisibleBullets(prev => prev + 1);
@@ -1488,47 +1390,27 @@ const PresentationView: React.FC<PresentationViewProps> = ({ slides, onExit, stu
                    </div>
                </div>
 
-               {/* Verbosity Selector */}
+               {/* Deck-wide Verbosity Selector */}
                <div className="flex justify-center items-center gap-2 px-3 py-2 border-b border-slate-700 bg-slate-800/30">
-                   <span className="text-[9px] font-bold text-slate-500 uppercase tracking-widest mr-2">Script Style</span>
+                   <span className="text-[9px] font-bold text-slate-500 uppercase tracking-widest mr-2">Deck Style</span>
                    {(['concise', 'standard', 'detailed'] as const).map(level => (
                        <button
                            key={level}
-                           onClick={() => handleVerbosityChange(level)}
-                           disabled={isRegenerating || (!isAIAvailable && level !== 'standard')}
+                           onClick={() => {
+                               if (level === deckVerbosity) return;  // No-op for same level
+                               setPendingVerbosity(level);
+                               setShowVerbosityConfirm(true);
+                           }}
+                           disabled={batchState.isActive || (!isAIAvailable && level !== 'standard')}
                            className={`px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider rounded-lg transition-all ${
-                               verbosityLevel === level
+                               deckVerbosity === level
                                    ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/20'
                                    : 'bg-slate-700 text-slate-400 hover:text-white hover:bg-slate-600'
-                           } ${(isRegenerating || (!isAIAvailable && level !== 'standard')) && verbosityLevel !== level ? 'opacity-50 cursor-not-allowed' : ''}`}
+                           } ${(batchState.isActive || (!isAIAvailable && level !== 'standard')) && deckVerbosity !== level ? 'opacity-50 cursor-not-allowed' : ''}`}
                        >
                            {level}
                        </button>
                    ))}
-
-                   {/* Divider */}
-                   <div className="w-px h-5 bg-slate-600 mx-1" />
-
-                   {/* Regenerate Button */}
-                   <button
-                       onClick={handleRegenerateScript}
-                       disabled={isRegenerating || !isAIAvailable || currentSlide.content.length === 0}
-                       className={`px-2.5 py-1.5 text-[10px] font-bold uppercase tracking-wider rounded-lg transition-all flex items-center gap-1.5 ${
-                           isRegenerating || !isAIAvailable || currentSlide.content.length === 0
-                               ? 'bg-slate-700/50 text-slate-500 cursor-not-allowed'
-                               : 'bg-slate-700 text-slate-300 hover:bg-amber-600 hover:text-white'
-                       }`}
-                       title={!isAIAvailable ? 'Add API key in Settings' : currentSlide.content.length === 0 ? 'Add slide content first' : 'Regenerate script for this slide'}
-                   >
-                       <svg className="w-3.5 h-3.5" viewBox="0 0 20 20" fill="currentColor">
-                           <path fillRule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clipRule="evenodd" />
-                       </svg>
-                       Regen
-                   </button>
-
-                   {isRegenerating && (
-                       <div className="w-4 h-4 border-2 border-indigo-400 border-t-transparent rounded-full animate-spin ml-2" />
-                   )}
                </div>
 
                <div className="flex-1 overflow-y-auto p-6 bg-[#0f172a] min-h-0 relative">
@@ -1544,15 +1426,7 @@ const PresentationView: React.FC<PresentationViewProps> = ({ slides, onExit, stu
                         </div>
                    )}
 
-                   <div className="text-xl md:text-2xl leading-relaxed font-sans text-slate-100 animate-fade-in whitespace-pre-wrap relative">
-                       {isRegenerating && (
-                           <div className="absolute inset-0 bg-slate-900/80 flex items-center justify-center rounded-lg">
-                               <div className="flex items-center gap-3 text-indigo-400">
-                                   <div className="w-6 h-6 border-2 border-indigo-400 border-t-transparent rounded-full animate-spin" />
-                                   <span className="text-sm font-medium">Regenerating script...</span>
-                               </div>
-                           </div>
-                       )}
+                   <div className="text-xl md:text-2xl leading-relaxed font-sans text-slate-100 animate-fade-in whitespace-pre-wrap">
                        <MarkdownText text={currentScriptSegment} />
                    </div>
                </div>
@@ -2191,6 +2065,38 @@ const PresentationView: React.FC<PresentationViewProps> = ({ slides, onExit, stu
       {/* Permission Recovery Modal */}
       {showRecoveryModal && (
         <PermissionRecovery onClose={() => setShowRecoveryModal(false)} />
+      )}
+
+      {/* Deck-wide Verbosity Confirmation Dialog */}
+      {showVerbosityConfirm && pendingVerbosity && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-slate-800 rounded-2xl p-6 max-w-md mx-4 shadow-2xl border border-slate-700">
+            <h3 className="text-lg font-bold text-white mb-2">
+              Change Teleprompter Style
+            </h3>
+            <p className="text-slate-300 mb-6">
+              This will regenerate all {slides.length} slides at <span className="font-bold text-indigo-400">{pendingVerbosity}</span> verbosity.
+            </p>
+            <div className="flex gap-3 justify-end">
+              <button
+                onClick={() => { setShowVerbosityConfirm(false); setPendingVerbosity(null); }}
+                className="px-4 py-2 text-sm font-medium text-slate-400 hover:text-white transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => {
+                  // handleConfirmDeckRegeneration will be added in Task 2
+                  setShowVerbosityConfirm(false);
+                  // Placeholder - actual batch regeneration implemented in Task 2
+                }}
+                className="px-4 py-2 bg-indigo-600 text-white rounded-lg font-medium hover:bg-indigo-500 transition-colors"
+              >
+                Regenerate
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
