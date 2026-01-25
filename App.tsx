@@ -195,6 +195,11 @@ function App() {
   const [lessonTitle, setLessonTitle] = useState('New Lesson');
   const [error, setError] = useState<string | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [generationProgress, setGenerationProgress] = useState<{
+    phase: 'slides' | 'teleprompter';
+    current: number;
+    total: number;
+  } | null>(null);
   const [isDarkMode, setIsDarkMode] = useState(true);
   const [showResourceHub, setShowResourceHub] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
@@ -359,6 +364,8 @@ function App() {
 
       console.log('[App] generationInput.verbosity:', generationInput.verbosity);
 
+      // Phase 1: Generate slides
+      setGenerationProgress({ phase: 'slides', current: 0, total: 0 });
       let generatedSlides = await provider.generateLessonSlides(generationInput);
 
       // Post-generation verbosity fix: Gemini's JSON mode ignores verbosity in system instruction
@@ -366,7 +373,12 @@ function App() {
       if (deckVerbosity !== 'standard') {
         console.log('[App] Non-standard verbosity requested, regenerating speakerNotes...');
         const updatedSlides = [...generatedSlides];
+        const totalSlides = updatedSlides.length;
+
         for (let i = 0; i < updatedSlides.length; i++) {
+          // Update progress for each slide
+          setGenerationProgress({ phase: 'teleprompter', current: i + 1, total: totalSlides });
+
           const slide = updatedSlides[i];
           const prevSlide = i > 0 ? updatedSlides[i - 1] : undefined;
           const nextSlide = i < updatedSlides.length - 1 ? updatedSlides[i + 1] : undefined;
@@ -381,6 +393,8 @@ function App() {
         generatedSlides = updatedSlides;
       }
 
+      // Clear progress
+      setGenerationProgress(null);
       setSlides(generatedSlides);
       setLessonTitle(generatedSlides[0]?.title || "New Lesson");
       setActiveSlideIndex(0);
@@ -402,6 +416,7 @@ function App() {
       setAppState(AppState.INPUT);
     } finally {
       setIsGenerating(false);
+      setGenerationProgress(null);
     }
   };
 
@@ -1377,7 +1392,27 @@ function App() {
                 Generating with {settings.provider === 'gemini' ? 'Gemini' :
                                  settings.provider === 'claude' ? 'Claude' : 'AI'}...
               </p>
-              <p className="text-slate-400 dark:text-slate-500 mt-1 text-sm">Mapping pedagogical phases and interpreting visual data from your document.</p>
+              <p className="text-slate-400 dark:text-slate-500 mt-1 text-sm">
+                {generationProgress?.phase === 'teleprompter'
+                  ? `Generating ${deckVerbosity} teleprompter: slide ${generationProgress.current} of ${generationProgress.total}`
+                  : 'Mapping pedagogical phases and interpreting visual data from your document.'
+                }
+              </p>
+
+              {/* Progress bar for teleprompter generation */}
+              {generationProgress?.phase === 'teleprompter' && generationProgress.total > 0 && (
+                <div className="mt-6 w-64">
+                  <div className="h-2 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-indigo-600 dark:bg-amber-500 transition-all duration-300 ease-out"
+                      style={{ width: `${(generationProgress.current / generationProgress.total) * 100}%` }}
+                    />
+                  </div>
+                  <p className="text-xs text-slate-400 dark:text-slate-500 mt-2">
+                    {Math.round((generationProgress.current / generationProgress.total) * 100)}% complete
+                  </p>
+                </div>
+              )}
 
               <div className="mt-12 flex gap-4 overflow-hidden py-4 opacity-30">
                   {pageImages.map((img, i) => (
