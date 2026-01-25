@@ -15,6 +15,7 @@ export interface GenerationInput {
   presentationText?: string;
   presentationImages?: string[];
   mode: GenerationMode;
+  verbosity?: VerbosityLevel;
 }
 
 // Context from slides for question generation

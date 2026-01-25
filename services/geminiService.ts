@@ -65,9 +65,25 @@ EXAMPLE OUTPUT:
 `;
 
 /**
+ * Get the appropriate teleprompter rules based on verbosity level.
+ */
+function getTeleprompterRulesForVerbosity(verbosity: VerbosityLevel = 'standard'): string {
+  switch (verbosity) {
+    case 'concise':
+      return TELEPROMPTER_RULES_CONCISE;
+    case 'detailed':
+      return TELEPROMPTER_RULES_DETAILED;
+    case 'standard':
+    default:
+      return TELEPROMPTER_RULES;
+  }
+}
+
+/**
  * Get the appropriate system instruction based on generation mode.
  */
-function getSystemInstructionForMode(mode: GenerationMode): string {
+function getSystemInstructionForMode(mode: GenerationMode, verbosity: VerbosityLevel = 'standard'): string {
+  const teleprompterRules = getTeleprompterRulesForVerbosity(verbosity);
   switch (mode) {
     case 'fresh':
       return `
@@ -81,7 +97,7 @@ CRITICAL: You will be provided with both text AND visual images of the document.
   - Success Criteria should be a clear checklist.
   - Differentiation should explain how to adapt for different levels (e.g., C Grade, B Grade, A Grade).
 
-${TELEPROMPTER_RULES}
+${teleprompterRules}
 
 LAYOUTS: Use 'split' for content with images, 'grid' or 'flowchart' for process stages, 'full-image' for hooks, and 'grid' for Success Criteria/Differentiation.
 `;
@@ -108,7 +124,7 @@ REFINE MODE RULES:
 - Output stands alone - no references to "original slide 3" or similar markers.
 - Generate teleprompter scripts by inferring the teaching goals from the presentation content.
 
-${TELEPROMPTER_RULES}
+${teleprompterRules}
 
 LAYOUTS: Use 'split' for content with images, 'grid' or 'flowchart' for process stages, 'full-image' for hooks.
 `;
@@ -127,7 +143,7 @@ BLEND MODE RULES:
 - Output stands alone - no references to source documents.
 - Synthesize both sources into a cohesive teaching narrative for the teleprompter scripts.
 
-${TELEPROMPTER_RULES}
+${teleprompterRules}
 
 LAYOUTS: Use 'split' for content with images, 'grid' or 'flowchart' for process stages, 'full-image' for hooks.
 `;
@@ -147,7 +163,7 @@ export const generateLessonSlides = async (
   const ai = new GoogleGenAI({ apiKey });
   const model = "gemini-3-flash-preview";
 
-  const systemInstruction = getSystemInstructionForMode(input.mode);
+  const systemInstruction = getSystemInstructionForMode(input.mode, input.verbosity);
 
   // Build contents array based on mode
   const contents: any[] = [];
