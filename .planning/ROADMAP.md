@@ -17,6 +17,14 @@
 
 **Goal:** Teacher can ask AI questions during presentation and get contextual, streaming responses
 
+**Plans:** 4 plans
+
+Plans:
+- [ ] 36-01-PLAN.md — Provider interface and context types
+- [ ] 36-02-PLAN.md — Gemini streaming implementation
+- [ ] 36-03-PLAN.md — Claude SSE streaming implementation
+- [ ] 36-04-PLAN.md — Ask AI panel UI and integration
+
 ### Requirements Covered
 
 - CHAT-01: Text input field in teleprompter panel
@@ -46,9 +54,9 @@
 
 ### Technical Notes
 
-- Extend `AIProviderInterface` with `askQuestion(lessonContext, userQuery)` method
+- Extend `AIProviderInterface` with `streamChat(context, message)` method
 - Implement in both Claude and Gemini providers
-- Add `buildLessonContext()` helper to construct context from slides
+- Add `buildChatContext()` helper to construct context from slides
 - Use streaming API for response (mandatory for UX)
 - Render inline in existing teleprompter panel layout
 - No BroadcastChannel sync (teacher-only)
@@ -67,6 +75,11 @@
 ## Phase 37: History & Keyboard
 
 **Goal:** Session history for reference and keyboard shortcuts for quick access
+
+**Plans:** (created by /gsd:plan-phase)
+
+Plans:
+- [ ] TBD — to be planned
 
 ### Requirements Covered
 
