@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-01-25)
 
 **Core value:** Students see only the presentation; teachers see the teleprompter script
-**Current focus:** v3.3 Deck-wide Verbosity - Phase 34
+**Current focus:** v3.3 Deck-wide Verbosity - Phase 35
 
 ## Current Position
 
-Phase: 34 of 35 (Deck-wide Verbosity Toggle)
+Phase: 35 of 35 (Persistence)
 Plan: 1 of 1 complete
 Status: Phase complete
-Last activity: 2026-01-25 - Completed 34-01-PLAN.md (Deck-wide Verbosity Toggle)
+Last activity: 2026-01-25 - Completed 35-01-PLAN.md (Deck-wide verbosity persistence)
 
-Progress: [██████░░░░] 67% (2/3 phases in v3.3)
+Progress: [██████████] 100% (3/3 phases in v3.3)
 
 ## Performance Metrics
 
 **Velocity:**
-- Milestones shipped: 13 (v1.0 through v3.2)
-- Total phases completed: 34
-- Total plans completed: 99
+- Milestones shipped: 13 (v1.0 through v3.3)
+- Total phases completed: 35
+- Total plans completed: 100
 - Total LOC: ~18,400 TypeScript
 
 **v3.2 Milestone (shipped):**
@@ -43,6 +43,8 @@ Progress: [██████░░░░] 67% (2/3 phases in v3.3)
 Decisions are logged in PROJECT.md Key Decisions table.
 Recent decisions affecting future work:
 
+- **v3.3-35**: File format v3 with deckVerbosity field; omit 'standard' to keep files clean
+- **v3.3-35**: Lifted state pattern for persistence (deckVerbosity in App.tsx, not PresentationView)
 - **v3.3-34**: Deck-wide verbosity replaces per-slide selector; removed single-slide Regen button
 - **v3.3-34**: AbortController pattern for batch operation cancellation with snapshot rollback
 - **v3.3**: Optional verbosity field in GenerationInput with 'standard' default (backward compatibility)
@@ -61,11 +63,11 @@ None.
 ## Session Continuity
 
 Last session: 2026-01-25
-Stopped at: Completed 34-01-PLAN.md
+Stopped at: Completed 35-01-PLAN.md
 Resume file: None
 
-**Next step:** `/gsd:plan-phase 35` (Persistence)
+**Next step:** v3.3 milestone complete - ready for next feature planning
 
 ---
 *State initialized: 2026-01-18*
-*Last updated: 2026-01-25 - Completed Phase 34 Plan 01*
+*Last updated: 2026-01-25 - Completed Phase 35 Plan 01 (v3.3 complete)*
