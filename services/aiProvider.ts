@@ -255,6 +255,11 @@ export interface AIProviderInterface {
     prevSlide?: Slide,
     nextSlide?: Slide
   ): Promise<string>;
+  // Ask AI: streaming chat response
+  streamChat(
+    message: string,
+    context: ChatContext
+  ): AsyncGenerator<string, void, unknown>;
 }
 
 // Factory function to create the appropriate provider instance
