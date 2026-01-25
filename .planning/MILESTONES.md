@@ -1,5 +1,32 @@
 # Project Milestones: Cue
 
+## v3.3 Deck-wide Verbosity (Shipped: 2026-01-26)
+
+**Delivered:** Extended v3.1's per-slide verbosity to work deck-wide. Teachers select verbosity upfront during upload, can change it globally during presentation mode (with confirmation and batch regeneration), and the setting persists in save files with backward compatibility.
+
+**Phases completed:** 33-35 (3 plans total)
+
+**Key accomplishments:**
+
+- Upfront verbosity selection on landing page — teachers choose Concise/Standard/Detailed before generating slides
+- Deck-wide verbosity toggle in teleprompter panel replaces per-slide selector
+- Confirmation dialog warns about regeneration cost before batch processing
+- Progress overlay shows "slide X of Y" with cancel button and rollback capability
+- File format v3 with deckVerbosity field and backward-compatible v2 migration
+
+**Stats:**
+
+- 26 files created/modified
+- ~18,345 lines of TypeScript (project total)
+- 3 phases, 3 plans, 11 requirements
+- 1 day (2026-01-25 → 2026-01-26)
+
+**Git range:** `feat(33-01)` → `feat(35-01)`
+
+**What's next:** TBD with /gsd:new-milestone
+
+---
+
 ## v3.2 Pedagogical Slide Types (Shipped: 2026-01-25)
 
 **Delivered:** Extended Cue's AI capabilities with three new slide types (Elaborate for deeper content, Work Together for collaborative activities, Class Challenge for live student input) plus single-slide teleprompter regeneration with context awareness.

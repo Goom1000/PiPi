@@ -4,11 +4,11 @@
 
 A presentation tool for teachers that transforms PDF lesson plans into interactive slideshows with AI-generated content, a teleprompter script for the teacher, and progressive bullet reveal. Teachers upload their existing lesson plans, select student age/grade level, and the AI creates an engaging presentation with speaker notes that guide the teacher through natural, conversational delivery.
 
-**v3.2 shipped:** Pedagogical Slide Types — teachers can insert AI-generated Elaborate slides (deeper content), Work Together slides (collaborative activities with student pairs), and Class Challenge slides (live contribution capture with real-time sync). Plus single-slide teleprompter regeneration with context awareness. Deployed at https://goom1000.github.io/Cue/
+**v3.3 shipped:** Deck-wide Verbosity — teachers select verbosity upfront during upload, can change it globally during presentation mode with confirmation and batch regeneration, and the setting persists in save files with backward compatibility. Deployed at https://goom1000.github.io/Cue/
 
 ## Current State
 
-Shipped v3.2 with ~18,100 LOC TypeScript. Added three pedagogical slide types (Elaborate, Work Together, Class Challenge) with AI generation and real-time sync. Single-slide teleprompter regeneration with context awareness. Previous v3.1 delivered verbosity toggle with per-slide caching.
+Shipped v3.3 with ~18,345 LOC TypeScript. Added deck-wide verbosity selection (upfront on landing page + toggle in presentation mode) with batch regeneration, progress tracking, cancellation with rollback, and file format v3 persistence. Previous v3.2 delivered pedagogical slide types (Elaborate, Work Together, Class Challenge).
 
 ## Core Value
 
@@ -99,18 +99,17 @@ Students see only the presentation; teachers see the presentation plus a telepro
 - ✓ Elaborate slide insertion (AI-generated deeper content) — v3.2
 - ✓ Work Together slide insertion (collaborative pair activities) — v3.2
 - ✓ Class Challenge slide (live contribution capture with real-time sync) — v3.2
+- ✓ Upfront verbosity selection on landing page during upload — v3.3
+- ✓ Deck-wide verbosity toggle in presentation mode with confirmation dialog — v3.3
+- ✓ Full regeneration of all slides when verbosity changes — v3.3
+- ✓ Clear all per-slide caches on deck-wide verbosity change — v3.3
+- ✓ Persist deck verbosity level in .cue save file (file format v3) — v3.3
 
 ### Active
 
-**v3.3: Deck-wide Verbosity**
+(None — next milestone TBD)
 
-- [ ] Upfront verbosity selection on landing page during upload
-- [ ] Deck-wide verbosity toggle in presentation mode with confirmation dialog
-- [ ] Full regeneration of all slides when verbosity changes
-- [ ] Clear all per-slide caches on deck-wide verbosity change
-- [ ] Persist deck verbosity level in .cue save file
-
-### Deferred (v3.1+)
+### Deferred (v3.3+)
 
 - [ ] Elapsed time display showing presentation duration
 - [ ] Fullscreen recovery (auto re-enter if exited)
@@ -136,22 +135,23 @@ Students see only the presentation; teachers see the presentation plus a telepro
 
 ### Current State
 
-Shipped v3.2 with ~18,100 LOC TypeScript.
+Shipped v3.3 with ~18,345 LOC TypeScript.
 Tech stack: React 19, Vite, Gemini/Claude API, Tailwind CSS, react-rnd.
 Client-side only (no backend).
 Deployed at: https://goom1000.github.io/Cue/
+
+v3.3 delivered Deck-wide Verbosity:
+- Upfront verbosity selection on landing page before slide generation
+- Deck-wide verbosity toggle replaces per-slide selector
+- Batch regeneration with confirmation dialog and progress overlay
+- Cancellation with rollback to pre-regeneration state
+- File format v3 with deckVerbosity field and v2 backward compatibility
 
 v3.2 delivered Pedagogical Slide Types:
 - Single teleprompter regeneration with context-aware AI (surrounding slides for flow)
 - Elaborate slide insertion (AI generates deeper content with examples)
 - Work Together slide insertion (collaborative activities with student pairs)
 - Class Challenge slides (live contribution capture with real-time sync)
-- All new slide types support verbosity levels and BroadcastChannel sync
-
-v3.1 delivered Teleprompter Verbosity:
-- Three-level verbosity toggle (Concise/Standard/Detailed)
-- Per-slide caching with instant switch-back
-- File format v2 with backward compatibility
 
 ### Technical Environment
 
@@ -241,6 +241,12 @@ v3.1 delivered Teleprompter Verbosity:
 | StudentPair separate from content | Enables shuffle without AI regeneration | ✓ Good — v3.2 |
 | Implicit locking via layout visibility | No explicit lock state needed for Class Challenge | ✓ Good — v3.2 |
 | Contribution sync via STATE_UPDATE | Reuses existing BroadcastChannel message | ✓ Good — v3.2 |
+| Optional verbosity in GenerationInput | Backward compatibility with existing callers | ✓ Good — v3.3 |
+| Deck-wide replaces per-slide verbosity | Simpler UX, consistent deck experience | ✓ Good — v3.3 |
+| AbortController for batch cancel | React-native pattern for cancellable async operations | ✓ Good — v3.3 |
+| Snapshot rollback on cancel | Deep copy before batch allows full state restoration | ✓ Good — v3.3 |
+| File format v3 with deckVerbosity | Persist deck-wide setting, omit 'standard' for clean files | ✓ Good — v3.3 |
+| Lifted deckVerbosity to App.tsx | State at persistence boundary, controlled prop to PresentationView | ✓ Good — v3.3 |
 
 ---
-*Last updated: 2026-01-25 after v3.3 milestone started*
+*Last updated: 2026-01-26 after v3.3 milestone*
