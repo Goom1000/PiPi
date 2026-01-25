@@ -556,6 +556,84 @@ STRICT: You MUST provide exactly (Number of content points + 1) speaker note seg
   return { ...data, id: `elaborate-${Date.now()}`, isGeneratingImage: false, slideType: 'elaborate' };
 };
 
+export const generateWorkTogetherSlide = async (
+  apiKey: string,
+  lessonTopic: string,
+  sourceSlide: Slide,
+  allSlides: Slide[]
+): Promise<Slide> => {
+  const ai = new GoogleGenAI({ apiKey });
+  const model = "gemini-3-flash-preview";
+
+  // Build full presentation context for coherence
+  const presentationContext = allSlides
+    .map((s, i) => `Slide ${i + 1}: "${s.title}" - ${s.content.slice(0, 2).join('; ')}`)
+    .join('\n');
+
+  const systemInstruction = `
+You are an educational designer creating "Work Together" collaborative activities for Year 6 (10-11 year olds).
+Topic: ${lessonTopic}
+Creating activity based on: "${sourceSlide.title}"
+Source content: ${sourceSlide.content.join('; ')}
+
+PRESENTATION CONTEXT (maintain coherence):
+${presentationContext}
+
+TASK: Create a quick, engaging collaborative activity (2-3 minutes) for student pairs.
+
+ACTIVITY REQUIREMENTS:
+1. Design for PAIRS (2 students) as the primary grouping
+2. ALWAYS include a group-of-3 variant (e.g., "If you're in a group of 3, one person can be the recorder" or "take turns")
+3. Use ONLY basic classroom resources: pen, paper, whiteboard, mini-whiteboard
+4. Do NOT require: tablets, computers, scissors, glue, colored materials, internet
+5. Activity should reinforce the source slide content
+6. Keep instructions clear and actionable for 10-11 year olds
+7. Include a clear outcome (e.g., "Be ready to share one thing you discovered")
+
+CONTENT FORMAT:
+- Provide 3-5 content points as numbered instructions or prose
+- Include the group-of-3 variant inline with the instructions (not as a separate point)
+- Title should indicate collaboration (e.g., "Partner Challenge: [Topic]" or "Work Together: [Topic]")
+
+${TELEPROMPTER_RULES}
+
+STRICT: You MUST provide exactly (Number of content points + 1) speaker note segments separated by "👉".
+The teleprompter script should include:
+- Segment 0: INTRO - how to launch the activity and get pairs started
+- Segments 1-N: What to say/observe during each phase of the activity
+- Final segment: How to wrap up and transition (share-out if applicable)
+`;
+
+  const response = await ai.models.generateContent({
+    model,
+    contents: `Generate a Work Together collaborative activity slide for: "${sourceSlide.title}". Use 'work-together' layout.`,
+    config: {
+      systemInstruction,
+      responseMimeType: "application/json",
+      responseSchema: {
+        type: Type.OBJECT,
+        properties: {
+          title: { type: Type.STRING, description: "Should indicate collaboration" },
+          content: { type: Type.ARRAY, items: { type: Type.STRING } },
+          speakerNotes: { type: Type.STRING, description: "Must follow 👉 format" },
+          imagePrompt: { type: Type.STRING },
+          layout: { type: Type.STRING, enum: ['work-together'] }
+        },
+        required: ['title', 'content', 'speakerNotes', 'imagePrompt', 'layout']
+      }
+    }
+  });
+
+  const data = JSON.parse(response.text || "{}");
+  return {
+    ...data,
+    id: `work-together-${Date.now()}`,
+    isGeneratingImage: false,
+    slideType: 'work-together',
+    layout: 'work-together'  // Ensure layout is set
+  };
+};
+
 export const generateLessonResources = async (apiKey: string, lessonText: string, slideContext: string): Promise<LessonResource[]> => {
     const ai = new GoogleGenAI({ apiKey });
     const model = "gemini-3-flash-preview";

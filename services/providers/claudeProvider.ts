@@ -569,6 +569,71 @@ Do not include any text before or after the JSON.
     };
   }
 
+  async generateWorkTogetherSlide(lessonTopic: string, sourceSlide: Slide, allSlides: Slide[]): Promise<Slide> {
+    // Build full presentation context for coherence
+    const presentationContext = allSlides
+      .map((s, i) => `Slide ${i + 1}: "${s.title}" - ${s.content.slice(0, 2).join('; ')}`)
+      .join('\n');
+
+    const systemPrompt = `
+You are an educational designer creating "Work Together" collaborative activities for Year 6 (10-11 year olds).
+Topic: ${lessonTopic}
+Creating activity based on: "${sourceSlide.title}"
+Source content: ${sourceSlide.content.join('; ')}
+
+PRESENTATION CONTEXT (maintain coherence):
+${presentationContext}
+
+TASK: Create a quick, engaging collaborative activity (2-3 minutes) for student pairs.
+
+ACTIVITY REQUIREMENTS:
+1. Design for PAIRS (2 students) as the primary grouping
+2. ALWAYS include a group-of-3 variant (e.g., "If you're in a group of 3, one person can be the recorder" or "take turns")
+3. Use ONLY basic classroom resources: pen, paper, whiteboard, mini-whiteboard
+4. Do NOT require: tablets, computers, scissors, glue, colored materials, internet
+5. Activity should reinforce the source slide content
+6. Keep instructions clear and actionable for 10-11 year olds
+7. Include a clear outcome (e.g., "Be ready to share one thing you discovered")
+
+CONTENT FORMAT:
+- Provide 3-5 content points as numbered instructions or prose
+- Include the group-of-3 variant inline with the instructions (not as a separate point)
+- Title should indicate collaboration (e.g., "Partner Challenge: [Topic]" or "Work Together: [Topic]")
+
+STRICT SPEAKER NOTES (TELEPROMPTER LOGIC):
+- You MUST provide exactly (Number of content points + 1) segments separated by "👉"
+- Segment 0: INTRO - how to launch the activity and get pairs started
+- Segments 1-N: What to say/observe during each phase of the activity
+- Final segment: How to wrap up and transition (share-out if applicable)
+- Include pacing cues: "[Give them 30 seconds]", "[Walk around and check progress]"
+
+IMPORTANT: Return your response as valid JSON with these fields:
+- title (string - should indicate collaboration)
+- content (array of strings - activity instructions)
+- speakerNotes (string - must follow the 👉 format)
+- imagePrompt (string)
+- layout (must be 'work-together')
+
+Do not include any text before or after the JSON.
+`;
+
+    const messages: ClaudeMessage[] = [{
+      role: 'user',
+      content: `Generate a Work Together collaborative activity slide for: "${sourceSlide.title}". Use 'work-together' layout.`
+    }];
+
+    const response = await callClaude(this.apiKey, messages, systemPrompt, 2048);
+    const data = extractJSON<any>(response);
+
+    return {
+      ...data,
+      id: `work-together-${Date.now()}`,
+      isGeneratingImage: false,
+      slideType: 'work-together',
+      layout: 'work-together'
+    };
+  }
+
   async generateLessonResources(lessonText: string, slideContext: string): Promise<LessonResource[]> {
     const systemPrompt = `
 You are an expert curriculum developer.

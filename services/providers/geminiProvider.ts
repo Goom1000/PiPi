@@ -11,6 +11,7 @@ import {
   generateContextualSlide as geminiGenerateContextualSlide,
   generateExemplarSlide as geminiGenerateExemplarSlide,
   generateElaborateSlide as geminiGenerateElaborateSlide,
+  generateWorkTogetherSlide as geminiGenerateWorkTogetherSlide,
   generateLessonResources as geminiGenerateLessonResources,
   generateImpromptuQuiz as geminiGenerateImpromptuQuiz,
   generateQuestionWithAnswer as geminiGenerateQuestionWithAnswer,
@@ -98,6 +99,14 @@ export class GeminiProvider implements AIProviderInterface {
   async generateElaborateSlide(lessonTopic: string, sourceSlide: Slide, allSlides: Slide[]): Promise<Slide> {
     try {
       return await geminiGenerateElaborateSlide(this.apiKey, lessonTopic, sourceSlide, allSlides);
+    } catch (error) {
+      throw this.wrapError(error);
+    }
+  }
+
+  async generateWorkTogetherSlide(lessonTopic: string, sourceSlide: Slide, allSlides: Slide[]): Promise<Slide> {
+    try {
+      return await geminiGenerateWorkTogetherSlide(this.apiKey, lessonTopic, sourceSlide, allSlides);
     } catch (error) {
       throw this.wrapError(error);
     }
