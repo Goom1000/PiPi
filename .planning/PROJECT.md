@@ -6,9 +6,19 @@ A presentation tool for teachers that transforms PDF lesson plans into interacti
 
 **v3.3 shipped:** Deck-wide Verbosity — teachers select verbosity upfront during upload, can change it globally during presentation mode with confirmation and batch regeneration, and the setting persists in save files with backward compatibility. Deployed at https://goom1000.github.io/Cue/
 
+## Current Milestone: v3.4 Ask AI
+
+**Goal:** Teachers can ask AI anything during a presentation without leaving the app
+
+**Target features:**
+- Text input in teleprompter panel with streaming responses
+- Lesson context injection (AI knows current slide, topic, grade level)
+- Quick action buttons ("Get 3 facts", "Explain simply", "Answer student question")
+- Session history with keyboard shortcut (Cmd+K)
+
 ## Current State
 
-Shipped v3.3 with ~18,345 LOC TypeScript. Added deck-wide verbosity selection (upfront on landing page + toggle in presentation mode) with batch regeneration, progress tracking, cancellation with rollback, and file format v3 persistence. Previous v3.2 delivered pedagogical slide types (Elaborate, Work Together, Class Challenge).
+Shipped v3.3 with ~18,345 LOC TypeScript. Starting v3.4 Ask AI milestone. Previous v3.3 delivered deck-wide verbosity selection with batch regeneration and file format v3 persistence.
 
 ## Core Value
 
@@ -107,7 +117,14 @@ Students see only the presentation; teachers see the presentation plus a telepro
 
 ### Active
 
-(None — next milestone TBD)
+- [ ] Ask AI text input in teleprompter panel — v3.4
+- [ ] Streaming AI response display — v3.4
+- [ ] Lesson context injection for AI queries — v3.4
+- [ ] Quick action buttons for common queries — v3.4
+- [ ] Copy response to clipboard — v3.4
+- [ ] Teacher-only visibility (no student sync) — v3.4
+- [ ] Session history with scrollable view — v3.4
+- [ ] Keyboard shortcut (Cmd+K) to focus input — v3.4
 
 ### Deferred (v3.3+)
 
