@@ -25,10 +25,10 @@ v3.3 extends the per-slide verbosity toggle from v3.1 to work deck-wide. Users s
   1. User sees verbosity selector (Concise/Standard/Detailed) on landing page near upload zones
   2. Selected verbosity level is passed to AI generation and used for initial teleprompter content
   3. When no selection is made, slides generate with Standard verbosity by default
-**Plans**: TBD
+**Plans**: 1 plan
 
 Plans:
-- [ ] 33-01: TBD
+- [ ] 33-01-PLAN.md — Extend AI pipeline with verbosity + add landing page selector UI
 
 ### Phase 34: Deck-wide Verbosity Toggle
 **Goal**: Users can change verbosity for entire presentation with controlled regeneration
@@ -62,10 +62,10 @@ Plans:
 
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
-| 33. Upfront Verbosity Selection | v3.3 | 0/? | Not started | - |
+| 33. Upfront Verbosity Selection | v3.3 | 0/1 | Planning complete | - |
 | 34. Deck-wide Verbosity Toggle | v3.3 | 0/? | Not started | - |
 | 35. Persistence | v3.3 | 0/? | Not started | - |
 
 ---
 *Created: 2026-01-25*
-*Last updated: 2026-01-25*
+*Last updated: 2026-01-25 — Phase 33 planned*
