@@ -200,7 +200,7 @@ function App() {
   const [showSettings, setShowSettings] = useState(false);
   
   const [autoGenerateImages, setAutoGenerateImages] = useState(true);
-  const [upfrontVerbosity, setUpfrontVerbosity] = useState<VerbosityLevel>('standard');
+  // Deck-wide verbosity: used for generation, presentation mode, and persistence
   const [deckVerbosity, setDeckVerbosity] = useState<VerbosityLevel>('standard');
   const [studentNames, setStudentNames] = useState<string[]>([]);
   const [studentGrades, setStudentGrades] = useState<import('./types').StudentWithGrade[]>([]);
@@ -351,7 +351,7 @@ function App() {
         presentationText: existingPptText || undefined,
         presentationImages: existingPptImages.length > 0 ? existingPptImages : undefined,
         mode: uploadMode as GenerationMode, // Safe cast - we guard against 'none' above
-        verbosity: upfrontVerbosity,
+        verbosity: deckVerbosity,
       };
 
       const generatedSlides = await provider.generateLessonSlides(generationInput);
@@ -1246,9 +1246,9 @@ function App() {
                       <div>
                         <p className="font-bold text-slate-700 dark:text-slate-300">Teleprompter Style</p>
                         <p className="text-xs text-slate-500 dark:text-slate-500">
-                          {upfrontVerbosity === 'concise' && 'Brief prompts for experienced teachers'}
-                          {upfrontVerbosity === 'standard' && 'Balanced guidance with examples'}
-                          {upfrontVerbosity === 'detailed' && 'Full script you can read verbatim'}
+                          {deckVerbosity === 'concise' && 'Brief prompts for experienced teachers'}
+                          {deckVerbosity === 'standard' && 'Balanced guidance with examples'}
+                          {deckVerbosity === 'detailed' && 'Full script you can read verbatim'}
                         </p>
                       </div>
                     </div>
@@ -1256,9 +1256,9 @@ function App() {
                       {(['concise', 'standard', 'detailed'] as const).map(level => (
                         <button
                           key={level}
-                          onClick={() => setUpfrontVerbosity(level)}
+                          onClick={() => setDeckVerbosity(level)}
                           className={`px-3 py-1.5 text-xs font-bold uppercase tracking-wider rounded-lg transition-all ${
-                            upfrontVerbosity === level
+                            deckVerbosity === level
                               ? 'bg-indigo-600 dark:bg-amber-500 text-white shadow-lg'
                               : 'bg-slate-200 dark:bg-slate-700 text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-white'
                           }`}
