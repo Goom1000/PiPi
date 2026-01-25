@@ -494,6 +494,68 @@ export const generateExemplarSlide = async (apiKey: string, lessonTopic: string,
   return { ...data, id: `exemplar-${Date.now()}`, isGeneratingImage: false };
 };
 
+export const generateElaborateSlide = async (
+  apiKey: string,
+  lessonTopic: string,
+  sourceSlide: Slide,
+  allSlides: Slide[]
+): Promise<Slide> => {
+  const ai = new GoogleGenAI({ apiKey });
+  const model = "gemini-3-flash-preview";
+
+  // Build full presentation context for coherence
+  const presentationContext = allSlides
+    .map((s, i) => `Slide ${i + 1}: "${s.title}" - ${s.content.slice(0, 2).join('; ')}`)
+    .join('\n');
+
+  const systemInstruction = `
+You are an educational designer creating "Elaborate" slides for Year 6 (10-11 year olds).
+Topic: ${lessonTopic}
+You are expanding on: "${sourceSlide.title}"
+Source content: ${sourceSlide.content.join('; ')}
+
+PRESENTATION CONTEXT (maintain coherence, don't repeat earlier content):
+${presentationContext}
+
+TASK: Create a deeper-dive slide that helps students truly understand and apply this concept.
+
+CONTENT REQUIREMENTS:
+1. Title should reference the source (e.g., "More on [Topic]" or "[Topic]: Going Deeper")
+2. ALWAYS include at least one analogy ("Think of it like...")
+3. Focus on APPLICATION - show HOW to use the concept in practice
+4. Match the tone of the source slide
+5. Provide 3-5 content points mixing prose context with concrete examples
+6. Format: Opening context point, then concrete examples/applications, then analogy
+
+${TELEPROMPTER_RULES}
+
+STRICT: You MUST provide exactly (Number of content points + 1) speaker note segments separated by "👉".
+`;
+
+  const response = await ai.models.generateContent({
+    model,
+    contents: `Generate an Elaborate slide for: "${sourceSlide.title}". Use 'split' or 'grid' layout.`,
+    config: {
+      systemInstruction,
+      responseMimeType: "application/json",
+      responseSchema: {
+        type: Type.OBJECT,
+        properties: {
+          title: { type: Type.STRING, description: "Reference source topic" },
+          content: { type: Type.ARRAY, items: { type: Type.STRING } },
+          speakerNotes: { type: Type.STRING, description: "Must follow 👉 format" },
+          imagePrompt: { type: Type.STRING },
+          layout: { type: Type.STRING, enum: ['split', 'full-image', 'flowchart', 'grid', 'tile-overlap'] }
+        },
+        required: ['title', 'content', 'speakerNotes', 'imagePrompt']
+      }
+    }
+  });
+
+  const data = JSON.parse(response.text || "{}");
+  return { ...data, id: `elaborate-${Date.now()}`, isGeneratingImage: false, slideType: 'elaborate' };
+};
+
 export const generateLessonResources = async (apiKey: string, lessonText: string, slideContext: string): Promise<LessonResource[]> => {
     const ai = new GoogleGenAI({ apiKey });
     const model = "gemini-3-flash-preview";

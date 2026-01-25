@@ -188,6 +188,11 @@ export interface AIProviderInterface {
     nextSlide?: Slide
   ): Promise<Slide>;
   generateExemplarSlide(lessonTopic: string, prevSlide: Slide): Promise<Slide>;
+  generateElaborateSlide(
+    lessonTopic: string,
+    sourceSlide: Slide,
+    allSlides: Slide[]
+  ): Promise<Slide>;
   generateLessonResources(lessonText: string, slideContext: string): Promise<LessonResource[]>;
   generateImpromptuQuiz(
     slides: Slide[],

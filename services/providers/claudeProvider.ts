@@ -512,6 +512,63 @@ Do not include any text before or after the JSON.
     };
   }
 
+  async generateElaborateSlide(lessonTopic: string, sourceSlide: Slide, allSlides: Slide[]): Promise<Slide> {
+    // Build full presentation context for coherence
+    const presentationContext = allSlides
+      .map((s, i) => `Slide ${i + 1}: "${s.title}" - ${s.content.slice(0, 2).join('; ')}`)
+      .join('\n');
+
+    const systemPrompt = `
+You are an educational designer creating "Elaborate" slides for Year 6 (10-11 year olds).
+Topic: ${lessonTopic}
+You are expanding on: "${sourceSlide.title}"
+Source content: ${sourceSlide.content.join('; ')}
+
+PRESENTATION CONTEXT (maintain coherence, don't repeat earlier content):
+${presentationContext}
+
+TASK: Create a deeper-dive slide that helps students truly understand and apply this concept.
+
+CONTENT REQUIREMENTS:
+1. Title should reference the source (e.g., "More on [Topic]" or "[Topic]: Going Deeper")
+2. ALWAYS include at least one analogy ("Think of it like...")
+3. Focus on APPLICATION - show HOW to use the concept in practice
+4. Match the tone of the source slide
+5. Provide 3-5 content points mixing prose context with concrete examples
+6. Format: Opening context point, then concrete examples/applications, then analogy
+
+STRICT SPEAKER NOTES (TELEPROMPTER LOGIC):
+- You MUST provide exactly (Number of content points + 1) segments separated by "👉"
+- Segment 0: INTRO - set context for why we're going deeper
+- Segment N: Explain the point (do NOT repeat the bullet text)
+- Include pacing cues: "[Pause for effect]", "[Let this sink in]"
+
+IMPORTANT: Return your response as valid JSON with these fields:
+- title (string)
+- content (array of strings)
+- speakerNotes (string - must follow the 👉 format)
+- imagePrompt (string)
+- layout (one of: 'split', 'full-image', 'flowchart', 'grid', 'tile-overlap')
+
+Do not include any text before or after the JSON.
+`;
+
+    const messages: ClaudeMessage[] = [{
+      role: 'user',
+      content: `Generate an Elaborate slide for: "${sourceSlide.title}". Use 'split' or 'grid' layout.`
+    }];
+
+    const response = await callClaude(this.apiKey, messages, systemPrompt, 2048);
+    const data = extractJSON<any>(response);
+
+    return {
+      ...data,
+      id: `elaborate-${Date.now()}`,
+      isGeneratingImage: false,
+      slideType: 'elaborate'
+    };
+  }
+
   async generateLessonResources(lessonText: string, slideContext: string): Promise<LessonResource[]> {
     const systemPrompt = `
 You are an expert curriculum developer.
