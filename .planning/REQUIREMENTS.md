@@ -29,12 +29,12 @@ Requirements for Pedagogical Slide Types milestone. Each maps to roadmap phases.
 
 ### Class Challenge Slides
 
-- [ ] **CHAL-01**: User can insert Class Challenge slide via "+" menu option
-- [ ] **CHAL-02**: Slide displays editable prompt/question at top
-- [ ] **CHAL-03**: Teacher can input student contributions during presentation mode
-- [ ] **CHAL-04**: Contributions display as styled cards on slide
-- [ ] **CHAL-05**: Contributions sync to student view in real-time via BroadcastChannel
-- [ ] **CHAL-06**: Contributions lock (become read-only) when navigating away from slide
+- [x] **CHAL-01**: User can insert Class Challenge slide via "+" menu option
+- [x] **CHAL-02**: Slide displays editable prompt/question at top
+- [x] **CHAL-03**: Teacher can input student contributions during presentation mode
+- [x] **CHAL-04**: Contributions display as styled cards on slide
+- [x] **CHAL-05**: Contributions sync to student view in real-time via BroadcastChannel
+- [x] **CHAL-06**: Contributions lock (become read-only) when navigating away from slide
 
 ## Future Requirements
 
@@ -90,12 +90,12 @@ Which phases cover which requirements. Updated during roadmap creation.
 | WORK-02 | Phase 31 | Complete |
 | WORK-03 | Phase 31 | Complete |
 | WORK-04 | Phase 31 | Complete |
-| CHAL-01 | Phase 32 | Pending |
-| CHAL-02 | Phase 32 | Pending |
-| CHAL-03 | Phase 32 | Pending |
-| CHAL-04 | Phase 32 | Pending |
-| CHAL-05 | Phase 32 | Pending |
-| CHAL-06 | Phase 32 | Pending |
+| CHAL-01 | Phase 32 | Complete |
+| CHAL-02 | Phase 32 | Complete |
+| CHAL-03 | Phase 32 | Complete |
+| CHAL-04 | Phase 32 | Complete |
+| CHAL-05 | Phase 32 | Complete |
+| CHAL-06 | Phase 32 | Complete |
 
 **Coverage:**
 - v3.2 requirements: 17 total
@@ -110,4 +110,4 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 ---
 *Requirements defined: 2026-01-25*
-*Last updated: 2026-01-25 after roadmap creation (100% coverage)*
+*Last updated: 2026-01-25 - Phase 32 complete (17/17 requirements complete)*

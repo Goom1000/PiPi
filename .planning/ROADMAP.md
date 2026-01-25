@@ -7,7 +7,7 @@ v3.2 extends Cue's AI generation capabilities with four pedagogical slide featur
 ## Milestones
 
 - ✅ **v3.1 Teleprompter Verbosity** - Phases 27-28 (shipped 2026-01-25)
-- 🚧 **v3.2 Pedagogical Slide Types** - Phases 29-32 (in progress)
+- ✅ **v3.2 Pedagogical Slide Types** - Phases 29-32 (shipped 2026-01-25)
 
 ## Phases
 
@@ -30,7 +30,7 @@ Plans:
 
 </details>
 
-### 🚧 v3.2 Pedagogical Slide Types (In Progress)
+### ✅ v3.2 Pedagogical Slide Types (SHIPPED 2026-01-25)
 
 **Milestone Goal:** Extend Cue's pedagogical capabilities with AI-generated Elaborate/Work Together slides, live Class Challenge input, and single-slide script regeneration.
 
@@ -90,7 +90,7 @@ Plans:
 **Plans**: 1 plan
 
 Plans:
-- [ ] 32-01: Add Class Challenge slide type with contribution input, card display, and real-time sync
+- [x] 32-01: Add Class Challenge slide type with contribution input, card display, and real-time sync
 
 ## Progress
 
@@ -104,7 +104,7 @@ Phases execute in numeric order: 29 → 30 → 31 → 32
 | 29. Single Regeneration | 1/1 | Complete | 2026-01-25 |
 | 30. Elaborate Slides | 1/1 | Complete | 2026-01-25 |
 | 31. Work Together Slides | 1/1 | Complete | 2026-01-25 |
-| 32. Class Challenge Slides | 0/1 | Not started | - |
+| 32. Class Challenge Slides | 1/1 | Complete | 2026-01-25 |
 
 ---
 
