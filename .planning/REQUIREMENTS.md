@@ -15,11 +15,11 @@ Requirements for deck-wide verbosity. Extends v3.1 per-slide verbosity to apply 
 
 ### Deck-wide Toggle
 
-- [ ] **DECK-01**: Verbosity selector in presentation mode changes deck-wide level (not per-slide)
-- [ ] **DECK-02**: Changing verbosity shows confirmation dialog with regeneration warning
-- [ ] **DECK-03**: After confirmation, all slides regenerate at new verbosity level
-- [ ] **DECK-04**: All per-slide caches are cleared when deck verbosity changes
-- [ ] **DECK-05**: Loading indicator shows regeneration progress across all slides
+- [x] **DECK-01**: Verbosity selector in presentation mode changes deck-wide level (not per-slide)
+- [x] **DECK-02**: Changing verbosity shows confirmation dialog with regeneration warning
+- [x] **DECK-03**: After confirmation, all slides regenerate at new verbosity level
+- [x] **DECK-04**: All per-slide caches are cleared when deck verbosity changes
+- [x] **DECK-05**: Loading indicator shows regeneration progress across all slides
 
 ### Persistence
 
@@ -56,11 +56,11 @@ Deferred to later milestones.
 | UPFR-01 | 33 | Complete |
 | UPFR-02 | 33 | Complete |
 | UPFR-03 | 33 | Complete |
-| DECK-01 | 34 | Pending |
-| DECK-02 | 34 | Pending |
-| DECK-03 | 34 | Pending |
-| DECK-04 | 34 | Pending |
-| DECK-05 | 34 | Pending |
+| DECK-01 | 34 | Complete |
+| DECK-02 | 34 | Complete |
+| DECK-03 | 34 | Complete |
+| DECK-04 | 34 | Complete |
+| DECK-05 | 34 | Complete |
 | PERS-01 | 35 | Pending |
 | PERS-02 | 35 | Pending |
 | PERS-03 | 35 | Pending |
@@ -72,4 +72,4 @@ Deferred to later milestones.
 
 ---
 *Requirements defined: 2026-01-25*
-*Last updated: 2026-01-25 — Phase 33 requirements complete*
+*Last updated: 2026-01-25 — Phase 34 requirements complete*

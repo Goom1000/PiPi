@@ -64,7 +64,7 @@ Last session: 2026-01-25
 Stopped at: Completed 34-01-PLAN.md
 Resume file: None
 
-**Next step:** `/gsd:plan-phase 35` (Polish and Refinements)
+**Next step:** `/gsd:plan-phase 35` (Persistence)
 
 ---
 *State initialized: 2026-01-18*
