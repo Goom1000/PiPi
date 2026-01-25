@@ -1501,7 +1501,7 @@ const PresentationView: React.FC<PresentationViewProps> = ({ slides, onExit, stu
                        <button
                            key={level}
                            onClick={() => {
-                               if (level === deckVerbosity) return;  // No-op for same level
+                               // Allow clicking same level to re-apply (useful if initial generation didn't respect verbosity)
                                setPendingVerbosity(level);
                                setShowVerbosityConfirm(true);
                            }}
@@ -2176,10 +2176,13 @@ const PresentationView: React.FC<PresentationViewProps> = ({ slides, onExit, stu
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-slate-800 rounded-2xl p-6 max-w-md mx-4 shadow-2xl border border-slate-700">
             <h3 className="text-lg font-bold text-white mb-2">
-              Change Teleprompter Style
+              {pendingVerbosity === deckVerbosity ? 'Re-apply Teleprompter Style' : 'Change Teleprompter Style'}
             </h3>
             <p className="text-slate-300 mb-6">
-              This will regenerate all {slides.length} slides at <span className="font-bold text-indigo-400">{pendingVerbosity}</span> verbosity.
+              {pendingVerbosity === deckVerbosity
+                ? <>This will regenerate all {slides.length} slides to ensure they match <span className="font-bold text-indigo-400">{pendingVerbosity}</span> verbosity.</>
+                : <>This will regenerate all {slides.length} slides at <span className="font-bold text-indigo-400">{pendingVerbosity}</span> verbosity.</>
+              }
             </p>
             <div className="flex gap-3 justify-end">
               <button
