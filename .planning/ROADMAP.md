@@ -79,7 +79,7 @@ Plans:
 **Plans:** 1 plan
 
 Plans:
-- [ ] 37-01-PLAN.md — History state, keyboard shortcuts, and history UI
+- [x] 37-01-PLAN.md — History state, keyboard shortcuts, and history UI
 
 ### Requirements Covered
 
@@ -131,4 +131,4 @@ When v3.4 is complete, teacher can:
 ---
 
 *Roadmap created: 2026-01-26*
-*Last updated: 2026-01-26 — Phase 37 planned*
+*Last updated: 2026-01-26 — Phase 37 complete, milestone ready for audit*
