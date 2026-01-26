@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-01-26)
 ## Current Position
 
 Phase: 36 (Core Ask AI)
-Plan: 03 of 4 complete
-Status: In progress
-Last activity: 2026-01-26 — Completed 36-02-PLAN.md and 36-03-PLAN.md
+Plan: 04 of 4 complete
+Status: Phase complete
+Last activity: 2026-01-26 — Completed 36-04-PLAN.md (Ask AI Panel UI)
 
-Progress: [███░░░░░░░] 30% (Phase 36-37, 3 of 10 plans complete)
+Progress: [████░░░░░░] 40% (Phase 36-37, 4 of 10 plans complete)
 
 ## Performance Metrics
 
@@ -27,7 +27,7 @@ Progress: [███░░░░░░░] 30% (Phase 36-37, 3 of 10 plans compl
 **v3.4 Milestone (in progress):**
 - Phases: 2 (36-37)
 - Requirements: 17 total
-- Plans completed: 3/10
+- Plans completed: 4/10
 - Started: 2026-01-26
 
 **Recent Milestones:**
@@ -54,6 +54,10 @@ Recent decisions affecting future work:
 - **36-02**: System prompt includes gradeLevel for age-appropriate language
 - **36-03**: Claude streaming uses manual SSE parsing (EventSource doesn't support POST)
 - **36-03**: Buffer strategy handles partial chunks split across network reads
+- **36-04**: Ask AI moved from inline teleprompter to header dropdown (better UX)
+- **36-04**: Dropdown overlays presentation area (not teleprompter) on left side
+- **36-04**: White/inverse button styling for high visibility in header
+- **36-04**: Character animation at 200 chars/sec using requestAnimationFrame
 
 ### Pending Todos
 
@@ -66,10 +70,10 @@ None.
 ## Session Continuity
 
 Last session: 2026-01-26
-Stopped at: Completed 36-02-PLAN.md (Gemini streaming) and 36-03-PLAN.md (Claude streaming)
+Stopped at: Completed 36-04-PLAN.md (Ask AI Panel UI) — Phase 36 complete
 Resume file: None
 
-**Next step:** Execute 36-04 (Ask AI UI integration)
+**Next step:** Start Phase 37 (Multi-turn conversation history)
 
 ---
 *State initialized: 2026-01-18*
