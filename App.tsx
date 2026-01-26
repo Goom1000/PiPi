@@ -220,6 +220,10 @@ function App() {
   const [showStudentListModal, setShowStudentListModal] = useState(false);
   const loadClassButtonRef = useRef<HTMLButtonElement>(null);
 
+  // Slide selection state (for Working Wall export)
+  const [selectedSlideIds, setSelectedSlideIds] = useState<Set<string>>(new Set());
+  const [lastClickedIndex, setLastClickedIndex] = useState<number | null>(null);
+
   // PDF handling state - Lesson Plan
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const [isProcessingFile, setIsProcessingFile] = useState(false);
@@ -247,6 +251,54 @@ function App() {
   }, [uploadedFile, lessonText, existingPptFile]);
 
   const activeSlide = slides[activeSlideIndex];
+
+  // Selection handlers
+  const toggleSlideSelection = (slideId: string) => {
+    setSelectedSlideIds(prev => {
+      const next = new Set(prev);
+      if (next.has(slideId)) {
+        next.delete(slideId);
+      } else {
+        next.add(slideId);
+      }
+      return next;
+    });
+  };
+
+  const selectSlideRange = (startIndex: number, endIndex: number) => {
+    const start = Math.min(startIndex, endIndex);
+    const end = Math.max(startIndex, endIndex);
+    const idsToAdd = slides.slice(start, end + 1).map(s => s.id);
+    setSelectedSlideIds(prev => {
+      const next = new Set(prev);
+      idsToAdd.forEach(id => next.add(id));
+      return next;
+    });
+  };
+
+  const selectAllSlides = () => {
+    setSelectedSlideIds(new Set(slides.map(s => s.id)));
+  };
+
+  const deselectAllSlides = () => {
+    setSelectedSlideIds(new Set());
+    setLastClickedIndex(null);
+  };
+
+  const handleSlideCheckboxClick = (slideId: string, index: number, event: React.MouseEvent) => {
+    event.stopPropagation(); // Don't trigger thumbnail click
+
+    // Shift+click: range select from last clicked
+    if (event.shiftKey && lastClickedIndex !== null && lastClickedIndex < slides.length) {
+      selectSlideRange(lastClickedIndex, index);
+      setLastClickedIndex(index);
+      return;
+    }
+
+    // Cmd/Ctrl+click or plain click: toggle
+    toggleSlideSelection(slideId);
+    setLastClickedIndex(index);
+  };
 
   // Shared PDF processor for both upload zones
   const processPdf = async (
@@ -1008,6 +1060,15 @@ function App() {
     window.addEventListener('beforeunload', handleBeforeUnload);
     return () => window.removeEventListener('beforeunload', handleBeforeUnload);
   }, [hasUnsavedChanges]);
+
+  // Clear selection when slides array changes (prevents stale selections after delete/reorder)
+  useEffect(() => {
+    setSelectedSlideIds(prev => {
+      const validIds = new Set(slides.map(s => s.id));
+      const filtered = new Set([...prev].filter(id => validIds.has(id)));
+      return filtered.size !== prev.size ? filtered : prev;
+    });
+  }, [slides]);
 
   if (appState === AppState.PRESENTING) {
     return (
