@@ -20,10 +20,10 @@
 **Plans:** 4 plans
 
 Plans:
-- [ ] 36-01-PLAN.md — Provider interface and context types
-- [ ] 36-02-PLAN.md — Gemini streaming implementation
-- [ ] 36-03-PLAN.md — Claude SSE streaming implementation
-- [ ] 36-04-PLAN.md — Ask AI panel UI and integration
+- [x] 36-01-PLAN.md — Provider interface and context types
+- [x] 36-02-PLAN.md — Gemini streaming implementation
+- [x] 36-03-PLAN.md — Claude SSE streaming implementation
+- [x] 36-04-PLAN.md — Ask AI panel UI and integration
 
 ### Requirements Covered
 
@@ -131,4 +131,4 @@ When v3.4 is complete, teacher can:
 ---
 
 *Roadmap created: 2026-01-26*
-*Last updated: 2026-01-26*
+*Last updated: 2026-01-26 — Phase 36 complete*

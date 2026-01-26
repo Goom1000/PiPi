@@ -60,17 +60,17 @@ Requirements for the Ask AI in-presentation assistant. Teachers ask questions, g
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| CHAT-01 | Phase 36 | Pending |
-| CHAT-02 | Phase 36 | Pending |
-| CHAT-03 | Phase 36 | Pending |
-| CHAT-04 | Phase 36 | Pending |
-| CHAT-05 | Phase 36 | Pending |
-| CTXT-01 | Phase 36 | Pending |
-| CTXT-02 | Phase 36 | Pending |
-| CTXT-03 | Phase 36 | Pending |
-| UX-01 | Phase 36 | Pending |
-| UX-02 | Phase 36 | Pending |
-| UX-03 | Phase 36 | Pending |
+| CHAT-01 | Phase 36 | Complete |
+| CHAT-02 | Phase 36 | Complete |
+| CHAT-03 | Phase 36 | Complete |
+| CHAT-04 | Phase 36 | Complete |
+| CHAT-05 | Phase 36 | Complete |
+| CTXT-01 | Phase 36 | Complete |
+| CTXT-02 | Phase 36 | Complete |
+| CTXT-03 | Phase 36 | Complete |
+| UX-01 | Phase 36 | Complete |
+| UX-02 | Phase 36 | Complete |
+| UX-03 | Phase 36 | Complete |
 | HIST-01 | Phase 37 | Pending |
 | HIST-02 | Phase 37 | Pending |
 | HIST-03 | Phase 37 | Pending |
@@ -85,4 +85,4 @@ Requirements for the Ask AI in-presentation assistant. Teachers ask questions, g
 
 ---
 *Requirements defined: 2026-01-26*
-*Last updated: 2026-01-26 after initial definition*
+*Last updated: 2026-01-26 — Phase 36 requirements complete (11/17)*
