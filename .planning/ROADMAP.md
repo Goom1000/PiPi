@@ -22,7 +22,7 @@ v3.5 enables teachers to select slides from their presentation and export them f
 **Plans:** 1 plan
 
 Plans:
-- [ ] 38-01-PLAN.md - Add selection state, checkbox UI, and toolbar controls
+- [x] 38-01-PLAN.md - Add selection state, checkbox UI, and toolbar controls
 
 **Requirements:**
 - SEL-01: Teacher can toggle selection checkbox on each slide thumbnail
@@ -90,7 +90,7 @@ Plans:
 
 | Phase | Name | Requirements | Status |
 |-------|------|--------------|--------|
-| 38 | Slide Selection UI | SEL-01, SEL-02, SEL-03, SEL-04, SEL-05 | Planned |
+| 38 | Slide Selection UI | SEL-01, SEL-02, SEL-03, SEL-04, SEL-05 | ✓ Complete |
 | 39 | Export Infrastructure | EXP-01, EXP-02, EXP-03, QEX-01, QEX-02, QEX-03 | Not Started |
 | 40 | AI Poster Mode | POS-01, POS-02, POS-03, POS-04, POS-05, POS-06 | Not Started |
 
@@ -98,4 +98,4 @@ Plans:
 
 ---
 *Roadmap created: 2026-01-27*
-*Last updated: 2026-01-27*
+*Last updated: 2026-01-27 — Phase 38 complete*

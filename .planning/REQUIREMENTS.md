@@ -9,11 +9,11 @@ Requirements for Working Wall Export milestone.
 
 ### Slide Selection
 
-- [ ] **SEL-01**: Teacher can toggle selection checkbox on each slide thumbnail
-- [ ] **SEL-02**: Selected slides show visual indicator (highlight, checkmark, or border)
-- [ ] **SEL-03**: Selection count displays when 1+ slides selected (e.g., "3 slides selected")
-- [ ] **SEL-04**: "Select All" button selects all slides at once
-- [ ] **SEL-05**: "Deselect All" button clears all selections
+- [x] **SEL-01**: Teacher can toggle selection checkbox on each slide thumbnail
+- [x] **SEL-02**: Selected slides show visual indicator (highlight, checkmark, or border)
+- [x] **SEL-03**: Selection count displays when 1+ slides selected (e.g., "3 slides selected")
+- [x] **SEL-04**: "Select All" button selects all slides at once
+- [x] **SEL-05**: "Deselect All" button clears all selections
 
 ### Export UI
 
@@ -63,11 +63,11 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| SEL-01 | Phase 38 | Pending |
-| SEL-02 | Phase 38 | Pending |
-| SEL-03 | Phase 38 | Pending |
-| SEL-04 | Phase 38 | Pending |
-| SEL-05 | Phase 38 | Pending |
+| SEL-01 | Phase 38 | Complete |
+| SEL-02 | Phase 38 | Complete |
+| SEL-03 | Phase 38 | Complete |
+| SEL-04 | Phase 38 | Complete |
+| SEL-05 | Phase 38 | Complete |
 | EXP-01 | Phase 39 | Pending |
 | EXP-02 | Phase 39 | Pending |
 | EXP-03 | Phase 39 | Pending |
@@ -88,4 +88,4 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 ---
 *Requirements defined: 2026-01-27*
-*Last updated: 2026-01-27 after roadmap creation*
+*Last updated: 2026-01-27 — Phase 38 complete*
