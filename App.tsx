@@ -20,6 +20,7 @@ import ClassBankSaveModal from './components/ClassBankSaveModal';
 import ClassBankDropdown from './components/ClassBankDropdown';
 import ClassManagementModal from './components/ClassManagementModal';
 import StudentListModal from './components/StudentListModal';
+import ExportModal from './components/ExportModal';
 import { useToast, ToastContainer } from './components/Toast';
 import useHashRoute from './hooks/useHashRoute';
 import StudentView from './components/StudentView';
@@ -223,6 +224,7 @@ function App() {
   // Slide selection state (for Working Wall export)
   const [selectedSlideIds, setSelectedSlideIds] = useState<Set<string>>(new Set());
   const [lastClickedIndex, setLastClickedIndex] = useState<number | null>(null);
+  const [showExportModal, setShowExportModal] = useState(false);
 
   // PDF handling state - Lesson Plan
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
@@ -1547,6 +1549,18 @@ function App() {
                   >
                     Deselect All
                   </button>
+
+                  <button
+                    onClick={() => setShowExportModal(true)}
+                    disabled={selectedSlideIds.size === 0}
+                    className={`px-4 py-2 rounded-xl text-sm font-bold transition-all ${
+                      selectedSlideIds.size === 0
+                        ? 'bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-500 cursor-not-allowed'
+                        : 'bg-indigo-600 dark:bg-amber-500 text-white dark:text-slate-900 hover:bg-indigo-700 dark:hover:bg-amber-400 shadow-lg'
+                    }`}
+                  >
+                    Export for Working Wall
+                  </button>
                 </div>
              </div>
 
@@ -1837,6 +1851,16 @@ function App() {
             setShowStudentListModal(false);
             setShowManageModal(true);
           }}
+        />
+      )}
+
+      {/* Export Modal */}
+      {showExportModal && (
+        <ExportModal
+          slides={slides}
+          selectedSlideIds={selectedSlideIds}
+          onUpdateSelection={setSelectedSlideIds}
+          onClose={() => setShowExportModal(false)}
         />
       )}
 
