@@ -10,24 +10,24 @@ See: .planning/PROJECT.md (updated 2026-01-27)
 ## Current Position
 
 Phase: 38 - Slide Selection UI
-Plan: Not started
-Status: Roadmap created, ready for planning
-Last activity: 2026-01-27 — Roadmap v3.5 created
+Plan: 1 of 1 complete
+Status: Phase 38 complete
+Last activity: 2026-01-27 — Completed 38-01-PLAN.md
 
-Progress: [░░░░░░░░░░] 0% (v3.5 phases 38-40)
+Progress: [███░░░░░░░] 33% (v3.5 phases 38-40, 1 of 3 plans complete)
 
 ## Performance Metrics
 
 **Velocity:**
 - Milestones shipped: 15 (v1.0 through v3.4)
-- Total phases completed: 37
-- Total plans completed: 110
-- Total LOC: ~18,420 TypeScript
+- Total phases completed: 38
+- Total plans completed: 111
+- Total LOC: ~18,530 TypeScript
 
 **v3.5 Milestone (in progress):**
 - Phases: 3 (38-40)
-- Requirements: 17 total, 0 shipped
-- Plans completed: 0
+- Requirements: 17 total, 5 shipped (SEL-01 through SEL-05)
+- Plans completed: 1
 - Started: 2026-01-27
 
 **Recent Milestones:**
@@ -42,7 +42,12 @@ Progress: [░░░░░░░░░░] 0% (v3.5 phases 38-40)
 ### Decisions
 
 Decisions are logged in PROJECT.md Key Decisions table.
-No v3.5 decisions yet.
+
+| Phase | Decision | Rationale | Impact |
+|-------|----------|-----------|--------|
+| 38-01 | Use Set<string> for selectedSlideIds instead of Array | O(1) operations (has/add/delete) vs Array O(n) for includes() | Better performance with many slides |
+| 38-01 | Selection ring (ring-2) coexists with active state ring (ring-1) | Visual distinction between selected and currently active slide | Both states visible simultaneously |
+| 38-01 | Automatic cleanup of stale selections via useEffect | Prevents ghost selections after slide delete/reorder | Prevents selecting non-existent slides |
 
 ### Pending Todos
 
@@ -55,11 +60,11 @@ None.
 ## Session Continuity
 
 Last session: 2026-01-27
-Stopped at: Roadmap created
+Stopped at: Completed 38-01-PLAN.md (Phase 38 complete)
 Resume file: None
 
-**Next step:** `/gsd:plan-phase 38` to create plan for Slide Selection UI
+**Next step:** `/gsd:plan-phase 39` to create plan for Working Wall Export Logic
 
 ---
 *State initialized: 2026-01-18*
-*Last updated: 2026-01-27 — Roadmap v3.5 created*
+*Last updated: 2026-01-27 — Phase 38 complete (38-01)*
