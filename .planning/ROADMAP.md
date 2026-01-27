@@ -6,19 +6,19 @@ v3.6 adds feature discovery through contextual tooltips and per-screen walkthrou
 
 ## Milestones
 
-- ✅ **v3.5 Working Wall Export** - Phases 1-40 (shipped 2026-01-27)
-- 🚧 **v3.6 Tooltips & Onboarding** - Phases 41-44 (in progress)
+- v3.5 Working Wall Export - Phases 1-40 (shipped 2026-01-27)
+- v3.6 Tooltips & Onboarding - Phases 41-44 (in progress)
 
 ## Phases
 
 <details>
-<summary>✅ v3.5 Working Wall Export (Phases 1-40) - SHIPPED 2026-01-27</summary>
+<summary>v3.5 Working Wall Export (Phases 1-40) - SHIPPED 2026-01-27</summary>
 
 Previous milestone phases collapsed. See git history for details.
 
 </details>
 
-### 🚧 v3.6 Tooltips & Onboarding (In Progress)
+### v3.6 Tooltips & Onboarding (In Progress)
 
 **Milestone Goal:** Help teachers discover and understand Cue's features through contextual tooltips and per-screen walkthrough tours.
 
@@ -40,12 +40,12 @@ Previous milestone phases collapsed. See git history for details.
 7. User can trigger tooltips via keyboard focus, not just hover
 8. Screen readers announce tour dialogs and tooltip content with proper ARIA labels
 
-**Plans:** TBD
+**Plans:** 3 plans
 
 Plans:
-- [ ] 41-01: Install driver.js and Floating UI, create InfoTooltip component
-- [ ] 41-02: Implement useTourState hook with localStorage persistence
-- [ ] 41-03: Add ARIA labels, keyboard navigation, and focus indicators
+- [ ] 41-01-PLAN.md - Install driver.js and Floating UI, create InfoTooltip component
+- [ ] 41-02-PLAN.md - Implement useTourState hook with localStorage persistence
+- [ ] 41-03-PLAN.md - Create TourButton component and useTour hook with keyboard accessibility
 
 #### Phase 42: Landing Page Tour & Tooltips
 
@@ -119,11 +119,11 @@ Plans:
 
 ## Progress
 
-**Execution Order:** Phases execute in numeric order: 41 → 42 → 43 → 44
+**Execution Order:** Phases execute in numeric order: 41 -> 42 -> 43 -> 44
 
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
-| 41. Tour Infrastructure & Accessibility | v3.6 | 0/3 | Not started | - |
+| 41. Tour Infrastructure & Accessibility | v3.6 | 0/3 | Planned | - |
 | 42. Landing Page Tour & Tooltips | v3.6 | 0/2 | Not started | - |
 | 43. Editor Tour & Tooltips | v3.6 | 0/2 | Not started | - |
 | 44. Presentation Mode Tour & Tooltips | v3.6 | 0/2 | Not started | - |
@@ -131,4 +131,4 @@ Plans:
 ---
 
 *Roadmap created: 2026-01-27*
-*Last updated: 2026-01-27*
+*Last updated: 2026-01-27 - Phase 41 plans created*
