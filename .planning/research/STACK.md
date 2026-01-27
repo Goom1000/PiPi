@@ -1,133 +1,149 @@
-# Technology Stack: Pedagogical Slide Types
+# Technology Stack: Tooltips & Onboarding Tours
 
-**Project:** Cue — Pedagogical slide type additions
-**Researched:** 2026-01-25
+**Project:** Cue — Tooltips and onboarding walkthrough features
+**Researched:** 2026-01-27
 **Confidence:** HIGH
 
 ## Executive Summary
 
-**No new dependencies required.** All four features (Elaborate slides, Work Together slides, Class Challenge slides, and single-slide teleprompter regeneration) can be implemented with the existing stack.
+**Two lightweight libraries recommended:**
 
-The codebase already has established patterns for:
-- AI content generation via provider abstraction (Gemini/Claude)
-- Slide insertion via dropdown menu
-- Real-time teacher-student sync via BroadcastChannel
-- On-demand regeneration (proven in v3.1 verbosity caching)
+1. **Driver.js** (~5kb) for onboarding tours — lightweight, framework-agnostic, direct React integration
+2. **Floating UI** (~3kb) for tooltips — modern, Tailwind-friendly, React 19 compatible
 
-## Existing Stack (No Changes)
+These libraries integrate seamlessly with existing React 19 + Tailwind CSS stack without introducing heavy dependencies or UI library lock-in.
 
-### Core Framework
-| Technology | Version | Purpose | Status |
-|------------|---------|---------|--------|
-| React | 19.2.0 | UI framework | ✓ Current |
-| TypeScript | 5.8.2 | Type safety | ✓ Current |
-| Vite | 6.2.0 | Build tool | ✓ Current |
+**Total bundle impact:** ~8kb gzipped (combined)
 
-### AI Providers
-| Technology | Version | Purpose | Status |
-|------------|---------|---------|--------|
-| @google/genai | 1.30.0 | Gemini API client | ✓ Current |
-| Claude API | (via fetch) | Claude Sonnet 4.5 | ✓ Current |
+## Recommended Stack
 
-### UI Libraries
-| Technology | Version | Purpose | Status |
-|------------|---------|---------|--------|
-| Tailwind CSS | (via CDN) | Styling | ✓ Current |
-| react-rnd | 10.5.2 | Draggable/resizable windows | ✓ Current |
+### Onboarding Tours
 
-### Communication
-| Technology | Version | Purpose | Status |
-|------------|---------|---------|--------|
-| BroadcastChannel | (native) | Teacher-student sync | ✓ Current |
+| Technology | Version | Purpose | Why |
+|------------|---------|---------|-----|
+| driver.js | 1.4.0 | Guided tours for per-screen walkthroughs | Lightest option (~5kb), zero dependencies, works with custom components, manual trigger support |
 
-## Why No New Dependencies?
-
-### 1. Elaborate Slides (AI-Generated Deeper Content)
-
-**Requirement:** Generate slide with expanded detail on current topic
-
-**Implementation path:**
-- Add new method to `AIProviderInterface`: `generateElaborateSlide()`
-- Pattern: Identical to existing `generateExemplarSlide()` and `generateContextualSlide()`
-- AI prompt engineering only (no new libraries)
-
-**Existing precedent:**
-```typescript
-// From services/aiProvider.ts (line 189-190)
-generateExemplarSlide(lessonTopic: string, prevSlide: Slide): Promise<Slide>;
-generateContextualSlide(lessonTopic: string, userInstruction: string,
-  prevSlide?: Slide, nextSlide?: Slide): Promise<Slide>;
+**Installation:**
+```bash
+npm install driver.js
 ```
 
-**Stack decision:** Use existing AI provider abstraction
-**Rationale:** Elaborate = "explain current slide in more depth" is a prompt variation, not a capability gap
+**Why Driver.js:**
+- **Lightest bundle:** ~5kb gzipped vs 37kb+ for react-joyride
+- **Zero dependencies:** Pure TypeScript, no transitive deps
+- **Manual trigger:** Perfect for per-screen walkthrough buttons
+- **Framework-agnostic:** Works with custom components without React wrapper complexity
+- **Active maintenance:** v1.4.0 published December 2025
+- **Tailwind-friendly:** Unstyled by default, easy to apply Tailwind classes
+
+**React integration pattern:**
+```typescript
+import { driver } from 'driver.js';
+import 'driver.js/dist/driver.css';
+
+const driverObj = driver({
+  steps: [
+    { element: '#some-element', popover: { title: 'Title', description: 'Description' } }
+  ]
+});
+
+// Trigger via button click
+<button onClick={() => driverObj.drive()}>Start Tour</button>
+```
+
+**Source confidence:** HIGH
+- [Official npm package](https://www.npmjs.com/package/driver.js) — v1.4.0 current
+- [Driver.js official docs](https://driverjs.com/) — React integration examples
+- [Bundle size verified](https://bundlephobia.com/package/driver.js) — 5kb gzipped
+- Multiple 2026 tutorials confirm direct React usage without wrappers
 
 ---
 
-### 2. Work Together Slides (AI-Generated Collaborative Activities)
+### Tooltips
 
-**Requirement:** Generate activity slides for pair/group work
+| Technology | Version | Purpose | Why |
+|------------|---------|---------|-----|
+| @floating-ui/react | 0.27.16 | Info icon tooltips for feature explanations | Modern Popper.js successor, ~3kb, React 19 compatible, complete styling control |
 
-**Implementation path:**
-- Add new method to `AIProviderInterface`: `generateWorkTogetherSlide()`
-- Pattern: Identical to Elaborate (context-aware generation)
-- AI prompt specifies activity format (pair work, group discussion, hands-on)
+**Installation:**
+```bash
+npm install @floating-ui/react
+```
 
-**Stack decision:** Use existing AI provider abstraction
-**Rationale:** Activity generation is prompt engineering, not a new API capability
+**Why Floating UI:**
+- **Lightest modern option:** ~3kb for positioning primitives
+- **React 19 compatible:** Official support, actively maintained
+- **Headless architecture:** Complete styling control with Tailwind CSS
+- **Positioning engine:** Smart collision detection, auto-adjustment
+- **Accessibility built-in:** Hooks for proper ARIA attributes
+- **No UI library lock-in:** Style with existing Tailwind patterns
+
+**React integration pattern:**
+```typescript
+import { useFloating, useHover, useInteractions } from '@floating-ui/react';
+
+const { refs, floatingStyles, context } = useFloating({
+  placement: 'top',
+});
+
+const hover = useHover(context);
+const { getReferenceProps, getFloatingProps } = useInteractions([hover]);
+
+return (
+  <>
+    <button ref={refs.setReference} {...getReferenceProps()}>
+      <InfoIcon />
+    </button>
+    <div ref={refs.setFloating} style={floatingStyles} {...getFloatingProps()}>
+      Tooltip content
+    </div>
+  </>
+);
+```
+
+**Source confidence:** HIGH
+- [Official npm package](https://www.npmjs.com/package/@floating-ui/react) — v0.27.16 current (5 months ago)
+- [Floating UI official docs](https://floating-ui.com/docs/react) — React 19 examples
+- [Bundle size verified](https://bundlephobia.com/package/@floating-ui/react) — ~3kb for core positioning
+- Industry standard (powers Radix UI, Headless UI tooltip primitives)
 
 ---
 
-### 3. Class Challenge Slides (Live Teacher Input)
+## Alternatives Considered
 
-**Requirement:** Teacher types student contributions live during presentation, visible to student view
+### Onboarding Tour Alternatives
 
-**Implementation path:**
-- Native React controlled inputs (React 19 built-in state management)
-- BroadcastChannel sync pattern (already proven for game state)
-- No rich text editing needed (plain text bullets sufficient)
+| Library | Why Not Recommended |
+|---------|-------------------|
+| **react-joyride** | Bundle size concern: adds ~37kb to bundle. React 19 compatibility issues (peer dependency warnings, community fork required for full support). Maintenance concerns (unresolved bugs from 2020). Official v3.0 still in pre-release with React 19 bugs. |
+| **Intro.js** | Commercial license required for business use (AGPL, $9.99-$299). Not React-first (requires manual DOM refs). Framework-agnostic means less idiomatic React integration. |
+| **Shepherd.js** | Smaller ecosystem (643 stars vs driver.js alternatives). AGPL license (commercial restrictions). Not React-specific, requires wrapper management. |
+| **OnboardJS** | State machine approach requires bringing your own UI. More complex for simple per-screen tours. Adds abstraction layer without clear benefit for manual-trigger use case. |
+| **React wrappers (driverjs-react, driver.jsx, use-driver)** | Community trend (2025-2026) favors direct driver.js integration. Wrappers add maintenance burden without significant DX improvement. Direct integration provides more control. |
 
-**Existing precedent:**
-```typescript
-// From types.ts (line 199)
-| { type: 'GAME_STATE_UPDATE'; payload: GameState }
-```
-
-**Why NOT react-contenteditable:**
-- Package outdated (v3.3.7 from ~2022-2023, 152k weekly downloads but no recent updates)
-- Adds unnecessary complexity for plain text input
-- React 19 controlled components are more predictable and performant
-- Native `<textarea>` or `<input>` with `onChange` is the React 19 best practice
-
-**Stack decision:** Native React controlled inputs + BroadcastChannel
-**Rationale:**
-- Plain text bullets don't need contenteditable complexity
-- React 19's controlled components handle form state reliably
-- BroadcastChannel already syncs complex game state (proven in v3.0)
-- Simpler = fewer bugs, better performance
+**Decision rationale:**
+- Bundle size matters for client-side app (driver.js: 5kb vs react-joyride: 37kb)
+- React 19 compatibility proven for driver.js, problematic for react-joyride
+- Manual trigger pattern works better with direct driver.js API
+- Framework-agnostic = works with custom components without React-specific constraints
 
 ---
 
-### 4. Single Slide Teleprompter Regeneration
+### Tooltip Alternatives
 
-**Requirement:** Regenerate teleprompter script for one slide without changing verbosity level
+| Library | Why Not Recommended |
+|---------|-------------------|
+| **Radix UI Tooltip** | Larger bundle (~135kb package size). Brings full Radix component architecture when only tooltips needed. Excellent option if using Radix elsewhere, but overkill for isolated tooltip use. |
+| **Tippy.js** | Legacy library (pre-Floating UI era). Heavier than Floating UI. Community recommends migrating to Floating UI for new projects in 2026. |
+| **react-tooltip** | Bundle size concerns raised in GitHub issues. Less flexible than Floating UI for custom styling. Floating UI is the modern standard. |
+| **Flowbite React / Material Tailwind** | Pulls in full component library for one component. Defeats purpose of custom component architecture. Increases bundle size unnecessarily. |
+| **react-tippy** | Outdated (last update ~2022-2023). Based on legacy Tippy.js. Not maintained for React 19. |
 
-**Implementation path:**
-- Call existing `regenerateTeleprompter()` method (added in v3.1)
-- Pattern: Identical to verbosity toggle, but reuse current verbosity level
-- UI: Add "↻ Regenerate" button next to verbosity selector
-
-**Existing precedent:**
-```typescript
-// From services/aiProvider.ts (line 208-211)
-regenerateTeleprompter(
-  slide: Slide,
-  verbosity: VerbosityLevel
-): Promise<string>;
-```
-
-**Stack decision:** Use existing regeneration method
-**Rationale:** Already implemented for v3.1 verbosity caching, just expose it to UI
+**Decision rationale:**
+- Headless architecture preserves existing custom component patterns
+- Floating UI is the modern industry standard (Popper.js successor)
+- Tailwind CSS compatibility without UI library dependencies
+- Smallest bundle for production-grade positioning logic
 
 ---
 
@@ -135,102 +151,191 @@ regenerateTeleprompter(
 
 ### What NOT to Add
 
-| Library | Why Avoid |
-|---------|-----------|
-| react-contenteditable | Outdated (2022-2023), adds complexity for plain text use case |
-| Draft.js | 2MB bundle, overkill for bullet point editing |
-| Lexical | Facebook's rich text editor - too heavy for simple input |
-| Liveblocks | 3rd-party collaboration service - BroadcastChannel already works |
-| Supabase Realtime | External dependency - BroadcastChannel is native and free |
-| Socket.io | Server required - BroadcastChannel is client-only and instant |
+| Category | Library | Why Avoid |
+|----------|---------|-----------|
+| **Full UI libraries** | shadcn/ui, Chakra UI, Ant Design | Defeats existing custom component architecture. Adds 100kb+ for two features. |
+| **Rich tour builders** | Appcues, UserGuiding, Pendo | SaaS products ($19-$99/month). Overkill for per-screen manual tours. Requires external account management. |
+| **Heavy abstractions** | React Tour, reactour, @reactour/tour | More abstraction than driver.js without meaningful DX improvement. Larger bundles. |
+| **Outdated libraries** | react-contenteditable, Draft.js | Not relevant for tooltips/tours, but in same UI enhancement category. React 19 has better native solutions. |
 
-**Principle:** Don't add dependencies when native browser APIs + existing patterns solve the problem.
+**Principle:** Lightweight, framework-agnostic libraries preserve existing architecture while adding specific capabilities.
 
 ---
 
 ## Integration Points with Existing Stack
 
-### AI Provider Extension Pattern
+### Driver.js + React 19
 
-All new AI methods follow existing interface:
+**Direct integration pattern (no wrapper):**
 
 ```typescript
-// services/aiProvider.ts — ADD these methods to AIProviderInterface
-interface AIProviderInterface {
-  // ... existing methods ...
+// components/WalkthroughButton.tsx
+import { driver } from 'driver.js';
+import 'driver.js/dist/driver.css';
 
-  // NEW: Pedagogical slide types
-  generateElaborateSlide(
-    lessonTopic: string,
-    currentSlide: Slide,
-    depth: 'detailed' | 'conceptual' | 'example-focused'
-  ): Promise<Slide>;
+export function WalkthroughButton({ screenId }: { screenId: string }) {
+  const startTour = () => {
+    const driverObj = driver({
+      showProgress: true,
+      steps: getStepsForScreen(screenId), // Dynamic per-screen
+    });
+    driverObj.drive();
+  };
 
-  generateWorkTogetherSlide(
-    lessonTopic: string,
-    currentSlide: Slide,
-    activityType: 'pair-share' | 'group-discussion' | 'hands-on' | 'think-pair-share'
-  ): Promise<Slide>;
+  return (
+    <button onClick={startTour} className="...tailwind classes">
+      <span>?</span> Show Guide
+    </button>
+  );
 }
 ```
 
-**Both Gemini and Claude providers must implement** (via `geminiService.ts` and `claudeProvider.ts`).
+**Per-screen step configuration:**
+
+```typescript
+// config/walkthroughs.ts
+export const walkthroughs: Record<string, Step[]> = {
+  'slide-builder': [
+    {
+      element: '#add-slide-button',
+      popover: {
+        title: 'Add Slides',
+        description: 'Click here to insert new slides',
+        side: 'bottom',
+        align: 'start'
+      }
+    },
+    // ... more steps
+  ],
+  'teleprompter-view': [ /* ... */ ],
+};
+```
+
+**Tailwind CSS styling:**
+
+```typescript
+const driverObj = driver({
+  popoverClass: 'bg-white shadow-lg rounded-lg border border-gray-200',
+  // Override default styles with Tailwind classes
+});
+```
 
 ---
 
-### Slide Insertion Menu Extension
+### Floating UI + Tailwind CSS
 
-Current pattern (from App.tsx line 30):
-
-```typescript
-const InsertPoint = ({
-  onClickBlank,
-  onClickExemplar
-}: {
-  onClickBlank: () => void,
-  onClickExemplar: () => void
-}) => { /* ... */ }
-```
-
-**Extend with new options:**
-- "Elaborate" → calls `handleInsertElaborateSlide(index)`
-- "Work Together" → calls `handleInsertWorkTogetherSlide(index)`
-- "Class Challenge" → inserts blank slide with `type: 'class-challenge'` flag
-
----
-
-### BroadcastChannel Message Extension
-
-Current pattern (from types.ts line 193-202):
+**Tooltip component pattern:**
 
 ```typescript
-type PresentationMessage =
-  | { type: 'STATE_UPDATE'; payload: PresentationState }
-  | { type: 'GAME_STATE_UPDATE'; payload: GameState }
-  // ...
-```
+// components/InfoTooltip.tsx
+import { useState } from 'react';
+import {
+  useFloating,
+  useHover,
+  useFocus,
+  useDismiss,
+  useRole,
+  useInteractions,
+  offset,
+  flip,
+  shift,
+  arrow,
+} from '@floating-ui/react';
 
-**Add for Class Challenge:**
-```typescript
-| { type: 'CHALLENGE_UPDATE'; payload: { slideId: string; contributions: string[] } }
-```
+export function InfoTooltip({ content, children }: Props) {
+  const [isOpen, setIsOpen] = useState(false);
 
-Pattern already proven for game state sync (v3.0).
+  const { refs, floatingStyles, context } = useFloating({
+    open: isOpen,
+    onOpenChange: setIsOpen,
+    placement: 'top',
+    middleware: [offset(10), flip(), shift()],
+  });
 
----
+  const hover = useHover(context);
+  const focus = useFocus(context);
+  const dismiss = useDismiss(context);
+  const role = useRole(context, { role: 'tooltip' });
 
-### Slide Type Discriminator (Optional Enhancement)
+  const { getReferenceProps, getFloatingProps } = useInteractions([
+    hover,
+    focus,
+    dismiss,
+    role,
+  ]);
 
-Current `Slide` interface could add optional type flag:
-
-```typescript
-export interface Slide {
-  // ... existing fields ...
-  slideType?: 'standard' | 'elaborate' | 'work-together' | 'class-challenge';
+  return (
+    <>
+      <button
+        ref={refs.setReference}
+        {...getReferenceProps()}
+        className="inline-flex items-center text-blue-500 hover:text-blue-600"
+      >
+        {children || <InfoIcon />}
+      </button>
+      {isOpen && (
+        <div
+          ref={refs.setFloating}
+          style={floatingStyles}
+          {...getFloatingProps()}
+          className="z-50 max-w-xs px-3 py-2 text-sm text-white bg-gray-900 rounded-lg shadow-lg"
+        >
+          {content}
+        </div>
+      )}
+    </>
+  );
 }
 ```
 
-**Not required** — just helps UI conditionally render Class Challenge edit mode.
+**Usage in existing components:**
+
+```typescript
+// In any React component
+<InfoTooltip content="This generates a new slide with AI">
+  <button className="...">Generate Slide</button>
+</InfoTooltip>
+```
+
+---
+
+## Bundle Size Impact
+
+| Library | Minified | Gzipped | Impact |
+|---------|----------|---------|--------|
+| driver.js | ~20kb | ~5kb | Minimal — equivalent to small utility library |
+| @floating-ui/react | ~15kb | ~3kb | Negligible — less than one image |
+| **Total** | **~35kb** | **~8kb** | **Low impact** for client-side app |
+
+**For context:**
+- Current largest dependency: react-rnd (~50kb gzipped)
+- Both libraries combined: 8kb (16% of react-rnd)
+- Industry standard: <50kb for feature additions is acceptable
+- These libraries: Well below threshold
+
+**Tree-shaking:**
+- Floating UI: Full tree-shaking support (import only what you use)
+- Driver.js: Single entry point, but entire library is <5kb (not worth code-splitting)
+
+---
+
+## React 19 Compatibility
+
+### Driver.js
+**Status:** ✓ Compatible
+- Framework-agnostic (vanilla TypeScript)
+- No React peer dependencies
+- Works with any React version (16+)
+- Confirmed working in React 19 projects (2026 tutorials)
+
+### Floating UI
+**Status:** ✓ Compatible
+- Official React 19 support added 2024
+- Peer dependency: `react@>=16.8.0` (includes React 19)
+- Active maintenance (last update 5 months ago)
+- Powers React 19-compatible libraries (Radix UI Themes v3.x)
+
+**Source:** [Radix Themes React 19 support](https://www.radix-ui.com/themes/docs/overview/releases) — Radix uses Floating UI primitives, verified React 19 compatible
 
 ---
 
@@ -238,23 +343,38 @@ export interface Slide {
 
 | Feature | Confidence | Rationale |
 |---------|------------|-----------|
-| Elaborate slides | HIGH | Identical pattern to generateExemplarSlide (shipped in v2.0) |
-| Work Together slides | HIGH | Same as Elaborate, different prompt |
-| Class Challenge slides | HIGH | BroadcastChannel proven in v3.0 game sync; React 19 controlled inputs are standard |
-| Single regeneration | HIGH | Method already exists (v3.1), just needs UI button |
+| Driver.js tours | HIGH | Framework-agnostic, proven in React 19, direct integration pattern documented in 2026 guides |
+| Floating UI tooltips | HIGH | Official React 19 support, actively maintained, industry standard (powers Radix/Headless UI) |
+| Tailwind integration | HIGH | Both libraries headless/unstyled by design, complete Tailwind control |
+| Bundle size impact | HIGH | Combined 8kb gzipped, negligible for client-side app |
+| Custom component compatibility | HIGH | Neither library imposes component structure, works with existing architecture |
 
 ---
 
 ## Installation
 
-**No changes required.** Existing dependencies cover all features.
-
 ```bash
-# Current package.json is sufficient:
-# - react: ^19.2.0
-# - react-dom: ^19.2.0
-# - @google/genai: ^1.30.0
-# - react-rnd: ^10.5.2 (unchanged)
+# Install both libraries
+npm install driver.js @floating-ui/react
+
+# No additional dependencies required
+# Both libraries are zero-dependency at their core
+```
+
+**Current package.json after installation:**
+```json
+{
+  "dependencies": {
+    "@google/genai": "^1.30.0",
+    "@floating-ui/react": "^0.27.16",
+    "driver.js": "^1.4.0",
+    "html2canvas": "^1.4.1",
+    "jspdf": "^4.0.0",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "react-rnd": "^10.5.2"
+  }
+}
 ```
 
 ---
@@ -262,25 +382,67 @@ export interface Slide {
 ## Validation Sources
 
 ### Official Documentation
-- **React 19 Forms:** [Native Form Handling in React 19](https://www.yeti.co/blog/native-form-handling-in-react-19) — confirms controlled components with `useState` are best practice for 2026
-- **React 19 State:** [Managing State – React](https://react.dev/learn/managing-state) — official guidance on controlled inputs
-- **BroadcastChannel API:** [MDN Web Docs](https://developer.mozilla.org/en-US/docs/Web/API/BroadcastChannel_API) — native browser API, no polyfill needed
+
+**Driver.js:**
+- [Official website](https://driverjs.com/) — React examples, configuration options
+- [npm package](https://www.npmjs.com/package/driver.js) — v1.4.0, 5kb bundle, zero dependencies
+- [GitHub repository](https://github.com/kamranahmedse/driver.js) — Active maintenance, 23k+ stars
+
+**Floating UI:**
+- [Official React docs](https://floating-ui.com/docs/react) — React 19 examples, hooks API
+- [Tooltip component guide](https://floating-ui.com/docs/tooltip) — Complete tooltip implementation
+- [npm package](https://www.npmjs.com/package/@floating-ui/react) — v0.27.16, React 19 peer dependency
 
 ### Ecosystem Research
-- **React + AI Stack 2026:** [The React + AI Stack for 2026](https://www.builder.io/blog/react-ai-stack-2026) — confirms TypeScript + Tailwind + AI API integration is current best practice
-- **Controlled Components:** [React Forms Best Practices](https://www.dhiwise.com/blog/design-converter/react-forms-best-practices-for-better-user-experience) — controlled components with `onChange` handlers recommended over contenteditable
 
-### Package Status
-- **react-contenteditable:** v3.3.7 last published ~2022-2023, no updates in 3+ years ([npm trends](https://npmtrends.com/react-contenteditable)) — decision: avoid, use native inputs
+**2026 Onboarding Library Comparisons:**
+- [5 Best React Onboarding Libraries (2026)](https://onboardjs.com/blog/5-best-react-onboarding-libraries-in-2025-compared) — Driver.js recommended for lightweight, manual-trigger tours
+- [React Product Tour Libraries (2026)](https://whatfix.com/blog/react-onboarding-tour/) — Driver.js: 340k+ weekly downloads, React-first approach
+- [Top 8 React Product Tour Libraries](https://www.chameleon.io/blog/react-product-tour) — Driver.js ideal for "lightweight, framework-agnostic, visually polished solution"
+
+**2026 Tooltip Library Comparisons:**
+- [Top 6 React Tooltip Libraries (2026)](https://themeselection.com/react-tooltip-libraries/) — Floating UI recommended for headless approach
+- [Lightweight React Tooltips](https://blog.openreplay.com/lightweight-tooltips-react/) — Floating UI: ~3kb, modern Popper.js successor
+- [15 Best React UI Libraries (2026)](https://www.builder.io/blog/react-component-libraries-2026) — Floating UI/Radix UI for headless components
+
+**Bundle Size Verification:**
+- [driver.js Bundlephobia](https://bundlephobia.com/package/driver.js) — 5kb gzipped confirmed
+- [react-joyride Bundlephobia](https://bundlephobia.com/package/react-joyride) — 37kb gzipped (comparison)
+- [Floating UI Bundlephobia](https://bundlephobia.com/package/@floating-ui/react) — 3kb core positioning
+
+**React 19 Compatibility:**
+- [react-joyride React 19 issues](https://github.com/gilbarbara/react-joyride/issues/1151) — Peer dependency warnings, community fork required
+- [Radix UI React 19 support](https://www.radix-ui.com/themes/docs/overview/releases) — June 2024 update, Floating UI verified compatible
+- Multiple 2026 tutorials show driver.js + React 19 direct integration without compatibility issues
+
+### Community Patterns (2026)
+
+**Driver.js with React:**
+- Community trend: Direct integration preferred over wrappers (driverjs-react, driver.jsx, use-driver)
+- [Medium: Creating Interactive User Guides with Driver.js](https://medium.com/@mefengl/creating-interactive-user-guides-in-react-with-driver-js-1-x-a-light-hearted-approach-297de5d99cb3) — React 19 example
+- [DEV: Streamline User Onboarding with driver.js](https://dev.to/fadilnatakusumah/streamline-user-onboarding-with-driverjs-222e) — React integration pattern
+
+**Floating UI adoption:**
+- Powers major libraries: Radix UI, Headless UI, shadcn/ui tooltips
+- Industry standard for positioning engines in 2026
+- Replaced Popper.js in most modern React projects
 
 ---
 
 ## Decision Summary
 
-**Zero new dependencies.** Extend existing patterns:
+**Add two lightweight libraries:**
 
-1. **Elaborate/Work Together slides:** Add AI provider methods (same pattern as Exemplar)
-2. **Class Challenge slides:** React controlled inputs + BroadcastChannel sync (proven in games)
-3. **Single regeneration:** Expose existing `regenerateTeleprompter()` to UI
+1. **driver.js (1.4.0)** for onboarding tours
+   - 5kb gzipped, zero dependencies
+   - Manual trigger perfect for per-screen walkthrough buttons
+   - Works with custom components without React wrapper complexity
 
-**Architectural principle:** Maximize existing capabilities before adding dependencies.
+2. **@floating-ui/react (0.27.16)** for tooltips
+   - 3kb gzipped for core positioning
+   - Headless architecture preserves Tailwind CSS styling patterns
+   - React 19 compatible, actively maintained
+
+**Combined bundle impact:** 8kb gzipped (acceptable for client-side app)
+
+**Architectural principle:** Choose lightweight, framework-agnostic libraries that preserve existing custom component architecture while adding specific capabilities. Avoid heavy UI libraries that would conflict with established Tailwind CSS patterns.
