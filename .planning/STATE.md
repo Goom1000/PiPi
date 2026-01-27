@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-01-27)
 ## Current Position
 
 Phase: 41 of 44 (Tour Infrastructure & Accessibility)
-Plan: 1 of 3 complete
+Plan: 2 of 3 complete
 Status: In progress
-Last activity: 2026-01-28 — Completed 41-01-PLAN.md (Tour Infrastructure Foundation)
+Last activity: 2026-01-28 — Completed 41-03-PLAN.md (Tour Button & Hook Integration)
 
-Progress: [█░░░░░░░░░] 0.8% (1/119)
+Progress: [█░░░░░░░░░] 1.7% (2/119)
 
 ## Performance Metrics
 
@@ -51,6 +51,9 @@ Recent decisions for v3.6:
 - Z-index 10000+ range for tours: overlay at z-10000, popover at z-10001 (41-01)
 - Tooltip color inversion in dark mode: light tooltips on dark bg for better contrast (41-01)
 - 200ms hover delay for tooltips to prevent accidental triggers (41-01)
+- Tour completion detection: Track step index and only fire onComplete when user reaches last step, not on skip/dismiss (41-03)
+- Keyboard navigation: Enable allowKeyboardControl in driver.js for Tab/Enter/Escape handling (41-03)
+- Focus indicators: Use theme-aware focus rings (indigo-500 light, amber-500 dark) for keyboard visibility (41-03)
 
 ### Pending Todos
 
@@ -71,11 +74,11 @@ See `.planning/todos/pending/` — run `/gsd:check-todos` to review
 ## Session Continuity
 
 Last session: 2026-01-28
-Stopped at: Completed 41-01-PLAN.md
+Stopped at: Completed 41-03-PLAN.md
 Resume file: None
 
-**Next step:** `/gsd:execute-phase 41-02` to implement tour functionality
+**Next step:** `/gsd:execute-phase 41-02` to implement tour state persistence, or continue with remaining plans
 
 ---
 *State initialized: 2026-01-18*
-*Last updated: 2026-01-28 — 41-01 tour infrastructure foundation complete*
+*Last updated: 2026-01-28 — 41-03 tour button & hook integration complete*
