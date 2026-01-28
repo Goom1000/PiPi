@@ -1,358 +1,342 @@
-# Feature Behavior Research: Bug Fix Milestone
+# Feature Landscape: AI Resource Enhancement (v3.7)
 
-**Project:** PiPi - Teacher Presentation Tool
-**Researched:** 2026-01-20
-**Purpose:** Define expected behavior and acceptance criteria for 4 bugs
-
----
-
-## Bug 1: Game Activity Not Syncing to Student View
-
-### Current Behavior (Bug)
-
-When teacher opens the Quiz Game modal in PresentationView, students viewing the projector (StudentView) continue to see the static slide content. The game activity is not broadcast to the student window.
-
-### Expected Behavior
-
-When teacher opens a game/quiz activity, the student view should:
-1. **Immediately display the game UI** - Students see the same quiz interface as teacher
-2. **Sync game state in real-time** - Question number, options, reveal state all synchronized
-3. **Show interactive elements read-only** - Students see questions/answers but cannot interact (teacher controls progression)
-
-### Standard Patterns
-
-**Observer Synchronization Pattern** (Martin Fowler):
-- Single shared state broadcasts to all observers
-- Changes in one view propagate to domain state, then to other views
-- Each view is an observer of the shared data
-
-**BroadcastChannel API** (already used in codebase):
-- Teacher sends `STATE_UPDATE` messages
-- Student listens and updates local state
-- Pattern supports extending payload for game state
-
-### Root Cause Analysis
-
-Looking at `PresentationView.tsx`:
-- QuizOverlay renders as a portal (`createPortal(..., document.body)`)
-- Game state (`isQuizModalOpen`, `mode`, `questions`, etc.) is local to PresentationView
-- `STATE_UPDATE` messages only include `{ currentIndex, visibleBullets, slides }`
-- **Missing:** Game state is not included in broadcast messages
-
-Looking at `StudentView.tsx`:
-- Only handles `STATE_UPDATE` with slide state
-- **Missing:** No game UI component or game state handling
-
-### Fix Requirements
-
-1. Extend `PresentationMessage` type to include game state:
-   ```typescript
-   | { type: 'GAME_START'; payload: { mode: 'quiz'; numQuestions: number } }
-   | { type: 'GAME_UPDATE'; payload: GameState }
-   | { type: 'GAME_END' }
-   ```
-
-2. Broadcast game state changes from PresentationView
-3. Add game rendering to StudentView
-4. Student view renders read-only game UI (no interaction buttons)
-
-### Acceptance Criteria
-
-| Criterion | Test Method |
-|-----------|-------------|
-| Opening game modal broadcasts to student | Open game in teacher view, verify student view changes |
-| Quiz questions appear on student view | Compare question text visible on both screens |
-| Answer reveal syncs to student view | Click "Reveal Answer" in teacher, verify student sees highlight |
-| Closing game returns student to slide | Close quiz, verify student shows current slide |
-| Game works with fresh student connection | Open student view AFTER game started, verify catches up |
+**Project:** Cue - Teacher Presentation Tool
+**Domain:** AI-powered worksheet/resource enhancement for K-12 teachers
+**Researched:** 2026-01-29
+**Confidence:** MEDIUM (based on competitor analysis and educational technology patterns)
 
 ---
 
-## Bug 2: Slide Preview Not Scaling to Fit Container
+## Executive Summary
 
-### Current Behavior (Bug)
-
-The NextSlidePreview floating window shows slide content that overflows or doesn't scale to fit the container. The preview should show a miniature of the full slide, but instead shows it at a fixed size that may be cropped.
-
-### Expected Behavior
-
-The slide preview should:
-1. **Scale entire slide to fit container** - Like "Fit to window" in presentation apps
-2. **Maintain aspect ratio** - 16:9 ratio preserved
-3. **Show complete slide content** - No cropping, all content visible
-4. **Resize dynamically** - When floating window resizes, preview scales with it
-
-### Standard Patterns
-
-**CSS `object-fit: contain`** - Scales content to fit within container without cropping
-- Preserves aspect ratio
-- May leave empty space (letterboxing)
-- Appropriate when full visibility matters over visual impact
-
-**CSS `aspect-ratio` property** - Maintains width-to-height ratio
-- Modern approach: `aspect-ratio: 16 / 9`
-- Browser adjusts dimensions to preserve ratio regardless of container size
-
-**Transform Scale Pattern** - Scale down content to fit:
-```css
-.preview-container {
-  aspect-ratio: 16 / 9;
-  overflow: hidden;
-}
-.preview-content {
-  transform: scale(var(--scale-factor));
-  transform-origin: top left;
-}
-```
-
-### Root Cause Analysis
-
-Looking at `NextSlidePreview.tsx` lines 72-105:
-```tsx
-<div className="w-full h-full bg-slate-800">
-  <div className="aspect-video">  // <- Sets 16:9 ratio
-    {nextSlide ? (
-      <div className="h-full w-full bg-white p-2 overflow-hidden">
-        <div className="text-[10px] font-bold ...">  // <- Fixed tiny text
-          {nextSlide.title}
-        </div>
-        <div className="space-y-0.5">
-          {nextSlide.content.slice(0, 3).map(...)}  // <- Shows first 3 bullets only
-        </div>
-      </div>
-    )}
-  </div>
-</div>
-```
-
-**Problem:** The preview renders a simplified text representation of the slide, not a scaled-down version of the actual slide renderer. This is a deliberate simplification but doesn't match expected "preview" behavior.
-
-**Two possible fixes:**
-1. **Quick fix:** Make the simplified preview actually fit properly (current approach but fixed)
-2. **Full fix:** Render actual `SlideContentRenderer` scaled down using CSS transform
-
-### Fix Requirements
-
-**Option A: Fix simplified preview (minimal change)**
-- Ensure container fills FloatingWindow content area
-- Use proper overflow handling
-- Scale text proportionally to container
-
-**Option B: Render actual slide scaled (better UX)**
-- Render `<SlideContentRenderer>` inside preview
-- Apply CSS transform scale based on container vs slide dimensions
-- Calculate scale factor: `min(containerWidth/1920, containerHeight/1080)`
-
-### Acceptance Criteria
-
-| Criterion | Test Method |
-|-----------|-------------|
-| Preview shows complete slide content | All visible bullets shown, not truncated |
-| Preview maintains 16:9 aspect ratio | Measure dimensions in DevTools |
-| Preview scales when window resizes | Drag FloatingWindow corner, verify preview adjusts |
-| No content overflow/clipping | Visual inspection at various sizes |
-| Preview matches actual slide appearance | Compare preview to main slide panel |
+AI resource enhancement in education follows a consistent pattern: teachers upload existing materials, AI adapts them while preserving intent, and outputs are differentiated for student needs. The market leaders (Diffit, MagicSchool, Eduaide.ai) focus on three core capabilities: **text leveling/differentiation**, **format transformation**, and **standards alignment**. Cue's unique advantage is **lesson context awareness**—the AI can align enhanced resources with the adapted presentation, creating cohesive lesson materials rather than isolated worksheets.
 
 ---
 
-## Bug 3: AI Slide Revision Not Working
+## Table Stakes
 
-### Current Behavior (Bug)
+Features teachers expect. Missing = product feels incomplete or unusable.
 
-User clicks "Revise" button after entering revision instructions, but the slide does not update. The revision may fail silently or not trigger the AI call properly.
+| Feature | Why Expected | Complexity | Cue Dependencies | Notes |
+|---------|--------------|------------|------------------|-------|
+| Multi-format upload (PDF, image, Word/Docs) | Teachers have resources in various formats; excluding any major format blocks adoption | MEDIUM | Existing PDF parsing infrastructure | PDF.js already handles lesson plans; extend for general documents |
+| Preview before enhancement | Teachers must see what AI will work with before committing | LOW | None | Critical for trust—teacher sees extracted content/image |
+| Original intent preservation | Teachers chose this resource for a reason; AI shouldn't rewrite from scratch | HIGH | AI prompting | Most common complaint about AI tools—over-generation |
+| Differentiation output (2-3 versions) | Universal design principle; every classroom has mixed abilities | MEDIUM | Verbosity infrastructure | Reuse existing concise/standard/detailed pattern |
+| Print-ready PDF export | Resources must be usable immediately; teachers print daily | LOW | Working Wall export infrastructure | jsPDF/html2canvas already proven |
+| Editable output | Teachers always want to tweak AI results | MEDIUM | None | Not just preview—actual editing capability |
+| Cancel/regenerate | AI output won't always match expectations | LOW | Existing regenerate patterns | "Try again" is expected in any AI tool |
 
-### Expected Behavior
+### Table Stakes Details
 
-AI revision flow should:
-1. **Accept natural language instruction** - "Simplify for 10 year olds", "Add real-world example"
-2. **Show loading state** - Button shows "Thinking..." during API call
-3. **Update slide content** - Title, content, speakerNotes, imagePrompt may all change
-4. **Preserve unchanged fields** - Only modify what the instruction requires
-5. **Handle errors gracefully** - Show error toast if API fails
+#### Multi-format Upload
 
-### Standard Patterns
+**What teachers expect:**
+- Drag-and-drop or click-to-upload
+- Accept PDF, PNG, JPG, JPEG, DOCX, Google Docs link
+- Clear visual feedback when file accepted
+- Error message if format unsupported
 
-**Optimistic UI Pattern:**
-- Show loading indicator immediately
-- On success, update state with response
-- On failure, show error and optionally revert
+**Competitor behavior:**
+- Diffit: PDF, text paste, URL, YouTube video
+- MagicSchool: Text paste primarily, some file upload
+- Canva: Full document import with format preservation
+- Eduaide.ai: Topic, article, URL, or document upload
 
-**Partial Update Pattern:**
-- API returns only changed fields
-- Merge response with existing slide: `{ ...existingSlide, ...revisions }`
+**Cue approach:** PDF + image is minimum viable; Word/Docs is stretch goal. Focus on image upload (photo of worksheet) as primary use case since teachers often have physical resources.
 
-### Root Cause Analysis
+#### Original Intent Preservation
 
-Looking at `SlideCard.tsx` lines 42-52:
-```tsx
-const handleMagicEdit = async () => {
-  if (!revisionInput.trim()) return;
-  if (!isAIAvailable) {
-    onRequestAI('refine this slide with AI');
-    return;
-  }
-  setIsRevising(true);
-  await onRevise(slide.id, revisionInput);  // <- This should update slide
-  setRevisionInput('');
-  setIsRevising(false);
-};
-```
+**Critical differentiator between useful and annoying AI.**
 
-Looking at `geminiService.ts` `reviseSlide` function (lines 291-308):
-```typescript
-export const reviseSlide = async (apiKey: string, slide: Slide, instruction: string): Promise<Partial<Slide>> => {
-  const ai = new GoogleGenAI({ apiKey });
-  const model = "gemini-3-flash-preview";
+Teachers report frustration when AI:
+- Rewrites content entirely instead of enhancing
+- Adds content not in original
+- Changes the learning objective
+- Removes key elements teacher deliberately included
 
-  const prompt = `
-    Current Slide: ${JSON.stringify(slide)}
-    Edit Instruction: "${instruction}"
-    Return ONLY JSON with updated fields.
-  `;
+**What preservation means:**
+- Keep same questions/activities, improve clarity
+- Keep same learning objective, improve scaffolding
+- Keep same content, improve visual hierarchy
+- Add differentiation WITHOUT changing core content
 
-  const response = await ai.models.generateContent({
-    model,
-    contents: prompt,
-    config: { responseMimeType: "application/json" }
-  });
+**Implementation:** AI prompt must emphasize "enhance and preserve" not "recreate."
 
-  return JSON.parse(response.text || "{}");
-};
-```
+#### Differentiation Output
 
-**Potential issues:**
-1. No error handling in `reviseSlide` - if JSON parse fails, throws
-2. No response schema constraining output format
-3. The `onRevise` callback in parent may not be merging response correctly
-4. Missing try-catch in `handleMagicEdit` to handle errors
+**Universal expectation in 2025-2026 educational AI.**
 
-Need to trace `onRevise` callback implementation in `App.tsx` or parent component.
+Every teacher serves students at different levels. The standard pattern is 3 levels:
+- **Simplified/Scaffold** (ELL, SEN, struggling readers): Reduced text complexity, visual supports, sentence starters
+- **Standard** (grade-level): Original content with enhanced clarity
+- **Extended/Challenge** (advanced): Additional depth, open-ended questions
 
-### Fix Requirements
+**Competitor implementations:**
+- Diffit: Reading level selector (grades 2-11+, Lexile)
+- MagicSchool: Text leveler tool, assignment scaffolder
+- Eduaide.ai: One-click differentiation button
+- Canva: Magic Write rewords for different reading levels
 
-1. Add response schema to `reviseSlide` to ensure valid Slide fields
-2. Add try-catch with error handling in `handleMagicEdit`
-3. Verify `onRevise` callback properly merges partial updates
-4. Add error toast on failure
-
-### Acceptance Criteria
-
-| Criterion | Test Method |
-|-----------|-------------|
-| Loading state shows during revision | Enter text, click Revise, verify "Thinking..." |
-| Slide updates after successful revision | Enter "Make shorter", verify content reduces |
-| Partial updates preserve other fields | Revise title only, verify content unchanged |
-| Error shows on API failure | Test with invalid API key or network off |
-| Input clears after successful revision | Verify text input empties after update |
+**Cue advantage:** Already has verbosity system (concise/standard/detailed) for teleprompter. Resource differentiation can reuse this UX pattern.
 
 ---
 
-## Bug 4: Flowchart Layout Alignment Issues
+## Differentiators
 
-### Current Behavior (Bug)
+Features that set Cue apart. Not expected, but high value when present.
 
-In the flowchart layout:
-1. **Arrows not centered on boxes** - Connector arrows misaligned with box centers
-2. **Boxes don't fill vertical space** - Cards appear smaller than available height
+| Feature | Value Proposition | Complexity | Cue Dependencies | Notes |
+|---------|-------------------|------------|------------------|-------|
+| Lesson context awareness | Enhanced resource aligns with adapted lesson content | MEDIUM | Existing lesson state | UNIQUE: No competitor does this |
+| Content alignment suggestions | AI suggests how resource connects to current slide | MEDIUM | Slide context | "This worksheet supports slide 3's learning objective" |
+| Visual clarity enhancement | Improve layout, spacing, hierarchy of existing resource | HIGH | Image processing | Beyond text—actual visual design improvement |
+| Answer key generation | Automatically create teacher answer version | LOW | AI prompting | Common ask, easy win |
+| Per-slide resource linking | Resources appear contextually with relevant slides | LOW | Slide/resource association | Presentation flow integration |
+| Batch differentiation | Create all 3 levels at once | MEDIUM | Parallel AI calls | Time saver vs. one-at-a-time |
+| Resource library persistence | Save enhanced resources for future lessons | LOW | .cue file format | Already planning this |
 
-### Expected Behavior
+### Differentiator Details
 
-Flowchart layout should:
-1. **Center arrows vertically on boxes** - Arrow midpoint aligns with box midpoint
-2. **Boxes fill available vertical space** - Use full height minus title/padding
-3. **Equal spacing between elements** - Consistent gaps between box-arrow-box
+#### Lesson Context Awareness (PRIMARY DIFFERENTIATOR)
 
-### Standard Patterns
+**What makes this unique:**
 
-**Flexbox Centering:**
-- `align-items: center` - Centers items on cross axis
-- `justify-content: center` - Centers items on main axis
-- For horizontal flowchart: main axis is row, cross axis is column
+Current tools (Diffit, MagicSchool, Eduaide) enhance resources in isolation. They don't know:
+- What lesson is being taught
+- What age/grade the students are
+- What content came before/after in the lesson
+- What vocabulary has been introduced
 
-**Flowchart Arrow Patterns:**
-- Arrows should be vertically centered with adjacent boxes
-- Arrow wrapper uses `align-items: center` and `justify-content: center`
-- Arrow height matches box height for alignment
+**Cue's advantage:** The teacher already uploaded a lesson plan and generated slides. The AI has full context:
+- Topic and learning objectives
+- Grade level and student age
+- Vocabulary and key terms from slides
+- Content flow and progression
 
-**CSS Pseudo-elements for Connectors:**
-- Use `::before`/`::after` for arrow heads
-- Position relative to parent element
-- Transforms for rotation (arrow direction)
-
-### Root Cause Analysis
-
-Looking at `SlideRenderers.tsx` `FlowchartLayout` (lines 113-164):
-
-```tsx
-<div className="flex w-full px-4 gap-4 md:gap-6 flex-1 items-start justify-center">
-  {slide.content.map((point, idx) => (
-    <React.Fragment key={idx}>
-      {/* Arrow */}
-      {idx > 0 && (
-        <div className={`... shrink-0 flex items-center justify-center h-full pb-20 px-2 ...`}>
-          <svg .../>
-        </div>
-      )}
-
-      {/* Card */}
-      <div className={`flex-1 min-w-0 ...`}>
-        <div className={`aspect-[4/3] rounded-3xl p-4 md:p-8 flex items-center justify-center ... h-full w-full ...`}>
-          ...
-        </div>
-      </div>
-    </React.Fragment>
-  ))}
-</div>
+**Implementation:**
+```
+When enhancing resource, include in prompt:
+- Current lesson topic
+- Grade level
+- Key vocabulary from slides
+- Learning objectives
+- Slide content for alignment suggestions
 ```
 
-**Issues identified:**
-1. `items-start` on parent container - This aligns items to top, not center
-2. `pb-20` on arrow wrapper - This bottom padding pushes arrow up, misaligning it
-3. `aspect-[4/3]` on cards - Fixed aspect ratio prevents filling available height
-4. Cards use `flex-1` but parent has `items-start`, so they don't stretch
+**Teacher benefit:** "The worksheet now uses the same vocabulary as my presentation" instead of generic enhancement.
 
-### Fix Requirements
+#### Visual Clarity Enhancement
 
-1. Change `items-start` to `items-stretch` or `items-center` on parent flex container
-2. Remove `pb-20` from arrow wrapper (this was likely a hack)
-3. Remove fixed `aspect-[4/3]` from cards OR use `min-h-full` instead
-4. Ensure arrows use `h-full` with `flex items-center` to center within stretched container
+**Beyond text-only enhancement.**
 
-### Acceptance Criteria
+Teachers often upload:
+- Scanned worksheets (grainy, tilted)
+- Screenshots from other resources
+- Photos of textbook pages
+- Hand-drawn diagrams
 
-| Criterion | Test Method |
-|-----------|-------------|
-| Arrows vertically centered on boxes | Visual inspection, measure with DevTools |
-| Boxes fill available vertical space | DevTools shows cards using full height |
-| Consistent spacing between elements | Measure gaps, verify equal |
-| Layout responsive at different widths | Resize window, verify no overflow |
-| Works with 2, 3, and 4+ boxes | Test with different content lengths |
+**Enhancement opportunities:**
+- Improve text readability
+- Straighten/deskew scanned images
+- Enhance contrast
+- Improve layout spacing
+- Add visual hierarchy (headers, sections)
+
+**Complexity reality check:** Full image enhancement requires vision AI capabilities. For v3.7 MVP, focus on:
+- Text extraction and reformatting (achievable)
+- Layout suggestions via structured prompts (achievable)
+- Actual image manipulation (defer to v4.0+)
+
+#### Answer Key Generation
+
+**Common teacher request, easy implementation.**
+
+Pattern:
+1. AI identifies questions in resource
+2. Generates answers based on lesson content
+3. Creates "Teacher Version" with answers shown
+
+**Already solved:** MagicSchool and Eduaide both offer this. Standard capability.
 
 ---
 
-## Summary: Priority and Complexity
+## Anti-Features
 
-| Bug | Priority | Complexity | Risk |
-|-----|----------|------------|------|
-| 1. Game sync | HIGH | MEDIUM | Extends existing BroadcastChannel pattern |
-| 2. Preview scaling | MEDIUM | LOW | CSS-only fix, isolated component |
-| 3. AI revision | HIGH | LOW-MEDIUM | Need to trace callback chain |
-| 4. Flowchart alignment | LOW | LOW | CSS-only fix, isolated layout |
+Features to explicitly NOT build. Common mistakes in this domain.
 
-### Recommended Fix Order
+| Anti-Feature | Why Avoid | What to Do Instead |
+|--------------|-----------|-------------------|
+| Full resource recreation | Destroys original intent; teachers feel replaced | Enhance existing content, preserve structure |
+| Automatic standards tagging | Scope creep; complex and often wrong | Let teachers specify standards if needed |
+| Real-time student interaction | Out of scope; changes product category | Stay focused on resource preparation, not delivery |
+| Cloud resource library | Requires auth, storage, sync infrastructure | Local-first with .cue file persistence |
+| AI-generated images for resources | Distraction from core value; quality inconsistent | Use existing images, improve layout/text only |
+| Gamification of resources | Scope creep; different product category | Resources are print materials, not interactive games |
+| Plagiarism/originality checking | Scope creep; complex, contentious | Out of scope—trust teacher |
+| Complex formatting (tables, multi-column) | High complexity, fragile | Start with simple layouts, add complexity later |
 
-1. **Bug 4 (Flowchart)** - Quick CSS win, low risk
-2. **Bug 2 (Preview)** - Quick CSS win, isolated
-3. **Bug 3 (AI revision)** - Debug and fix, may reveal error handling gaps
-4. **Bug 1 (Game sync)** - Largest scope, requires new message types and StudentView changes
+### Anti-Feature Details
+
+#### Full Resource Recreation
+
+**The #1 mistake in educational AI tools.**
+
+Teachers report (from research on AI tool frustrations):
+- "It rewrote my entire worksheet instead of improving it"
+- "I lost the specific examples I had chosen"
+- "It changed my questions to something generic"
+
+**Why it happens:** AI tools default to "generation" mode, not "enhancement" mode.
+
+**How to avoid:**
+- Explicit prompt engineering: "Preserve all original content, questions, and structure"
+- Show diff/comparison: "Here's what changed"
+- Allow selective enhancement: "Improve section 2 only"
+
+#### Automatic Standards Tagging
+
+**Tempting but problematic.**
+
+Why it seems like a good idea:
+- Teachers need standards alignment
+- AI can match content to standards
+- Other tools advertise this feature
+
+Why to avoid for Cue:
+- Standards vary by state/country/school
+- Incorrect tagging is worse than no tagging
+- Adds significant complexity
+- Teacher still has to verify anyway
+
+**Better approach:** Let teacher specify standards if they want, don't auto-detect.
+
+#### AI-Generated Images for Resources
+
+**Distraction from core value.**
+
+Why to avoid:
+- Image generation is unreliable for educational accuracy
+- Adds cost (image APIs expensive)
+- Quality varies wildly
+- Teachers have images they want to use
+- Focus should be on text/layout enhancement
+
+**Exception:** If teacher explicitly asks "add an illustration of X," that's different. But don't auto-generate.
+
+---
+
+## Feature Dependencies
+
+```
+Upload Infrastructure
+    |
+    v
+Content Extraction (PDF parsing / OCR / text extraction)
+    |
+    v
+Preview & Confirmation
+    |
+    v
+Enhancement Selection (differentiation level, enhancement options)
+    |
+    +------------------+
+    |                  |
+    v                  v
+AI Enhancement    Lesson Context Injection
+    |                  |
+    +------------------+
+    |
+    v
+Output Generation (differentiated versions)
+    |
+    v
+Preview & Edit
+    |
+    v
+Export (PDF) + Persist (.cue file)
+```
+
+### Existing Cue Infrastructure to Leverage
+
+| Existing Feature | How It Supports v3.7 |
+|------------------|----------------------|
+| PDF.js integration | Document parsing for uploaded PDFs |
+| Working Wall export | PDF generation infrastructure |
+| Verbosity system | Differentiation UX pattern |
+| AI provider abstraction | Gemini/Claude for enhancement |
+| Lesson state | Context for lesson-aware enhancement |
+| .cue file format | Resource persistence structure |
+| Slide context in AI prompts | Pattern for including lesson context |
+
+---
+
+## MVP Recommendation
+
+For v3.7 MVP, prioritize:
+
+### Must Have (Week 1-2)
+1. **Image upload** - Photo of worksheet (PNG, JPG)
+2. **PDF upload** - Digital worksheets
+3. **Text extraction preview** - Show what AI sees
+4. **Basic enhancement** - Improve clarity, fix formatting
+5. **Differentiation** - Simple/Standard/Detailed versions
+6. **PDF export** - Print-ready output
+7. **Lesson context injection** - Use topic, grade from lesson
+
+### Should Have (Week 3)
+8. **In-app editing** - Tweak AI output before export
+9. **Regenerate** - Try again with different approach
+10. **Resource persistence** - Save in .cue file
+11. **Answer key generation** - Teacher version with answers
+
+### Defer to Post-MVP
+- Word/Docs upload (requires additional parsing)
+- Visual layout enhancement (complex image processing)
+- Per-slide resource linking (UX complexity)
+- Batch operations (multi-resource enhancement)
+
+---
+
+## Competitive Landscape Summary
+
+| Tool | Primary Strength | Weakness vs. Cue |
+|------|------------------|------------------|
+| [Diffit](https://web.diffit.me) | Reading level adaptation, one-click leveling | No lesson context, standalone tool |
+| [MagicSchool](https://www.magicschool.ai) | 80+ tools, comprehensive suite | No lesson context, overwhelming options |
+| [Eduaide.ai](https://www.eduaide.ai) | Deep differentiation, scaffolding tools | No lesson context, subscription required |
+| [Canva for Education](https://www.canva.com/education/) | Visual design, templates | Not education-first, no differentiation |
+| [Nearpod](https://nearpod.com) | Interactive delivery | Not resource enhancement, delivery focused |
+
+**Cue's positioning:** "Enhance resources that align with your adapted lesson" vs. competitors' "Enhance resources in isolation."
 
 ---
 
 ## Sources
 
-- [Observer Synchronization Pattern](https://martinfowler.com/eaaDev/MediatedSynchronization.html) - Martin Fowler on multi-view sync
-- [CSS aspect-ratio property](https://web.dev/articles/aspect-ratio) - web.dev guide
-- [CSS object-fit](https://developer.mozilla.org/en-US/docs/Web/CSS/object-fit) - MDN reference
-- [Flexbox Alignment](https://developer.mozilla.org/en-US/docs/Web/CSS/Guides/Flexible_box_layout/Aligning_items) - MDN flexbox guide
-- [CSS Flowcharts Examples](https://freefrontend.com/css-flowcharts/) - Pattern reference
-- [Flexbox Guide](https://css-tricks.com/snippets/css/a-guide-to-flexbox/) - CSS-Tricks reference
+- [MagicSchool Teacher Tools](https://www.magicschool.ai/magic-tools) - Feature survey
+- [Diffit for Teachers](https://web.diffit.me) - Differentiation patterns
+- [Eduaide Content Generator](https://www.eduaide.ai/solutions/content-generator) - Enhancement workflows
+- [Canva AI for Teachers](https://www.canva.com/ai-for-teachers/) - Visual enhancement patterns
+- [Nearpod Back to School 2025](https://nearpod.com/blog/updates-back-to-school-2025/) - AI feature trends
+- [7 Best AI Worksheet Generator Tools](https://monsha.ai/blog/7-best-ai-worksheet-generator-tools-for-teachers) - Competitor analysis
+- [AI Tools for Teachers 2025](https://www.chiangraitimes.com/ai/ai-tools-for-teachers-in-2025/) - Differentiation expectations
+- [Differentiated Instruction Strategies](https://www.prodigygame.com/main-en/blog/differentiated-instruction-strategies-examples-download) - Pedagogical patterns
+- [Truth For Teachers - AI for Differentiation](https://truthforteachers.com/truth-for-teachers-podcast/ai-for-scaffolds-supports-and-differentiated-tasks/) - Teacher workflow expectations
+- [EdWeek - AI in Schools Downsides](https://www.edweek.org/technology/rising-use-of-ai-in-schools-comes-with-big-downsides-for-students/2025/10) - Problem patterns to avoid
+
+---
+
+## Confidence Notes
+
+| Area | Confidence | Rationale |
+|------|------------|-----------|
+| Table stakes features | HIGH | Consistent across all competitors, well-documented expectations |
+| Differentiation patterns | HIGH | Universal in educational AI, well-established UX |
+| Lesson context advantage | MEDIUM | Novel approach, no direct competitor validation |
+| Visual enhancement complexity | LOW | Requires deeper technical research for v4.0 |
+| Anti-features | HIGH | Documented complaints and failed patterns |
+
+---
+
+*Research completed: 2026-01-29*

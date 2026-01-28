@@ -1,254 +1,172 @@
 # Project Research Summary
 
-**Project:** Cue v3.2 — Pedagogical Slide Types
-**Domain:** AI-powered educational presentation tools for K-12 teachers
-**Researched:** 2026-01-25
+**Project:** Cue v3.7 - AI Resource Enhancement
+**Domain:** AI-powered document enhancement for educational worksheets
+**Researched:** 2026-01-29
 **Confidence:** HIGH
 
 ## Executive Summary
 
-This research examines adding four pedagogical features to Cue's existing presentation system: Elaborate slides (AI-generated deeper content), Work Together slides (collaborative activities), Class Challenge slides (live interactive student contribution capture), and Single Slide Script Regeneration. The excellent news: **no new dependencies required**. All four features integrate cleanly with Cue's existing stack (React 19, TypeScript, Gemini/Claude AI providers, BroadcastChannel sync).
+AI Resource Enhancement is a well-understood domain with clear patterns: teachers upload existing materials (worksheets, handouts, PDFs), AI analyzes and enhances them while preserving original intent, and outputs are differentiated for varying student abilities. The key insight from research is to **use an AI-first approach with multimodal vision** rather than traditional OCR or complex client-side parsing. Gemini/Claude's vision capabilities handle document understanding better than Tesseract.js or PDF.js text extraction, especially for complex layouts, tables, and scanned documents.
 
-The recommended approach leverages proven patterns from v3.1 verbosity caching and existing AI provider abstraction. Elaborate and Work Together slides extend the same insertion pattern as Exemplar slides. Class Challenge introduces a new interactive slide type with teacher-controlled input synced via BroadcastChannel (already proven for game state). Single teleprompter regeneration exposes an existing method (`regenerateTeleprompter()`) to the UI with careful cache management.
+The recommended approach leverages Cue's existing architecture extensively. File upload follows the established PDF processing pattern in App.tsx. AI integration extends the AIProviderInterface with two new methods (analyzeDocument, enhanceResource). PDF export reuses jsPDF + html2canvas from ExportModal. Persistence extends CueFileContent with an optional enhancedResources array. **Only one new dependency is needed: mammoth.js (~200KB) for Word document support**, and even that can be deferred since PDF and images cover 90% of teacher use cases.
 
-The key risk is **integration complexity, not technical capability**. Class Challenge requires presentation-mode editing (breaking the "presentation is read-only" assumption), and cache invalidation for single regeneration must avoid conflicts with the v3.1 verbosity caching system. The architecture supports these features, but implementation order matters: start with low-complexity extensions (Single Regenerate, Elaborate) before tackling the novel pattern (Class Challenge).
+The primary risks are hallucination-corrupted educational content and teacher trust erosion. AI can introduce factual errors when "enhancing" worksheets with wrong numbers, dates, or technical terms. Prevention requires a "preserve mode" default where AI improves presentation without changing content, mandatory diff-based review UI showing every change, and explicit constraints in prompts forbidding factual modifications. Teachers need transparency about what changed, why, and how confident the AI is. Without this, the feature will fail despite working technology.
 
 ## Key Findings
 
 ### Recommended Stack
 
-**Zero new dependencies required.** All four features build on Cue's existing 17,000 LOC codebase. The current React 19 + TypeScript + AI provider architecture already has the necessary extension points.
+The existing stack provides nearly everything needed. Cue already uses React 19, Vite, TypeScript, Gemini API, Claude API, PDF.js, jsPDF, and html2canvas. The only required addition is mammoth.js for Word document text extraction.
 
-**Core technologies (no changes):**
-- **React 19.2.0**: Controlled components handle Class Challenge input — Native `<input>` with `onChange` is best practice for 2026, avoiding outdated libraries like react-contenteditable
-- **@google/genai 1.30.0 + Claude API**: Existing provider abstraction extends cleanly — Add three methods (`generateElaborateSlide`, `generateWorkTogetherSlide`, `generateClassChallengeSlide`) following the `generateExemplarSlide` pattern
-- **BroadcastChannel (native)**: Already proven for game state sync in v3.0 — Class Challenge uses same pattern with `CHALLENGE_UPDATE` message type
+**Core technologies (existing - no changes):**
+- **Gemini/Claude Vision API**: Document understanding via multimodal analysis - far superior to traditional OCR
+- **jsPDF + html2canvas**: PDF generation for enhanced resource export - proven pattern from Working Wall
+- **PDF.js**: PDF page rendering and text extraction - existing lesson plan processing infrastructure
 
-**Anti-recommendations (what NOT to add):**
-- react-contenteditable: Outdated (2022-2023), adds complexity for plain text use case
-- Draft.js / Lexical: 2MB+ bundle, overkill for bullet point editing
-- Liveblocks / Supabase Realtime / Socket.io: External dependencies when BroadcastChannel already works client-side
+**New addition:**
+- **mammoth.js (^1.11.0)**: Word document text extraction (~200KB) - optional, can defer to v2
 
-**Architectural principle:** Maximize existing capabilities before adding dependencies.
+**Explicitly NOT adding:**
+- Tesseract.js (5MB+ bloat, inferior accuracy to Gemini vision)
+- Canvas libraries (Konva.js, Fabric.js - over-engineered)
+- Additional PDF libraries (pdf-lib, pdfmake - existing jsPDF sufficient)
 
 ### Expected Features
 
-All four features are **table stakes** in modern pedagogical presentation tools (ClassPoint, Nearpod, Pear Deck, Microsoft Copilot, Twistly). Missing these makes Cue feel incomplete for teacher workflows.
+**Must have (table stakes):**
+- Multi-format upload (PDF, image) - teachers have resources in various formats
+- Preview before enhancement - critical for trust
+- Original intent preservation - most common AI complaint is over-generation
+- Differentiation output (simple/standard/detailed) - universal expectation in 2025-2026
+- Print-ready PDF export - teachers need immediately usable output
+- Editable output - teachers always want to tweak AI results
+- Cancel/regenerate - expected in any AI tool
 
-**Must have (v3.2 scope):**
-- **Elaborate slides**: AI generates 3-5 paragraphs expanding on current slide with examples, explanations, and context — Core scaffolding technique, users expect depth-on-demand
-- **Work Together slides**: AI generates collaborative activity instructions (pair work, group discussion, think-pair-share) — Foundational to modern pedagogy, research-backed
-- **Class Challenge slides**: Teacher types student contributions live during presentation, visible to student view — Interactive brainstorming, formative assessment pattern
-- **Single teleprompter regeneration**: Regenerate script for one slide after manual edits, respecting current verbosity level — Teachers manually refine AI content, need script to match
+**Should have (differentiators):**
+- Lesson context awareness - UNIQUE: enhanced resources align with adapted lesson content
+- Content alignment suggestions - "This worksheet supports slide 3's learning objective"
+- Answer key generation - common ask, easy win
 
-**Should have (differentiators beyond v3.2):**
-- **Teleprompter-integrated Elaborate slides**: Speaker notes guide teachers through complex explanations (not just content depth)
-- **Grade-aware Work Together activities**: Use student grade data from class bank for differentiated group activities
-- **No-device Class Challenge**: Teacher-controlled model works in low-tech environments (competitor advantage over ClassPoint/Poll Everywhere)
-- **Verbosity-aware single regeneration**: Generate all three verbosity levels on regenerate, preserve cache
-
-**Defer (anti-features):**
-- Student device polling for Class Challenge: Breaks Cue's client-only model, creates equity issues
-- Pre-built activity template libraries: Scope creep, generic templates disconnect from lesson content
-- Automatic script regeneration on content edit: Destroys teacher manual refinements, creates "AI fighting teacher" UX
-- Live word cloud visualization: High complexity, marginal value over simple list display
+**Defer (v2+):**
+- Word/Docs upload - requires additional parsing, PDF covers most cases
+- Visual layout enhancement - complex image processing
+- Per-slide resource linking - UX complexity
+- Batch multi-resource enhancement - time saver but not MVP
 
 ### Architecture Approach
 
-**All integration points already exist.** The InsertPoint component (slide insertion menu), AIProviderInterface (generation methods), BroadcastChannel sync (teacher-student communication), and verbosity caching system provide complete extension points. The challenge is integration coherence, not missing capabilities.
+The architecture extends Cue naturally with minimal new components. Enhanced resources are a new data type stored alongside slides in presentation state, persisted via CueFile format extension.
 
 **Major components:**
-1. **InsertPoint menu extension** — Add 3 buttons (Elaborate, Work Together, Class Challenge) to existing dropdown, extend from 2 to 5 options with vertical layout
-2. **AI Provider interface extension** — Add 3 methods to `AIProviderInterface`, implement in both `geminiProvider.ts` and `claudeProvider.ts` following `generateExemplarSlide` pattern
-3. **Class Challenge interactive slide** — New slide type with optional `challengeData: { prompt, responses, isLocked }` field, teacher input via React controlled components, BroadcastChannel sync to student view
-4. **Single regeneration UI** — Add "🔄 Regen" button to teleprompter panel (PresentationView), call existing `regenerateTeleprompter()` method with current verbosity, update cache carefully
-5. **Slide type discriminator** — Optional `slideType?: 'standard' | 'elaborate' | 'work-together' | 'class-challenge'` field for visual badges, export metadata, filtering
-
-**Data flow patterns:**
-- **Elaborate/Work Together insertion**: Create temp slide → AI generates with full slide context (not just prevSlide) → replace temp → auto-generate image if enabled
-- **Class Challenge live input**: Teacher types response → update slide state → broadcast `CHALLENGE_UPDATE` → student view renders with animation → lock on navigation away
-- **Single regeneration**: User clicks button → call `provider.regenerateTeleprompter(currentSlide, currentVerbosity)` → update cache at current verbosity level → clear stale cache flags
+1. **ResourceHub.tsx (modified)** - Adds "Enhance" mode tab alongside existing "Generate" mode
+2. **resourceAnalyzerService.ts (new)** - Orchestrates file parsing: PDF via existing pattern, images via FileReader, Word via mammoth.js
+3. **AIProviderInterface (extended)** - Adds analyzeDocument() and enhanceResource() methods
+4. **EnhancedResourcePreview.tsx (new)** - Renders preview with edit capability (similar to PosterRenderer)
+5. **resourceExportService.ts (new)** - PDF generation following ExportModal pattern
+6. **CueFileContent (extended)** - Optional enhancedResources array (v4 file format)
 
 ### Critical Pitfalls
 
-Top 5 integration risks (all manageable with patterns from research):
+1. **Document Parsing Fails Silently** - PDF.js extracts text without layout; tables become jumbled. **Prevent:** Use multimodal AI (image + text) as primary approach, detect complexity before processing, warn users about limitations.
 
-1. **Cache invalidation conflicts with manual teleprompter** — Single regeneration breaks v3.1's assumption that `speakerNotes` is immutable. Need separate `manualTeleprompter` field or extend cache with `standardManual` to avoid losing regenerated work on verbosity switches. **Prevention:** Extend cache structure before Phase 1 implementation.
+2. **AI Hallucinations Corrupt Educational Content** - AI "enhances" worksheets with wrong numbers/facts. **Prevent:** Default to "preserve" mode, explicit prompt constraints forbidding factual changes, mandatory diff-based review UI.
 
-2. **BroadcastChannel race conditions on live input** — Class Challenge contributions may arrive out of order or collide (messages are async, no ordering guarantee). **Prevention:** Timestamp messages, deduplicate by UUID, append-only state updates with sorting by timestamp.
+3. **Layout Reconstruction Loses Structure** - Fill-in-blanks, tables, spacing lost in output. **Prevent:** Offer format-specific templates, "text only" enhancement option, layout preview before committing.
 
-3. **AI context degradation on slide insertion** — Passing only `prevSlide` to generation (current Exemplar pattern) causes Elaborate/Work Together to lack lesson arc awareness, generating generic content that repeats earlier slides or contradicts upcoming content. **Prevention:** Reuse `buildSlideContext()` pattern from quiz generation (pass cumulative previous slides + optional lookahead to next slide).
+4. **Large Documents Crash Browser** - Memory exhaustion with no error message. **Prevent:** Enforce file size limits (25MB, 20 pages), process in chunks, detect device capabilities.
 
-4. **PresentationState sync breaks with new slide types** — Adding interactive slides (Class Challenge with contributions) without extending BroadcastChannel message types causes lost data on navigation. **Prevention:** Extend `Slide` interface with optional `challengeData` field, add `CHALLENGE_UPDATE` message type, ensure contributions persist in slide state.
-
-5. **AI content homogenization from repeated regeneration** — Teachers regenerating Elaborate/Work Together multiple times using previous generation as context causes convergence to bland, generic content (research shows iterative AI outputs lose specificity). **Prevention:** Always regenerate from original slide context (stateless), track regeneration count with warning, inject diversity prompts on retry ("focus on visual examples" vs "focus on misconceptions").
-
-**Additional moderate pitfalls:**
-- Slide insertion breaks auto-save sequence (pause auto-save during generation or force save on completion)
-- Elaborate/Work Together slides lack visual distinction (add `slideType` badges, color-coded sidebar borders)
-- Class Challenge input validation missing (sanitize HTML, max length 200 chars, profanity filter)
-- Work Together grouping algorithm unfair (use student grades for heterogeneous pairing, not random shuffle)
+5. **Teachers Don't Trust Invisible Changes** - Feature fails without trust calibration. **Prevent:** Visual diff with accept/reject controls, transparency about AI limitations, preserve audit trail.
 
 ## Implications for Roadmap
 
-Based on research, suggested phase structure optimizes for **dependency order, complexity escalation, and pattern establishment**:
+Based on research, suggested phase structure:
 
-### Phase 1: Single Slide Teleprompter Regeneration
-**Rationale:** Simplest implementation, immediate teacher value, establishes cache management pattern for later phases.
-**Delivers:** "🔄 Regen" button in teleprompter panel, regenerates current slide only, respects verbosity level
-**Addresses:** Teachers manually editing slide content need speaker notes to match (table stakes feature)
-**Avoids:** Pitfall 1 (cache invalidation) — Extend cache structure or add `manualTeleprompter` field to separate manual overrides from verbosity cache
-**Stack:** Reuses existing `provider.regenerateTeleprompter()` method (v3.1), updates `verbosityCache`, no new dependencies
-**Complexity:** LOW (UI button + state update)
-**Research needed:** None (method already exists, just needs UI exposure)
+### Phase 1: Types and File Upload
+**Rationale:** Foundation must exist before any processing. File upload is low-risk and validates integration path.
+**Delivers:** Accept PDF/image uploads, detect file types, store in local state, show upload preview
+**Addresses:** Multi-format upload (table stake)
+**Avoids:** Large document crash (by implementing size limits immediately)
+**Uses:** Existing PDF processing pattern from App.tsx
 
-### Phase 2: Elaborate Slide Insertion
-**Rationale:** Extends proven Exemplar insertion pattern, tests AI provider extension before more complex features.
-**Delivers:** "Elaborate" option in InsertPoint menu, AI generates deeper content with examples/explanations
-**Addresses:** Core scaffolding technique, users expect depth-on-demand (table stakes)
-**Avoids:** Pitfall 2 (AI context degradation) — Use `buildSlideContext()` to pass cumulative lesson context, not just prevSlide; Pitfall 5 (homogenization) — Regenerate from original context stateless
-**Implements:** Extend `AIProviderInterface` with `generateElaborateSlide()`, implement in Gemini + Claude providers
-**Complexity:** MEDIUM (AI prompt engineering for quality, paragraph layout vs bullets)
-**Research needed:** None (standard AI generation pattern)
+### Phase 2: AI Document Analysis
+**Rationale:** Analysis must work before enhancement can be built. Testing multimodal approach early validates core assumption.
+**Delivers:** Send documents to Gemini/Claude vision, receive structured analysis (document type, sections, exercises)
+**Addresses:** Preview before enhancement (table stake)
+**Avoids:** Complex layout parsing failure (by using multimodal as primary approach)
+**Implements:** AIProviderInterface extension (analyzeDocument method)
 
-### Phase 3: Work Together Slide Insertion
-**Rationale:** Same pattern as Elaborate, different prompt engineering, can share implementation approach.
-**Delivers:** "Work Together" option in menu, AI generates collaborative activity instructions
-**Addresses:** Foundational pedagogy (think-pair-share, peer teaching), research-backed effectiveness
-**Avoids:** Pitfall 2 (context degradation) — Same solution as Phase 2; Pitfall 9 (grouping fairness) — Use student grades for heterogeneous pairing if implementing group suggestions
-**Implements:** Add `generateWorkTogetherSlide()` to providers, activity-specific prompts
-**Complexity:** MEDIUM (prompt quality for age-appropriate activities)
-**Research needed:** None (leverages Phase 2 patterns)
+### Phase 3: Enhancement with Lesson Context
+**Rationale:** Core feature depends on phases 1-2. Lesson context is Cue's primary differentiator.
+**Delivers:** AI-enhanced content with lesson awareness, differentiated versions (simple/standard/detailed)
+**Addresses:** Original intent preservation, differentiation output, lesson context awareness
+**Avoids:** AI hallucinations (by implementing preserve mode and prompt constraints)
+**Implements:** AIProviderInterface extension (enhanceResource method)
 
-### Phase 4: Class Challenge Interactive Slides
-**Rationale:** Most architecturally novel (presentation-mode editing, live sync), defer until earlier patterns established.
-**Delivers:** "Class Challenge" option, teacher input field during presentation, live student view sync
-**Addresses:** Interactive brainstorming, formative assessment, visible student contributions (table stakes in interactive tools)
-**Avoids:** Pitfall 3 (BroadcastChannel race conditions) — Timestamp + UUID messages, append-only state; Pitfall 4 (state sync) — Extend Slide with `challengeData` field, add `CHALLENGE_UPDATE` message; Pitfall 8 (input validation) — Sanitize HTML, max length 200 chars
-**Implements:** New `ClassChallengeSlide` component, React controlled inputs, BroadcastChannel sync, locking on navigation
-**Complexity:** HIGH (breaks "presentation is read-only" assumption, new interaction pattern)
-**Research needed:** None (BroadcastChannel already proven for game state v3.0, just needs application to live input)
+### Phase 4: Preview, Edit, and Trust UI
+**Rationale:** Teachers must see and approve changes before any output. Trust mechanisms cannot be retrofitted.
+**Delivers:** Side-by-side diff view, inline editing, accept/reject per change, regenerate option
+**Addresses:** Editable output, cancel/regenerate, teacher trust (critical pitfall)
+**Avoids:** Invisible changes eroding trust
+**Implements:** EnhancedResourcePreview component
+
+### Phase 5: Export and Persistence
+**Rationale:** Output delivery after all processing and editing complete. Follows proven patterns.
+**Delivers:** Print-ready PDF export, save in .cue file, load preserved resources
+**Addresses:** Print-ready PDF export, resource persistence
+**Implements:** resourceExportService, CueFile v4 format
+**Uses:** jsPDF + html2canvas (existing)
 
 ### Phase Ordering Rationale
 
-- **Phase 1 first:** Low-complexity quick win, validates cache management approach for later phases, immediate teacher value for manual editing workflow
-- **Phases 2-3 together:** Both extend same AI provider pattern, establish `buildSlideContext()` usage, test prompt engineering quality before interactive features
-- **Phase 4 last:** Requires presentation-mode editing (novel pattern), benefits from earlier phases testing AI generation and state management, highest risk phase isolated from others
-
-**Dependency chain:**
-```
-No external dependencies
-  ├─ Phase 1 (Single Regen) → validates cache extension pattern
-  ├─ Phase 2 (Elaborate) → establishes AI provider extension + context pattern
-  ├─ Phase 3 (Work Together) → reuses Phase 2 patterns
-  └─ Phase 4 (Class Challenge) → new pattern (presentation editing + sync)
-```
-
-**Build order per phase:**
-1. UI extensions (buttons, placeholders) — all phases can start with no-op UI
-2. AI provider methods — Phases 2-4 implement generation
-3. State management — Phase 1 cache, Phase 4 live sync
-4. Integration — wire up handlers, test end-to-end
+- **Dependencies are sequential:** Upload -> Analysis -> Enhancement -> Preview -> Export
+- **Risk mitigation front-loaded:** File limits (Phase 1), multimodal approach (Phase 2), hallucination prevention (Phase 3), trust UI (Phase 4) all address critical pitfalls early
+- **Persistence can parallel:** Phase 5 types work can begin during Phase 2-3 development
+- **MVP deliverable at Phase 5:** Full feature loop complete; Word support can follow
 
 ### Research Flags
 
-**Phases with standard patterns (skip `/gsd:research-phase`):**
-- **Phase 1 (Single Regen):** Reuses existing method, just UI placement decision
-- **Phase 2 (Elaborate):** Standard AI generation, follows Exemplar pattern exactly
-- **Phase 3 (Work Together):** Same as Phase 2, different prompt domain
+Phases likely needing deeper research during planning:
+- **Phase 3 (Enhancement):** Prompt engineering for preserve mode vs. elaborate mode; provider-specific prompt optimization for Gemini vs Claude
+- **Phase 4 (Preview/Trust):** Diff visualization UX research; optimal granularity for change review
 
-**Phases needing validation during implementation (consider `/gsd:research-phase` if complexity emerges):**
-- **Phase 4 (Class Challenge):** Presentation-mode editing is new pattern — May need deeper research if BroadcastChannel race conditions prove more complex than anticipated, or if locking mechanism conflicts with navigation logic
-
-**Overall:** All phases have HIGH confidence implementation paths. No phase requires external research during planning.
+Phases with standard patterns (skip research-phase):
+- **Phase 1 (Upload):** Well-established browser File API patterns, existing Cue PDF processing to follow
+- **Phase 5 (Export):** Existing jsPDF + html2canvas pattern fully documented in ExportModal.tsx
 
 ## Confidence Assessment
 
 | Area | Confidence | Notes |
 |------|------------|-------|
-| Stack | **HIGH** | Zero new dependencies verified against 2026 best practices (React 19 controlled components, native BroadcastChannel). All features use existing capabilities. |
-| Features | **HIGH** | Verified with multiple authoritative sources (ClassPoint, Nearpod, Microsoft Copilot, SlideSpeak, peer-reviewed pedagogy research). All four are table stakes in modern tools. |
-| Architecture | **HIGH** | All integration points confirmed in Cue codebase (InsertPoint component, AIProviderInterface, BroadcastChannel sync, verbosity cache). Patterns already proven (Exemplar insertion, game state sync). |
-| Pitfalls | **HIGH** | Based on Cue v3.1 verbosity implementation analysis + 2026 web research on BroadcastChannel race conditions, AI homogenization, cache invalidation. All critical pitfalls have prevention strategies. |
+| Stack | HIGH | Minimal additions; mammoth.js well-documented; Gemini/Claude vision verified |
+| Features | HIGH | Competitor analysis consistent; differentiation patterns universal |
+| Architecture | HIGH | Extends existing Cue patterns; integration points clearly mapped |
+| Pitfalls | HIGH | Multiple authoritative sources; mapped to implementation phases |
 
-**Overall confidence:** **HIGH**
-
-Research draws from:
-- Verified Cue codebase patterns (App.tsx, types.ts, aiProvider.ts, useBroadcastSync.ts, PresentationView.tsx)
-- Official documentation (React 19 forms, BroadcastChannel MDN, Gemini/Claude APIs)
-- Established educational technology tools (ClassPoint, Nearpod, Pear Deck)
-- 2026 AI tooling research (Microsoft Copilot, Twistly, SlideSpeak)
-- Peer-reviewed pedagogy (think-pair-share effectiveness, scaffolding research)
-- 2026 web security and state management best practices
+**Overall confidence:** HIGH
 
 ### Gaps to Address
 
-**Minor implementation questions (resolvable during phase planning):**
-
-1. **InsertPoint UI layout:** Vertical dropdown vs horizontal 2-row grid for 5 options — **Resolution:** Prototype both, choose based on visual hierarchy (vertical recommended for scalability)
-
-2. **Elaborate slide layout:** Paragraph text layout vs existing bullet layouts — **Resolution:** Test readability with 3-4 paragraph content, may need new "article" layout type
-
-3. **Work Together grouping:** Should Phase 3 implement grouping suggestions or just activity instructions? — **Resolution:** Defer grouping to post-MVP, start with activity instructions only (simpler, still valuable)
-
-4. **Class Challenge staleness:** Should locked challenges be editable if teacher returns? — **Resolution:** Lock on navigation away, no editing after lock (prevents inconsistency with student view)
-
-5. **Single regen verbosity:** Should regeneration update all three verbosity levels or just current? — **Resolution:** Start with current level only (faster, simpler), extend to all three in post-MVP if teachers request
-
-**No blocking gaps.** All questions have straightforward resolution paths during implementation.
+- **Provider-specific prompt optimization:** Gemini and Claude may need different prompts for consistent results. Test both during Phase 3 development.
+- **Complex layout handling:** Multimodal approach is recommended, but edge cases (heavily formatted tables, multi-column worksheets) need validation with real teacher documents.
+- **Memory limits on low-end devices:** Device capability detection (navigator.deviceMemory) is Chrome-only. Need fallback strategy for Safari/Firefox.
 
 ## Sources
 
 ### Primary (HIGH confidence)
-
-**Existing Cue Architecture:**
-- Codebase analysis: App.tsx (InsertPoint pattern, exemplar insertion, cache invalidation logic lines 321-334), types.ts (Slide interface, BroadcastChannel messages), aiProvider.ts (provider interface, regenerateTeleprompter method), PresentationView.tsx (verbosity toggle, game state sync), useBroadcastSync.ts (sync pattern)
-- v3.1 ROADMAP: Verbosity implementation decisions, cache management patterns
-
-**Official Documentation:**
-- [React 19 Forms: Native Form Handling in React 19](https://www.yeti.co/blog/native-form-handling-in-react-19) — Controlled components best practice 2026
-- [Managing State – React Official](https://react.dev/learn/managing-state) — Official guidance on controlled inputs
-- [BroadcastChannel API – MDN](https://developer.mozilla.org/en-US/docs/Web/API/BroadcastChannel_API) — Native browser API spec
-
-**Educational Technology Platforms:**
-- [ClassPoint Interactive Quiz Questions](https://www.classpoint.io/interactive-quiz-questions) — Real-time student response collection
-- [Nearpod vs PearDeck Comparison](https://www.teachfloor.com/blog/nearpod-vs-peardeck) — Interactive slide type comparison
-- [Using Slide Decks for Collaborative Learning | Edutopia](https://www.edutopia.org/article/using-slide-decks-collaborative-learning/) — Pedagogical patterns
-
-**AI Presentation Tools:**
-- [Add Speaker Notes in PowerPoint with AI | Twistly](https://twistly.ai/add-speaker-notes-in-powerpoint-with-ai/) — Single slide regeneration patterns
-- [Create a new presentation with Copilot in PowerPoint](https://support.microsoft.com/en-us/office/create-a-new-presentation-with-copilot-in-powerpoint-3222ee03-f5a4-4d27-8642-9c387ab4854d) — Microsoft Copilot speaker notes
-- [Add Speaker Notes with AI to Presentations - SlideSpeak](https://slidespeak.co/blog/2024/04/18/add-speaker-notes-with-ai-to-presentations/) — Slide-by-slide AI patterns
+- Cue codebase (App.tsx, aiProvider.ts, ExportModal.tsx) - architecture patterns
+- [Gemini Document Processing](https://ai.google.dev/gemini-api/docs/document-processing) - PDF/image multimodal support
+- [mammoth npm package](https://www.npmjs.com/package/mammoth) - v1.11.0 confirmed
+- [OpenAI hallucination research](https://openai.com/index/why-language-models-hallucinate/) - prevention strategies
 
 ### Secondary (MEDIUM confidence)
+- [Nutrient.io PDF.js guide](https://www.nutrient.io/blog/complete-guide-to-pdfjs/) - layout extraction limitations
+- [Michigan Virtual AI in Education](https://michiganvirtual.org/research/publications/ai-in-education-a-2025-snapshot-of-trust-use-and-emerging-practices/) - teacher trust patterns
+- [Diffit](https://web.diffit.me), [MagicSchool](https://www.magicschool.ai), [Eduaide](https://www.eduaide.ai) - competitor feature analysis
 
-**Pedagogical Research:**
-- [Think-Pair-Share: Promoting Equitable Participation (PMC)](https://pmc.ncbi.nlm.nih.gov/articles/PMC10887392/) — Collaborative learning effectiveness
-- [Scaffolding Content | University at Buffalo](https://www.buffalo.edu/catt/teach/develop/build/scaffolding.html) — Elaboration as scaffolding strategy
-- [Challenge Based Learning Engages Students | Edutopia](https://www.edutopia.org/article/challenge-based-learning-engages-students/) — Interactive challenge pedagogy
-
-**2026 Stack Best Practices:**
-- [The React + AI Stack for 2026](https://www.builder.io/blog/react-ai-stack-2026) — TypeScript + Tailwind + AI API integration
-- [React Forms Best Practices](https://www.dhiwise.com/blog/design-converter/react-forms-best-practices-for-better-user-experience) — Controlled components over contenteditable
-
-**BroadcastChannel & Real-Time Sync:**
-- [BroadcastChannel spec vague about async nature - WHATWG #7267](https://github.com/whatwg/html/issues/7267) — Ordering not guaranteed
-- [Handling Race Conditions in Real-Time Apps](https://dev.to/mattlewandowski93/handling-race-conditions-in-real-time-apps-49c8) — Event cache solutions
-- [Real-Time Collaboration with BroadcastChannel API](https://www.slingacademy.com/article/real-time-collaboration-with-broadcast-channel-api-in-javascript/) — Protocol design
-
-**AI Content Quality:**
-- [AI-induced cultural stagnation is already happening](https://theconversation.com/ai-induced-cultural-stagnation-is-no-longer-speculation-its-already-happening-272488) — Convergence to generic content
-- [AI Content Generation 2026: Brand Voice, Strategy and Scaling](https://www.roboticmarketer.com/ai-content-generation-in-2026-brand-voice-strategy-and-scaling/) — Hallucinations, tone mismatches
-- [Best AI Presentation Makers 2026](https://plusai.com/blog/best-ai-presentation-makers) — "AI struggles when missing context, lacks strategic soul"
-
-### Tertiary (LOW confidence - validation needed)
-
-**Cache Invalidation Patterns:**
-- [React Query Cache Invalidation](https://medium.com/@kennediowusu/react-query-cache-invalidation-why-your-mutations-work-but-your-ui-doesnt-update-a1ad23bc7ef1) — State management patterns (applies to React but Cue doesn't use React Query)
-- [Managing Query Keys for Cache Invalidation](https://www.wisp.blog/blog/managing-query-keys-for-cache-invalidation-in-react-query) — Cache strategies (general principles apply)
+### Tertiary (LOW confidence)
+- [OCR Accuracy Benchmarks 2026](https://research.aimultiple.com/ocr-accuracy/) - Gemini leads printed text; benchmark methodology not verified
 
 ---
-
-**Research completed:** 2026-01-25
-**Ready for roadmap:** Yes
-**Next step:** Requirements definition phase can begin
+*Research completed: 2026-01-29*
+*Ready for roadmap: yes*
