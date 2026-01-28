@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-01-27)
 ## Current Position
 
 Phase: 41 of 44 (Tour Infrastructure & Accessibility)
-Plan: 2 of 3 complete
-Status: In progress
-Last activity: 2026-01-28 — Completed 41-03-PLAN.md (Tour Button & Hook Integration)
+Plan: 3 of 3 complete
+Status: Phase complete
+Last activity: 2026-01-28 — Completed 41-04-PLAN.md (Tour Infrastructure Integration)
 
-Progress: [█░░░░░░░░░] 1.7% (2/119)
+Progress: [█░░░░░░░░░] 1.7% (3/119)
 
 ## Performance Metrics
 
@@ -54,6 +54,9 @@ Recent decisions for v3.6:
 - Tour completion detection: Track step index and only fire onComplete when user reaches last step, not on skip/dismiss (41-03)
 - Keyboard navigation: Enable allowKeyboardControl in driver.js for Tab/Enter/Escape handling (41-03)
 - Focus indicators: Use theme-aware focus rings (indigo-500 light, amber-500 dark) for keyboard visibility (41-03)
+- Tour button visibility: Only on INPUT state (landing page), not EDITING state to avoid clutter (41-04)
+- Tour replay behavior: User can restart tour anytime by clicking button, regardless of completion state (41-04)
+- Data-tour attributes: Pattern established for element targeting (upload-zone, generate-button) (41-04)
 
 ### Pending Todos
 
@@ -74,11 +77,11 @@ See `.planning/todos/pending/` — run `/gsd:check-todos` to review
 ## Session Continuity
 
 Last session: 2026-01-28
-Stopped at: Completed 41-03-PLAN.md
+Stopped at: Completed 41-04-PLAN.md (Phase 41 complete)
 Resume file: None
 
-**Next step:** `/gsd:execute-phase 41-02` to implement tour state persistence, or continue with remaining plans
+**Next step:** Phase 41 complete. Ready for Phase 42-44 (Tour Content Creation) or other roadmap priorities.
 
 ---
 *State initialized: 2026-01-18*
-*Last updated: 2026-01-28 — 41-03 tour button & hook integration complete*
+*Last updated: 2026-01-28 — Phase 41 tour infrastructure & accessibility complete*
