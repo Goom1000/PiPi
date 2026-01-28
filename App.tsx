@@ -26,6 +26,9 @@ import ExportModal from './components/ExportModal';
 import { useToast, ToastContainer } from './components/Toast';
 import useHashRoute from './hooks/useHashRoute';
 import StudentView from './components/StudentView';
+import { TourButton } from './components/TourButton';
+import { useTour } from './hooks/useTour';
+import { useTourState } from './hooks/useTourState';
 
 declare const pdfjsLib: any;
 
@@ -138,6 +141,46 @@ function App() {
   if (route === '/student') {
     return <StudentView />;
   }
+
+  // Tour state - persist completion to localStorage
+  const { isCompleted, markCompleted } = useTourState();
+
+  // Define minimal landing tour steps (3 steps to prove progress indicator works)
+  const landingTourSteps = useMemo(() => [
+    {
+      element: 'header',
+      popover: {
+        title: 'Welcome to Cue',
+        description: 'This quick tour shows you the basics. Press Next or use arrow keys to continue.',
+      },
+    },
+    {
+      element: '[data-tour="upload-zone"]',
+      popover: {
+        title: 'Upload Your Content',
+        description: 'Drop a lesson plan PDF on the left, or an existing presentation on the right.',
+      },
+    },
+    {
+      element: '[data-tour="generate-button"]',
+      popover: {
+        title: 'Generate Your Lesson',
+        description: 'Click here to create AI-powered slides with teleprompter scripts. That\'s it!',
+      },
+    },
+  ], []);
+
+  // useTour hook with persistence wiring
+  const { startTour: startLandingTour, isRunning: isLandingTourRunning } = useTour({
+    steps: landingTourSteps,
+    onComplete: () => markCompleted('landing'),
+  });
+
+  // Handler that checks completion before starting
+  const handleStartLandingTour = useCallback(() => {
+    // Start regardless of completion - user explicitly requested it
+    startLandingTour();
+  }, [startLandingTour]);
 
   // Settings and provider
   const [settings, , refreshSettings] = useSettings();
@@ -1114,6 +1157,11 @@ function App() {
         </div>
         
         <div className="flex items-center gap-4">
+             {/* TOUR BUTTON - only on landing/input screen */}
+             {appState === AppState.INPUT && (
+               <TourButton onStart={handleStartLandingTour} />
+             )}
+
              {/* SETTINGS GEAR */}
             <button
                 onClick={() => setShowSettings(true)}
@@ -1221,7 +1269,7 @@ function App() {
               <div className="bg-white dark:bg-slate-900 rounded-3xl shadow-2xl dark:shadow-black/50 p-8 border border-slate-200 dark:border-slate-800 animate-fade-in relative z-10 transition-colors duration-300">
 
                 {/* Dual Upload Zones */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                <div data-tour="upload-zone" className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                   {/* Lesson Plan PDF Upload (green theme) */}
                   <div
                     onClick={() => fileInputRef.current?.click()}
@@ -1421,6 +1469,7 @@ function App() {
                   </Button>
                   <div className="relative">
                     <Button
+                      data-tour="generate-button"
                       onClick={handleGenerate}
                       className={`px-16 py-5 text-xl rounded-2xl shadow-indigo-100 dark:shadow-none ${!provider ? 'opacity-50' : ''}`}
                       isLoading={isGenerating}
