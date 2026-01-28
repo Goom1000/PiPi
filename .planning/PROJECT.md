@@ -6,14 +6,19 @@ A presentation tool for teachers that transforms PDF lesson plans into interacti
 
 **v3.5 shipped:** Working Wall Export — Teachers can export selected slides as printable A4 PDFs for classroom "Working Wall" displays, with optional AI poster enhancement. Deployed at https://goom1000.github.io/Cue/
 
-## Current Milestone: v3.6 Tooltips & Onboarding
+## Current Milestone: v3.7 AI Resource Enhancement
 
-**Goal:** Help users discover and understand Cue's features through contextual tooltips and per-screen walkthrough tours.
+**Goal:** Enable teachers to upload existing worksheets and handouts, then have AI enhance them while preserving intent and aligning with the Cue lesson.
 
 **Target features:**
-- Per-screen walkthrough tours (landing page, editor, presentation mode)
-- Manual trigger via button on each screen
-- Info icon tooltips next to features explaining what they do
+- Upload existing resources (images, PDF, Word/Docs) in Resources section
+- AI-powered enhancement with lesson context awareness
+- Visual clarity improvements (graphics, layout)
+- Content alignment with adapted lesson
+- Differentiation (simple/standard/detailed versions)
+- Preview and edit in-app before export
+- Export as print-ready PDF
+- Persist enhanced resources in .cue file
 
 ## Current State
 
@@ -130,14 +135,18 @@ Students see only the presentation; teachers see the presentation plus a telepro
 
 ### Active
 
-- [ ] Per-screen walkthrough tours with manual trigger
-- [ ] Info icon tooltips explaining features
-- [ ] Landing page tour and tooltips
-- [ ] Editor tour and tooltips
-- [ ] Presentation mode tour and tooltips
+- [ ] Upload existing resources (images, PDF, Word/Docs) for AI enhancement
+- [ ] AI enhancement with lesson context awareness
+- [ ] Visual clarity improvements (better graphics, cleaner layout)
+- [ ] Content alignment with adapted lesson content
+- [ ] Differentiation output (simple/standard/detailed versions)
+- [ ] In-app preview and edit before export
+- [ ] Export enhanced resources as print-ready PDF
+- [ ] Persist enhanced resources in .cue save file
 
-### Deferred (v3.5+)
+### Deferred (v3.7+)
 
+- [ ] Tooltips and onboarding walkthrough (v3.6 deferred — Phase 41 infrastructure complete)
 - [ ] Elapsed time display showing presentation duration
 - [ ] Fullscreen recovery (auto re-enter if exited)
 - [ ] Setup wizard with screenshots
@@ -279,4 +288,4 @@ v3.5 delivered Working Wall Export:
 | Timestamp as React key | Guaranteed unique for history entries | ✓ Good — v3.4 |
 
 ---
-*Last updated: 2026-01-27 after v3.6 milestone started*
+*Last updated: 2026-01-29 after v3.7 milestone started (v3.6 deferred)*
