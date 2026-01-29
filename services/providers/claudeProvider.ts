@@ -3,6 +3,7 @@ import { Slide, LessonResource, PosterLayout, DocumentAnalysis, EnhancementResul
 import { QuizQuestion, QuestionWithAnswer } from '../geminiService';
 import { getStudentFriendlyRules } from '../prompts/studentFriendlyRules';
 import { DOCUMENT_ANALYSIS_SYSTEM_PROMPT, buildAnalysisUserPrompt } from '../documentAnalysis/analysisPrompts';
+import { ENHANCEMENT_SYSTEM_PROMPT, buildEnhancementUserPrompt } from '../documentEnhancement/enhancementPrompts';
 
 // Shared teleprompter rules used across all generation modes
 const TELEPROMPTER_RULES = `
@@ -233,6 +234,124 @@ const DOCUMENT_ANALYSIS_JSON_SCHEMA = {
       visualContentCount: { type: 'integer' }
     },
     required: ['documentType', 'documentTypeConfidence', 'title', 'pageCount', 'hasAnswerKey', 'elements', 'visualContentCount'],
+    additionalProperties: false
+  }
+};
+
+// Reusable schema for EnhancedElement in Claude tool schemas
+const ENHANCED_ELEMENT_SCHEMA = {
+  type: 'object',
+  properties: {
+    type: {
+      type: 'string',
+      enum: ['header', 'subheader', 'paragraph', 'question', 'answer', 'instruction', 'table', 'diagram', 'image', 'list', 'blank-space']
+    },
+    originalContent: { type: 'string' },
+    enhancedContent: { type: 'string' },
+    position: { type: 'integer' },
+    visualContent: { type: 'boolean' },
+    slideReference: { type: 'string' },
+    children: { type: 'array', items: { type: 'string' } },
+    tableData: {
+      type: 'object',
+      properties: {
+        headers: { type: 'array', items: { type: 'string' } },
+        rows: { type: 'array', items: { type: 'array', items: { type: 'string' } } }
+      },
+      additionalProperties: false
+    }
+  },
+  required: ['type', 'originalContent', 'enhancedContent', 'position'],
+  additionalProperties: false
+};
+
+// Reusable schema for DifferentiatedVersion in Claude tool schemas
+const DIFFERENTIATED_VERSION_SCHEMA = (level: 'simple' | 'standard' | 'detailed') => ({
+  type: 'object',
+  properties: {
+    level: { type: 'string', enum: [level] },
+    title: { type: 'string' },
+    alignedSlides: { type: 'array', items: { type: 'integer' } },
+    slideAlignmentNote: { type: 'string' },
+    elements: { type: 'array', items: ENHANCED_ELEMENT_SCHEMA }
+  },
+  required: ['level', 'title', 'alignedSlides', 'slideAlignmentNote', 'elements'],
+  additionalProperties: false
+});
+
+// JSON Schema for EnhancementResult structured output (Claude tool_choice)
+const ENHANCEMENT_RESULT_JSON_SCHEMA = {
+  name: 'enhancement_result',
+  schema: {
+    type: 'object',
+    properties: {
+      slideMatches: {
+        type: 'array',
+        items: {
+          type: 'object',
+          properties: {
+            slideIndex: { type: 'integer' },
+            slideTitle: { type: 'string' },
+            relevanceScore: { type: 'string', enum: ['high', 'medium', 'low'] },
+            reason: { type: 'string' }
+          },
+          required: ['slideIndex', 'slideTitle', 'relevanceScore', 'reason'],
+          additionalProperties: false
+        }
+      },
+      versions: {
+        type: 'object',
+        properties: {
+          simple: DIFFERENTIATED_VERSION_SCHEMA('simple'),
+          standard: DIFFERENTIATED_VERSION_SCHEMA('standard'),
+          detailed: DIFFERENTIATED_VERSION_SCHEMA('detailed')
+        },
+        required: ['simple', 'standard', 'detailed'],
+        additionalProperties: false
+      },
+      answerKeys: {
+        type: 'object',
+        properties: {
+          structure: { type: 'string', enum: ['unified', 'per-level'] },
+          keys: {
+            type: 'array',
+            items: {
+              type: 'object',
+              properties: {
+                level: { type: 'string', enum: ['simple', 'standard', 'detailed'] },
+                items: {
+                  type: 'array',
+                  items: {
+                    type: 'object',
+                    properties: {
+                      questionRef: { type: 'string' },
+                      type: { type: 'string', enum: ['closed', 'open-ended'] },
+                      answer: { type: 'string' },
+                      rubric: {
+                        type: 'object',
+                        properties: {
+                          criteria: { type: 'array', items: { type: 'string' } },
+                          exemplar: { type: 'string' },
+                          commonMistakes: { type: 'array', items: { type: 'string' } }
+                        },
+                        additionalProperties: false
+                      }
+                    },
+                    required: ['questionRef', 'type'],
+                    additionalProperties: false
+                  }
+                }
+              },
+              required: ['items'],
+              additionalProperties: false
+            }
+          }
+        },
+        required: ['structure', 'keys'],
+        additionalProperties: false
+      }
+    },
+    required: ['slideMatches', 'versions', 'answerKeys'],
     additionalProperties: false
   }
 };
@@ -1504,19 +1623,49 @@ Generate the poster layout now.
 
   /**
    * Enhance a document with differentiated versions and answer keys.
-   * Phase 45 Plan 02 will implement the full functionality.
+   * Generates three versions (simple/standard/detailed) aligned with lesson slides.
    */
   async enhanceDocument(
-    _documentAnalysis: DocumentAnalysis,
-    _slideContext: string,
-    _options: EnhancementOptions,
-    _signal?: AbortSignal
+    documentAnalysis: DocumentAnalysis,
+    slideContext: string,
+    options: EnhancementOptions,
+    signal?: AbortSignal
   ): Promise<EnhancementResult> {
-    // TODO: Implement in Phase 45 Plan 02
-    throw new AIProviderError(
-      'Document enhancement not yet implemented for Claude provider',
-      'UNKNOWN_ERROR'
-    );
+    const userPrompt = buildEnhancementUserPrompt(documentAnalysis, slideContext, options);
+
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': this.apiKey,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true',
+      },
+      body: JSON.stringify({
+        model: MODEL,
+        max_tokens: 8192,  // Enhancement output is substantial
+        system: ENHANCEMENT_SYSTEM_PROMPT,
+        messages: [{ role: 'user', content: userPrompt }],
+        tools: [{
+          name: 'enhancement_result',
+          description: 'Return the enhancement result with differentiated versions',
+          input_schema: ENHANCEMENT_RESULT_JSON_SCHEMA.schema
+        }],
+        tool_choice: { type: 'tool', name: 'enhancement_result' }
+      }),
+      signal  // Pass abort signal for cancellation
+    });
+
+    if (!response.ok) {
+      throw this.createErrorFromResponse(response.status, await response.text());
+    }
+
+    const data = await response.json();
+    const toolUse = data.content?.find((c: any) => c.type === 'tool_use');
+    if (!toolUse?.input) {
+      throw new AIProviderError(USER_ERROR_MESSAGES.PARSE_ERROR, 'PARSE_ERROR', 'No tool result');
+    }
+    return toolUse.input as EnhancementResult;
   }
 
   /**
