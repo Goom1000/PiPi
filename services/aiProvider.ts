@@ -16,6 +16,7 @@ export interface GenerationInput {
   presentationImages?: string[];
   mode: GenerationMode;
   verbosity?: VerbosityLevel;
+  gradeLevel?: string;  // e.g., "Year 6 (10-11 years old)"
 }
 
 // Context from slides for question generation

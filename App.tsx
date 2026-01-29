@@ -459,6 +459,7 @@ function App() {
         presentationImages: existingPptImages.length > 0 ? existingPptImages : undefined,
         mode: uploadMode as GenerationMode, // Safe cast - we guard against 'none' above
         verbosity: deckVerbosity,
+        gradeLevel: 'Year 6 (10-11 years old)',  // Default grade level for student-friendly content
       };
 
       console.log('[App] generationInput.verbosity:', generationInput.verbosity);
