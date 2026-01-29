@@ -2,6 +2,7 @@ import { GoogleGenAI, Type } from "@google/genai";
 import { AIProviderInterface, AIProviderError, USER_ERROR_MESSAGES, GenerationInput, GameQuestionRequest, VerbosityLevel, ChatContext } from '../aiProvider';
 import { Slide, LessonResource, DocumentAnalysis, EnhancementResult, EnhancementOptions } from '../../types';
 import { DOCUMENT_ANALYSIS_SYSTEM_PROMPT, buildAnalysisUserPrompt } from '../documentAnalysis/analysisPrompts';
+import { ENHANCEMENT_SYSTEM_PROMPT, buildEnhancementUserPrompt } from '../documentEnhancement/enhancementPrompts';
 import {
   QuizQuestion,
   QuestionWithAnswer,
@@ -22,6 +23,172 @@ import {
   regenerateTeleprompter as geminiRegenerateTeleprompter,
   streamChatResponse as geminiStreamChatResponse,
 } from '../geminiService';
+
+/**
+ * JSON Schema for EnhancementResult structured output.
+ * Defines the shape of AI-generated document enhancement results.
+ */
+const ENHANCEMENT_RESULT_SCHEMA = {
+  type: Type.OBJECT,
+  properties: {
+    slideMatches: {
+      type: Type.ARRAY,
+      items: {
+        type: Type.OBJECT,
+        properties: {
+          slideIndex: { type: Type.INTEGER },
+          slideTitle: { type: Type.STRING },
+          relevanceScore: { type: Type.STRING, enum: ['high', 'medium', 'low'] },
+          reason: { type: Type.STRING }
+        },
+        required: ['slideIndex', 'slideTitle', 'relevanceScore', 'reason']
+      }
+    },
+    versions: {
+      type: Type.OBJECT,
+      properties: {
+        simple: {
+          type: Type.OBJECT,
+          properties: {
+            level: { type: Type.STRING, enum: ['simple'] },
+            title: { type: Type.STRING },
+            alignedSlides: { type: Type.ARRAY, items: { type: Type.INTEGER } },
+            slideAlignmentNote: { type: Type.STRING },
+            elements: {
+              type: Type.ARRAY,
+              items: {
+                type: Type.OBJECT,
+                properties: {
+                  type: { type: Type.STRING, enum: ['header', 'subheader', 'paragraph', 'question', 'answer', 'instruction', 'table', 'diagram', 'image', 'list', 'blank-space'] },
+                  originalContent: { type: Type.STRING },
+                  enhancedContent: { type: Type.STRING },
+                  position: { type: Type.INTEGER },
+                  visualContent: { type: Type.BOOLEAN },
+                  slideReference: { type: Type.STRING },
+                  children: { type: Type.ARRAY, items: { type: Type.STRING } },
+                  tableData: {
+                    type: Type.OBJECT,
+                    properties: {
+                      headers: { type: Type.ARRAY, items: { type: Type.STRING } },
+                      rows: { type: Type.ARRAY, items: { type: Type.ARRAY, items: { type: Type.STRING } } }
+                    }
+                  }
+                },
+                required: ['type', 'originalContent', 'enhancedContent', 'position']
+              }
+            }
+          },
+          required: ['level', 'title', 'alignedSlides', 'slideAlignmentNote', 'elements']
+        },
+        standard: {
+          type: Type.OBJECT,
+          properties: {
+            level: { type: Type.STRING, enum: ['standard'] },
+            title: { type: Type.STRING },
+            alignedSlides: { type: Type.ARRAY, items: { type: Type.INTEGER } },
+            slideAlignmentNote: { type: Type.STRING },
+            elements: {
+              type: Type.ARRAY,
+              items: {
+                type: Type.OBJECT,
+                properties: {
+                  type: { type: Type.STRING, enum: ['header', 'subheader', 'paragraph', 'question', 'answer', 'instruction', 'table', 'diagram', 'image', 'list', 'blank-space'] },
+                  originalContent: { type: Type.STRING },
+                  enhancedContent: { type: Type.STRING },
+                  position: { type: Type.INTEGER },
+                  visualContent: { type: Type.BOOLEAN },
+                  slideReference: { type: Type.STRING },
+                  children: { type: Type.ARRAY, items: { type: Type.STRING } },
+                  tableData: {
+                    type: Type.OBJECT,
+                    properties: {
+                      headers: { type: Type.ARRAY, items: { type: Type.STRING } },
+                      rows: { type: Type.ARRAY, items: { type: Type.ARRAY, items: { type: Type.STRING } } }
+                    }
+                  }
+                },
+                required: ['type', 'originalContent', 'enhancedContent', 'position']
+              }
+            }
+          },
+          required: ['level', 'title', 'alignedSlides', 'slideAlignmentNote', 'elements']
+        },
+        detailed: {
+          type: Type.OBJECT,
+          properties: {
+            level: { type: Type.STRING, enum: ['detailed'] },
+            title: { type: Type.STRING },
+            alignedSlides: { type: Type.ARRAY, items: { type: Type.INTEGER } },
+            slideAlignmentNote: { type: Type.STRING },
+            elements: {
+              type: Type.ARRAY,
+              items: {
+                type: Type.OBJECT,
+                properties: {
+                  type: { type: Type.STRING, enum: ['header', 'subheader', 'paragraph', 'question', 'answer', 'instruction', 'table', 'diagram', 'image', 'list', 'blank-space'] },
+                  originalContent: { type: Type.STRING },
+                  enhancedContent: { type: Type.STRING },
+                  position: { type: Type.INTEGER },
+                  visualContent: { type: Type.BOOLEAN },
+                  slideReference: { type: Type.STRING },
+                  children: { type: Type.ARRAY, items: { type: Type.STRING } },
+                  tableData: {
+                    type: Type.OBJECT,
+                    properties: {
+                      headers: { type: Type.ARRAY, items: { type: Type.STRING } },
+                      rows: { type: Type.ARRAY, items: { type: Type.ARRAY, items: { type: Type.STRING } } }
+                    }
+                  }
+                },
+                required: ['type', 'originalContent', 'enhancedContent', 'position']
+              }
+            }
+          },
+          required: ['level', 'title', 'alignedSlides', 'slideAlignmentNote', 'elements']
+        }
+      },
+      required: ['simple', 'standard', 'detailed']
+    },
+    answerKeys: {
+      type: Type.OBJECT,
+      properties: {
+        structure: { type: Type.STRING, enum: ['unified', 'per-level'] },
+        keys: {
+          type: Type.ARRAY,
+          items: {
+            type: Type.OBJECT,
+            properties: {
+              level: { type: Type.STRING, enum: ['simple', 'standard', 'detailed'] },
+              items: {
+                type: Type.ARRAY,
+                items: {
+                  type: Type.OBJECT,
+                  properties: {
+                    questionRef: { type: Type.STRING },
+                    type: { type: Type.STRING, enum: ['closed', 'open-ended'] },
+                    answer: { type: Type.STRING },
+                    rubric: {
+                      type: Type.OBJECT,
+                      properties: {
+                        criteria: { type: Type.ARRAY, items: { type: Type.STRING } },
+                        exemplar: { type: Type.STRING },
+                        commonMistakes: { type: Type.ARRAY, items: { type: Type.STRING } }
+                      }
+                    }
+                  },
+                  required: ['questionRef', 'type']
+                }
+              }
+            },
+            required: ['items']
+          }
+        }
+      },
+      required: ['structure', 'keys']
+    }
+  },
+  required: ['slideMatches', 'versions', 'answerKeys']
+};
 
 /**
  * GeminiProvider wraps the existing geminiService functions.
@@ -272,19 +439,40 @@ export class GeminiProvider implements AIProviderInterface {
 
   /**
    * Enhance a document with differentiated versions and answer keys.
-   * Phase 45 Plan 02 will implement the full functionality.
+   * Generates three versions (simple/standard/detailed) aligned with lesson slides.
    */
   async enhanceDocument(
-    _documentAnalysis: DocumentAnalysis,
-    _slideContext: string,
-    _options: EnhancementOptions,
-    _signal?: AbortSignal
+    documentAnalysis: DocumentAnalysis,
+    slideContext: string,
+    options: EnhancementOptions,
+    signal?: AbortSignal
   ): Promise<EnhancementResult> {
-    // TODO: Implement in Phase 45 Plan 02
-    throw new AIProviderError(
-      'Document enhancement not yet implemented for Gemini provider',
-      'UNKNOWN_ERROR'
-    );
+    try {
+      const ai = new GoogleGenAI({ apiKey: this.apiKey });
+
+      const userPrompt = buildEnhancementUserPrompt(documentAnalysis, slideContext, options);
+
+      const response = await ai.models.generateContent({
+        model: 'gemini-2.0-flash',
+        contents: { parts: [{ text: userPrompt }] },
+        config: {
+          systemInstruction: ENHANCEMENT_SYSTEM_PROMPT,
+          responseMimeType: 'application/json',
+          responseSchema: ENHANCEMENT_RESULT_SCHEMA,
+          temperature: 0.3,  // Some creativity for enhancements, but consistent
+          abortSignal: signal  // For cancellation support
+        }
+      });
+
+      const text = response.text || '{}';
+      return JSON.parse(text) as EnhancementResult;
+    } catch (error) {
+      // Let AbortError propagate for cancellation handling
+      if ((error as Error).name === 'AbortError') {
+        throw error;
+      }
+      throw this.wrapError(error);
+    }
   }
 
   /**
