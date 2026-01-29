@@ -336,6 +336,87 @@ export interface DocumentAnalysis {
   visualContentCount: number; // Number of diagrams/images flagged for review
 }
 
+// ============================================================================
+// DOCUMENT ENHANCEMENT TYPES (Phase 45)
+// For AI-powered differentiation, slide alignment, and answer key generation
+// ============================================================================
+
+// Slide match result from AI alignment detection
+export interface SlideMatch {
+  slideIndex: number;                          // 0-indexed slide number
+  slideTitle: string;                          // For display in confirmation UI
+  relevanceScore: 'high' | 'medium' | 'low';
+  reason: string;                              // Brief explanation for teacher
+}
+
+// Enhanced element (mirrors AnalyzedElement with enhancements)
+export interface EnhancedElement {
+  type: ElementType;
+  originalContent: string;    // Preserved from analysis
+  enhancedContent: string;    // May differ based on level
+  position: number;
+  visualContent?: boolean;    // Preserved - signals "don't modify"
+  slideReference?: string;    // Added: "See Slide 5 (Fractions)"
+  children?: string[];        // For lists, numbered items, or multi-part questions
+  tableData?: {               // For tables only
+    headers: string[];
+    rows: string[][];
+  };
+}
+
+// Single differentiated version of a resource
+export interface DifferentiatedVersion {
+  level: 'simple' | 'standard' | 'detailed';
+  title: string;              // May be enhanced from original
+  alignedSlides: number[];    // 1-indexed slide numbers this relates to
+  slideAlignmentNote: string; // e.g., "Worksheet 1 aligns with Slides 5-7"
+  elements: EnhancedElement[];
+}
+
+// Answer key item for a single question/exercise
+export interface AnswerKeyItem {
+  questionRef: string;        // e.g., "Question 1" or "Exercise A, part 2"
+  type: 'closed' | 'open-ended';
+  // For closed questions (specific answer)
+  answer?: string;
+  // For open-ended questions (rubric)
+  rubric?: {
+    criteria: string[];       // What to look for
+    exemplar?: string;        // Example good answer
+    commonMistakes?: string[]; // What to watch for
+  };
+}
+
+// Answer key for one or all differentiation levels
+export interface AnswerKey {
+  level?: 'simple' | 'standard' | 'detailed';  // If per-level
+  items: AnswerKeyItem[];
+}
+
+// Answer key result with structure decision
+export interface AnswerKeyResult {
+  structure: 'unified' | 'per-level';
+  keys: AnswerKey[];
+}
+
+// Complete enhancement result from AI
+export interface EnhancementResult {
+  slideMatches: SlideMatch[];      // Which slides this resource aligns with
+  versions: {
+    simple: DifferentiatedVersion;
+    standard: DifferentiatedVersion;
+    detailed: DifferentiatedVersion;
+  };
+  answerKeys: AnswerKeyResult;
+}
+
+// Options for enhancement operation
+export interface EnhancementOptions {
+  preserveMode: boolean;      // true = preserve original, false = allow modification (future)
+  generateAnswerKey: boolean; // ENHANCE-04
+  gradeLevel: string;         // e.g., "Year 6 (10-11 years old)"
+}
+
 export interface LessonPlan {
   topic: string;
   gradeLevel: string; // Defaults to "Year 6" (10-11yo)
