@@ -91,7 +91,10 @@ Plans:
 2. User sees document structure identified (sections, exercises, answer blanks)
 3. Analysis completes within 10 seconds for typical 2-page worksheet
 
-**Plans:** TBD
+**Plans:** 1 plan
+
+Plans:
+- [ ] 44-01-PLAN.md — Types, prompts, provider methods, and analysis service
 
 **Note:** This phase provides the analysis foundation that Phase 45 enhancement builds upon. Uses multimodal AI (Gemini/Claude vision) per research recommendations.
 
@@ -161,7 +164,7 @@ Plans:
 | 41. Tour Infrastructure | v3.6 | 4/4 | Complete | 2026-01-28 |
 | 42. Student-Friendly Slides | v3.7 | 2/2 | Complete | 2026-01-29 |
 | 43. Types and File Upload | v3.7 | 2/2 | Complete | 2026-01-29 |
-| 44. AI Document Analysis | v3.7 | 0/TBD | Not started | - |
+| 44. AI Document Analysis | v3.7 | 0/1 | Planned | - |
 | 45. Enhancement with Lesson Context | v3.7 | 0/TBD | Not started | - |
 | 46. Preview, Edit, and Trust UI | v3.7 | 0/TBD | Not started | - |
 | 47. Export and Persistence | v3.7 | 0/TBD | Not started | - |
@@ -196,4 +199,4 @@ Plans:
 
 ---
 *Roadmap created: 2026-01-27*
-*Last updated: 2026-01-29 - Phase 43 complete (2 plans)*
+*Last updated: 2026-01-30 - Phase 44 planned (1 plan)*
