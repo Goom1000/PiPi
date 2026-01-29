@@ -2,6 +2,7 @@
 import { GoogleGenAI, Type } from "@google/genai";
 import { Slide, LessonResource } from "../types";
 import { GenerationInput, GenerationMode, AIProviderError, USER_ERROR_MESSAGES, GameQuestionRequest, SlideContext, BLOOM_DIFFICULTY_MAP, shuffleQuestionOptions, ChatContext } from './aiProvider';
+import { getStudentFriendlyRules } from './prompts/studentFriendlyRules';
 
 // Shared teleprompter rules used across all generation modes
 const TELEPROMPTER_RULES = `
@@ -96,13 +97,21 @@ function getTeleprompterRulesForVerbosity(verbosity: VerbosityLevel = 'standard'
 /**
  * Get the appropriate system instruction based on generation mode.
  */
-function getSystemInstructionForMode(mode: GenerationMode, verbosity: VerbosityLevel = 'standard'): string {
+function getSystemInstructionForMode(
+  mode: GenerationMode,
+  verbosity: VerbosityLevel = 'standard',
+  gradeLevel: string = 'Year 6 (10-11 years old)'
+): string {
   const teleprompterRules = getTeleprompterRulesForVerbosity(verbosity);
+  const studentFriendlyRules = getStudentFriendlyRules(gradeLevel);
+
   switch (mode) {
     case 'fresh':
       return `
 You are an elite Primary Education Consultant.
 Your goal is to transform a formal lesson plan into a teaching slideshow.
+
+${studentFriendlyRules}
 
 CRITICAL: You will be provided with both text AND visual images of the document.
 - Use the images to accurately interpret TABLES, CHARTS, and DIAGRAMS that may not have parsed well as text.
@@ -120,6 +129,8 @@ LAYOUTS: Use 'split' for content with images, 'grid' or 'flowchart' for process 
       return `
 You are an elite Primary Education Consultant.
 Your goal is to transform an existing presentation into clean, less text-dense Cue-style slides.
+
+${studentFriendlyRules}
 
 CRITICAL RULE - CONTENT PRESERVATION:
 **You MUST preserve ALL content from the original presentation.**
@@ -147,6 +158,8 @@ LAYOUTS: Use 'split' for content with images, 'grid' or 'flowchart' for process 
       return `
 You are an elite Primary Education Consultant.
 Your goal is to create slides that combine lesson content with an existing presentation.
+
+${studentFriendlyRules}
 
 BLEND MODE RULES:
 - Analyze BOTH the lesson plan AND existing presentation provided.
@@ -180,7 +193,7 @@ export const generateLessonSlides = async (
   // Debug: Log verbosity being used for generation
   console.log('[GeminiService] generateLessonSlides - verbosity:', input.verbosity || 'undefined (defaulting to standard)');
 
-  const systemInstruction = getSystemInstructionForMode(input.mode, input.verbosity);
+  const systemInstruction = getSystemInstructionForMode(input.mode, input.verbosity, input.gradeLevel);
 
   // Build contents array based on mode
   const contents: any[] = [];
@@ -550,6 +563,7 @@ export const generateElaborateSlide = async (
 ): Promise<Slide> => {
   const ai = new GoogleGenAI({ apiKey });
   const model = "gemini-3-flash-preview";
+  const studentFriendlyRules = getStudentFriendlyRules('Year 6 (10-11 years old)');
 
   // Build full presentation context for coherence
   const presentationContext = allSlides
@@ -561,6 +575,8 @@ You are an educational designer creating "Elaborate" slides for Year 6 (10-11 ye
 Topic: ${lessonTopic}
 You are expanding on: "${sourceSlide.title}"
 Source content: ${sourceSlide.content.join('; ')}
+
+${studentFriendlyRules}
 
 PRESENTATION CONTEXT (maintain coherence, don't repeat earlier content):
 ${presentationContext}
@@ -612,6 +628,7 @@ export const generateWorkTogetherSlide = async (
 ): Promise<Slide> => {
   const ai = new GoogleGenAI({ apiKey });
   const model = "gemini-3-flash-preview";
+  const studentFriendlyRules = getStudentFriendlyRules('Year 6 (10-11 years old)');
 
   // Build full presentation context for coherence
   const presentationContext = allSlides
@@ -623,6 +640,8 @@ You are an educational designer creating "Work Together" collaborative activitie
 Topic: ${lessonTopic}
 Creating activity based on: "${sourceSlide.title}"
 Source content: ${sourceSlide.content.join('; ')}
+
+${studentFriendlyRules}
 
 PRESENTATION CONTEXT (maintain coherence):
 ${presentationContext}
@@ -690,6 +709,7 @@ export const generateClassChallengeSlide = async (
 ): Promise<Slide> => {
   const ai = new GoogleGenAI({ apiKey });
   const model = "gemini-3-flash-preview";
+  const studentFriendlyRules = getStudentFriendlyRules('Year 6 (10-11 years old)');
 
   // Build full presentation context for coherence
   const presentationContext = allSlides
@@ -701,6 +721,8 @@ You are an educational designer creating "Class Challenge" slides for Year 6 (10
 Topic: ${lessonTopic}
 Creating challenge based on: "${sourceSlide.title}"
 Source content: ${sourceSlide.content.join('; ')}
+
+${studentFriendlyRules}
 
 PRESENTATION CONTEXT (maintain coherence):
 ${presentationContext}
