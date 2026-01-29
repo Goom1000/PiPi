@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-01-29)
 ## Current Position
 
 Phase: 45 of 47 (Enhancement with Lesson Context)
-Plan: 1 of 3 complete
+Plan: 2 of 3 complete
 Status: In progress
-Last activity: 2026-01-30 — Completed 45-01-PLAN.md (enhancement types, prompts, interface)
+Last activity: 2026-01-30 — Completed 45-02-PLAN.md (provider implementations)
 
-Progress: [██████░░░░] 55%
+Progress: [██████░░░░] 57%
 Pending todos: 9
 
 ## Performance Metrics
@@ -44,7 +44,7 @@ Pending todos: 9
 | 42 | Student-friendly slide language | SLIDE-01, SLIDE-02, SLIDE-03 | COMPLETE |
 | 43 | Resource file upload | UPLOAD-01 to UPLOAD-05 | COMPLETE |
 | 44 | AI document analysis | (foundation) | COMPLETE |
-| 45 | Enhancement with lesson context | ENHANCE-01 to ENHANCE-06 | In progress (1/3) |
+| 45 | Enhancement with lesson context | ENHANCE-01 to ENHANCE-06 | In progress (2/3) |
 | 46 | Preview, edit, and trust UI | PREVIEW-01 to PREVIEW-04 | |
 | 47 | Export and persistence | EXPORT-01 to EXPORT-03 | |
 
@@ -71,6 +71,8 @@ Recent decisions for v3.7:
 - Gemini uses responseSchema for structured output, Claude uses tool_choice (DEC-44-01)
 - buildSlideContextForEnhancement limits to 15 slides to avoid token overflow (DEC-45-01)
 - Enhancement prompts include CRITICAL preservation rules to prevent content removal (DEC-45-01)
+- Gemini AbortSignal via config.abortSignal, Claude via fetch signal (DEC-45-02)
+- Progress callbacks report enhancing state at 0% and 50% (DEC-45-02)
 
 ### Pending Todos
 
@@ -83,11 +85,11 @@ None identified yet for v3.7.
 ## Session Continuity
 
 Last session: 2026-01-30
-Stopped at: Completed 45-01-PLAN.md (enhancement types, prompts, interface)
+Stopped at: Completed 45-02-PLAN.md (provider implementations)
 Resume file: None
 
-**Next step:** Execute 45-02-PLAN.md (provider implementations)
+**Next step:** Execute 45-03-PLAN.md (UI integration)
 
 ---
 *State initialized: 2026-01-18*
-*Last updated: 2026-01-30 — Plan 45-01 complete (enhancement types, prompts, interface)*
+*Last updated: 2026-01-30 — Plan 45-02 complete (provider implementations)*
