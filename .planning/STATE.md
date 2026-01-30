@@ -5,25 +5,25 @@
 See: .planning/PROJECT.md (updated 2026-01-29)
 
 **Core value:** Students see only the presentation; teachers see the teleprompter script
-**Current focus:** v3.7 AI Resource Enhancement — Phase 47 in progress
+**Current focus:** v3.7 AI Resource Enhancement — Phase 47 COMPLETE
 
 ## Current Position
 
 Phase: 47 of 47 (Export and Persistence)
-Plan: 1 of 2 complete
-Status: In progress
-Last activity: 2026-01-31 — Completed 47-01-PLAN.md (PDF export with zip bundling)
+Plan: 2 of 2 complete
+Status: COMPLETE
+Last activity: 2026-01-31 — Completed 47-02-PLAN.md (Save/load persistence)
 
-Progress: [█████████▓] 93%
+Progress: [██████████] 100%
 Pending todos: 9
 
 ## Performance Metrics
 
 **Velocity:**
 - Milestones shipped: 17 (v1.0 through v3.5)
-- Total phases completed: 46
-- Total plans completed: 136
-- Total LOC: ~22,500 TypeScript
+- Total phases completed: 47
+- Total plans completed: 137
+- Total LOC: ~22,600 TypeScript
 
 **v3.6 Tooltips & Onboarding (deferred):**
 - Phase 41 complete (tour infrastructure)
@@ -31,11 +31,11 @@ Pending todos: 9
 - Infrastructure preserved for later completion
 
 **Recent Milestones:**
+- v3.7: 6 phases, 14 plans (2026-01-31) - AI Resource Enhancement
 - v3.5: 3 phases, 4 plans, 1 day (2026-01-27)
 - v3.4: 2 phases, 5 plans, 8 days (2026-01-26)
 - v3.3: 3 phases, 3 plans, 1 day (2026-01-26)
 - v3.2: 4 phases, 4 plans, 1 day (2026-01-25)
-- v3.1: 2 phases, 3 plans, 1 day (2026-01-25)
 
 ## v3.7 Roadmap Summary
 
@@ -46,7 +46,7 @@ Pending todos: 9
 | 44 | AI document analysis | (foundation) | COMPLETE |
 | 45 | Enhancement with lesson context | ENHANCE-01 to ENHANCE-06 | COMPLETE |
 | 46 | Preview, edit, and trust UI | PREVIEW-01 to PREVIEW-04 | COMPLETE |
-| 47 | Export and persistence | EXPORT-01 to EXPORT-03 | 01 COMPLETE |
+| 47 | Export and persistence | EXPORT-01 to EXPORT-03 | COMPLETE |
 
 ## Accumulated Context
 
@@ -83,6 +83,9 @@ Recent decisions for v3.7:
 - Use jsPDF text API for vector PDF output (sharper than html2canvas) (DEC-47-01)
 - A4 portrait with 25mm left margin for binding/hole-punching (DEC-47-01)
 - Bundle all PDFs in single zip download for teacher convenience (DEC-47-01)
+- SerializedEditState uses [number, string][] tuples for Map serialization (DEC-47-02)
+- EnhancedResourceState stores full originalResource for offline restoration (DEC-47-02)
+- v3->v4 migration defaults enhancedResources to empty array (DEC-47-02)
 
 ### Pending Todos
 
@@ -90,16 +93,16 @@ See `.planning/todos/pending/` — run `/gsd:check-todos` to review
 
 ### Blockers/Concerns
 
-None identified yet for v3.7.
+None - v3.7 milestone complete.
 
 ## Session Continuity
 
 Last session: 2026-01-31
-Stopped at: Completed 47-01-PLAN.md (PDF export with zip bundling)
+Stopped at: Completed 47-02-PLAN.md (Save/load persistence) - v3.7 COMPLETE
 Resume file: None
 
-**Next step:** Execute 47-02-PLAN.md (Persistence in .cue file)
+**Next step:** v3.7 complete. Ready for next milestone planning.
 
 ---
 *State initialized: 2026-01-18*
-*Last updated: 2026-01-31 — Completed 47-01-PLAN.md (PDF export)*
+*Last updated: 2026-01-31 — Completed Phase 47 (Export and Persistence) - v3.7 COMPLETE*
