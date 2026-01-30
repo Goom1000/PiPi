@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-01-29)
 ## Current Position
 
 Phase: 46 of 47 (Preview, Edit, and Trust UI)
-Plan: 1 of 2 complete
-Status: In progress
-Last activity: 2026-01-30 — Completed 46-01-PLAN.md (Edit mode and inline editing)
+Plan: 2 of 2 complete
+Status: COMPLETE
+Last activity: 2026-01-30 — Completed 46-02-PLAN.md (Diff view and per-element regeneration)
 
-Progress: [████████░░] 82%
+Progress: [████████░░] 84%
 Pending todos: 9
 
 ## Performance Metrics
@@ -45,7 +45,7 @@ Pending todos: 9
 | 43 | Resource file upload | UPLOAD-01 to UPLOAD-05 | COMPLETE |
 | 44 | AI document analysis | (foundation) | COMPLETE |
 | 45 | Enhancement with lesson context | ENHANCE-01 to ENHANCE-06 | COMPLETE |
-| 46 | Preview, edit, and trust UI | PREVIEW-01 to PREVIEW-04 | Plan 01 COMPLETE |
+| 46 | Preview, edit, and trust UI | PREVIEW-01 to PREVIEW-04 | COMPLETE |
 | 47 | Export and persistence | EXPORT-01 to EXPORT-03 | |
 
 ## Accumulated Context
@@ -77,6 +77,9 @@ Recent decisions for v3.7:
 - Use contenteditable="plaintext-only" for inline editing security (DEC-46-01)
 - Store edits in Map per differentiation level for O(1) lookup (DEC-46-01)
 - Lists editable as newline-separated text in edit mode (DEC-46-01)
+- Use react-diff-viewer-continued with --legacy-peer-deps for React 19 (DEC-46-02)
+- Diff and edit modes mutually exclusive to prevent UI confusion (DEC-46-02)
+- Per-element regeneration uses same AI provider with focused prompts (DEC-46-02)
 
 ### Pending Todos
 
@@ -89,11 +92,11 @@ None identified yet for v3.7.
 ## Session Continuity
 
 Last session: 2026-01-30
-Stopped at: Completed 46-01-PLAN.md (edit mode and inline editing)
+Stopped at: Completed 46-02-PLAN.md (diff view and per-element regeneration)
 Resume file: None
 
-**Next step:** Execute Phase 46 Plan 02 (Diff view and per-element regeneration)
+**Next step:** Execute Phase 47 (Export and persistence)
 
 ---
 *State initialized: 2026-01-18*
-*Last updated: 2026-01-30 — Completed 46-01 (edit mode and inline editing)*
+*Last updated: 2026-01-30 — Completed Phase 46 (Preview, Edit, and Trust UI)*
