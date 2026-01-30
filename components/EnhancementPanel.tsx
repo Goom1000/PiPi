@@ -18,6 +18,7 @@ import {
   getDefaultEnhancementOptions,
   EnhancementState
 } from '../services/documentEnhancement/documentEnhancementService';
+import { exportEnhancedResource, ExportProgress } from '../services/exportService';
 import Button from './Button';
 
 interface EnhancementPanelProps {
@@ -26,11 +27,16 @@ interface EnhancementPanelProps {
   slides: Slide[];
   provider: AIProviderInterface;
   onError: (title: string, message: string) => void;
+  // Optional callback to notify parent of state changes for persistence
+  onStateChange?: (state: { result: EnhancementResult | null; editState: EditState }) => void;
+  // Optional initial state for restoring from saved data
+  initialResult?: EnhancementResult;
+  initialEditState?: EditState;
 }
 
 type DifferentiationLevel = 'simple' | 'standard' | 'detailed';
 
-const initialEditState: EditState = {
+const defaultEditState: EditState = {
   edits: {
     simple: new Map(),
     standard: new Map(),
@@ -53,7 +59,7 @@ function editReducer(state: EditState, action: EditAction): EditState {
       return { edits: newEdits };
     }
     case 'DISCARD_ALL':
-      return initialEditState;
+      return defaultEditState;
     default:
       return state;
   }
@@ -64,17 +70,24 @@ const EnhancementPanel: React.FC<EnhancementPanelProps> = ({
   analysis,
   slides,
   provider,
-  onError
+  onError,
+  onStateChange,
+  initialResult,
+  initialEditState: initialEditStateProp
 }) => {
-  // State management
-  const [enhancementState, setEnhancementState] = useState<EnhancementState>({ status: 'idle' });
-  const [result, setResult] = useState<EnhancementResult | null>(null);
+  // State management - use initial values if provided (for restoration from saved data)
+  const [enhancementState, setEnhancementState] = useState<EnhancementState>(
+    initialResult ? { status: 'complete' } : { status: 'idle' }
+  );
+  const [result, setResult] = useState<EnhancementResult | null>(initialResult ?? null);
   const [selectedLevel, setSelectedLevel] = useState<DifferentiationLevel>('standard');
   const [showAnswerKey, setShowAnswerKey] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
   const [showDiff, setShowDiff] = useState(false);
   const [regeneratingPosition, setRegeneratingPosition] = useState<number | null>(null);
-  const [editState, dispatch] = useReducer(editReducer, initialEditState);
+  const [isExporting, setIsExporting] = useState(false);
+  const [exportProgress, setExportProgress] = useState<ExportProgress | null>(null);
+  const [editState, dispatch] = useReducer(editReducer, initialEditStateProp ?? defaultEditState);
   const abortControllerRef = useRef<AbortController | null>(null);
 
   // When entering diff mode, exit edit mode (mutually exclusive)
@@ -83,6 +96,13 @@ const EnhancementPanel: React.FC<EnhancementPanelProps> = ({
       setIsEditMode(false);
     }
   }, [showDiff, isEditMode]);
+
+  // Notify parent of state changes for persistence
+  useEffect(() => {
+    if (onStateChange) {
+      onStateChange({ result, editState });
+    }
+  }, [result, editState, onStateChange]);
 
   const handleEnhance = async () => {
     abortControllerRef.current = new AbortController();
@@ -118,6 +138,27 @@ const EnhancementPanel: React.FC<EnhancementPanelProps> = ({
   const handleTryAgain = () => {
     setEnhancementState({ status: 'idle' });
     setResult(null);
+  };
+
+  const handleExport = async () => {
+    if (!result) return;
+
+    setIsExporting(true);
+    setExportProgress(null);
+
+    try {
+      await exportEnhancedResource(
+        result,
+        editState,
+        analysis.title || resource.filename,
+        setExportProgress
+      );
+    } catch (error) {
+      onError('Export Failed', (error as Error).message);
+    } finally {
+      setIsExporting(false);
+      setExportProgress(null);
+    }
   };
 
   const hasAnyEdits = () => {
@@ -908,11 +949,47 @@ Regenerate the content now:`;
           </div>
         </div>
 
-        {/* Footer with Regenerate button */}
+        {/* Footer with Export and Regenerate buttons */}
         <div className="p-4 border-t border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/50">
-          <Button variant="secondary" onClick={handleEnhance} className="w-full" disabled={regeneratingPosition !== null}>
-            {regeneratingPosition !== null ? 'Regenerating element...' : 'Regenerate Enhancement'}
-          </Button>
+          <div className="flex flex-row gap-3">
+            {/* Export button - primary action */}
+            <button
+              onClick={handleExport}
+              disabled={isExporting || regeneratingPosition !== null}
+              className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-400 text-white rounded-xl font-medium text-sm transition-colors"
+            >
+              {isExporting ? (
+                <>
+                  <svg className="w-4 h-4 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                  </svg>
+                  <span>
+                    {exportProgress?.phase === 'generating'
+                      ? `Generating PDFs... ${exportProgress.percent}%`
+                      : `Bundling... ${exportProgress?.percent ?? 0}%`
+                    }
+                  </span>
+                </>
+              ) : (
+                <>
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                  </svg>
+                  <span>Export All Versions</span>
+                </>
+              )}
+            </button>
+
+            {/* Regenerate button - secondary action */}
+            <Button
+              variant="secondary"
+              onClick={handleEnhance}
+              className="flex-1"
+              disabled={regeneratingPosition !== null || isExporting}
+            >
+              {regeneratingPosition !== null ? 'Regenerating...' : 'Regenerate'}
+            </Button>
+          </div>
         </div>
       </div>
     );
