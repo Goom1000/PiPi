@@ -21,7 +21,8 @@ AI enhances uploaded resources (worksheets, handouts) while preserving original 
 
 ### Lesson alignment approach
 - AI auto-detects which slides the resource relates to (teacher doesn't manually select)
-- Show matched slides to teacher BEFORE enhancement begins for confirmation
+- Slide matching happens during enhancement (single API call for efficiency)
+- Matched slides shown to teacher in results (post-enhancement)
 - Echo slide concepts/terminology in enhanced content
 - Add explicit slide number references (e.g., "See Slide 5")
 - Slide number labeling appears in header/footer area of generated resources
@@ -33,11 +34,11 @@ AI enhances uploaded resources (worksheets, handouts) while preserving original 
 - Claude's discretion on whether to generate one master key or one per differentiation level (depends on content divergence)
 
 ### Enhancement UI flow
-- After analysis completes: show configuration step (matched slides + settings)
-- Teacher reviews matches, adjusts if needed, clicks 'Enhance'
+- After analysis completes: show EnhancementPanel with "Enhance" button
+- Teacher clicks 'Enhance' to start enhancement (slide matching + differentiation)
 - Simple progress bar during processing (no step-by-step status)
 - Cancel button visible throughout, returns to pre-enhancement state immediately
-- After completion: results appear in sidebar, teacher stays in editor context
+- After completion: results appear with matched slides + three differentiation tabs + answer key toggle
 
 ### Claude's Discretion
 - Exact progress bar implementation

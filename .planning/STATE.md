@@ -5,25 +5,25 @@
 See: .planning/PROJECT.md (updated 2026-01-29)
 
 **Core value:** Students see only the presentation; teachers see the teleprompter script
-**Current focus:** v3.7 AI Resource Enhancement — Phase 45 in progress
+**Current focus:** v3.7 AI Resource Enhancement — Phase 45 complete
 
 ## Current Position
 
 Phase: 45 of 47 (Enhancement with Lesson Context)
-Plan: 2 of 3 complete
-Status: In progress
-Last activity: 2026-01-30 — Completed 45-02-PLAN.md (provider implementations)
+Plan: 3 of 3 complete
+Status: COMPLETE
+Last activity: 2026-01-30 — Completed Phase 45 (enhancement UI verified)
 
-Progress: [██████░░░░] 57%
+Progress: [████████░░] 80%
 Pending todos: 9
 
 ## Performance Metrics
 
 **Velocity:**
 - Milestones shipped: 17 (v1.0 through v3.5)
-- Total phases completed: 44
-- Total plans completed: 130
-- Total LOC: ~21,000 TypeScript
+- Total phases completed: 45
+- Total plans completed: 133
+- Total LOC: ~22,000 TypeScript
 
 **v3.6 Tooltips & Onboarding (deferred):**
 - Phase 41 complete (tour infrastructure)
@@ -44,7 +44,7 @@ Pending todos: 9
 | 42 | Student-friendly slide language | SLIDE-01, SLIDE-02, SLIDE-03 | COMPLETE |
 | 43 | Resource file upload | UPLOAD-01 to UPLOAD-05 | COMPLETE |
 | 44 | AI document analysis | (foundation) | COMPLETE |
-| 45 | Enhancement with lesson context | ENHANCE-01 to ENHANCE-06 | In progress (2/3) |
+| 45 | Enhancement with lesson context | ENHANCE-01 to ENHANCE-06 | COMPLETE |
 | 46 | Preview, edit, and trust UI | PREVIEW-01 to PREVIEW-04 | |
 | 47 | Export and persistence | EXPORT-01 to EXPORT-03 | |
 
@@ -73,6 +73,7 @@ Recent decisions for v3.7:
 - Enhancement prompts include CRITICAL preservation rules to prevent content removal (DEC-45-01)
 - Gemini AbortSignal via config.abortSignal, Claude via fetch signal (DEC-45-02)
 - Progress callbacks report enhancing state at 0% and 50% (DEC-45-02)
+- Analysis cached per resource.id to avoid re-analyzing (DEC-45-03)
 
 ### Pending Todos
 
@@ -85,11 +86,11 @@ None identified yet for v3.7.
 ## Session Continuity
 
 Last session: 2026-01-30
-Stopped at: Completed 45-02-PLAN.md (provider implementations)
+Stopped at: Phase 45 complete (enhancement UI verified and working)
 Resume file: None
 
-**Next step:** Execute 45-03-PLAN.md (UI integration)
+**Next step:** Execute Phase 46 (Preview, edit, and trust UI)
 
 ---
 *State initialized: 2026-01-18*
-*Last updated: 2026-01-30 — Plan 45-02 complete (provider implementations)*
+*Last updated: 2026-01-30 — Phase 45 complete (enhancement with lesson context)*
