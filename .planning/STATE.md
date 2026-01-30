@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-01-29)
 
 **Core value:** Students see only the presentation; teachers see the teleprompter script
-**Current focus:** v3.7 AI Resource Enhancement — Phase 45 complete
+**Current focus:** v3.7 AI Resource Enhancement — Phase 47 in progress
 
 ## Current Position
 
-Phase: 46 of 47 (Preview, Edit, and Trust UI)
-Plan: 2 of 2 complete
-Status: COMPLETE
-Last activity: 2026-01-30 — Completed 46-02-PLAN.md (Diff view and per-element regeneration)
+Phase: 47 of 47 (Export and Persistence)
+Plan: 1 of 2 complete
+Status: In progress
+Last activity: 2026-01-31 — Completed 47-01-PLAN.md (PDF export with zip bundling)
 
-Progress: [█████████░] 90%
+Progress: [█████████▓] 93%
 Pending todos: 9
 
 ## Performance Metrics
@@ -22,8 +22,8 @@ Pending todos: 9
 **Velocity:**
 - Milestones shipped: 17 (v1.0 through v3.5)
 - Total phases completed: 46
-- Total plans completed: 135
-- Total LOC: ~22,000 TypeScript
+- Total plans completed: 136
+- Total LOC: ~22,500 TypeScript
 
 **v3.6 Tooltips & Onboarding (deferred):**
 - Phase 41 complete (tour infrastructure)
@@ -46,7 +46,7 @@ Pending todos: 9
 | 44 | AI document analysis | (foundation) | COMPLETE |
 | 45 | Enhancement with lesson context | ENHANCE-01 to ENHANCE-06 | COMPLETE |
 | 46 | Preview, edit, and trust UI | PREVIEW-01 to PREVIEW-04 | COMPLETE |
-| 47 | Export and persistence | EXPORT-01 to EXPORT-03 | |
+| 47 | Export and persistence | EXPORT-01 to EXPORT-03 | 01 COMPLETE |
 
 ## Accumulated Context
 
@@ -80,6 +80,9 @@ Recent decisions for v3.7:
 - Use react-diff-viewer-continued with --legacy-peer-deps for React 19 (DEC-46-02)
 - Diff and edit modes mutually exclusive to prevent UI confusion (DEC-46-02)
 - Per-element regeneration uses same AI provider with focused prompts (DEC-46-02)
+- Use jsPDF text API for vector PDF output (sharper than html2canvas) (DEC-47-01)
+- A4 portrait with 25mm left margin for binding/hole-punching (DEC-47-01)
+- Bundle all PDFs in single zip download for teacher convenience (DEC-47-01)
 
 ### Pending Todos
 
@@ -91,12 +94,12 @@ None identified yet for v3.7.
 
 ## Session Continuity
 
-Last session: 2026-01-30
-Stopped at: Completed 46-02-PLAN.md (diff view and per-element regeneration)
+Last session: 2026-01-31
+Stopped at: Completed 47-01-PLAN.md (PDF export with zip bundling)
 Resume file: None
 
-**Next step:** Plan Phase 47 (Export and persistence)
+**Next step:** Execute 47-02-PLAN.md (Persistence in .cue file)
 
 ---
 *State initialized: 2026-01-18*
-*Last updated: 2026-01-30 — Completed Phase 46 (Preview, Edit, and Trust UI)*
+*Last updated: 2026-01-31 — Completed 47-01-PLAN.md (PDF export)*
