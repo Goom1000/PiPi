@@ -142,8 +142,8 @@ Plans:
 **Plans:** 2 plans
 
 Plans:
-- [ ] 46-01-PLAN.md — Edit mode and inline editing with state management
-- [ ] 46-02-PLAN.md — Diff view and per-element regeneration
+- [x] 46-01-PLAN.md — Edit mode and inline editing with state management
+- [x] 46-02-PLAN.md — Diff view and per-element regeneration
 
 ---
 
@@ -175,7 +175,7 @@ Plans:
 | 43. Types and File Upload | v3.7 | 2/2 | Complete | 2026-01-29 |
 | 44. AI Document Analysis | v3.7 | 1/1 | Complete | 2026-01-30 |
 | 45. Enhancement with Lesson Context | v3.7 | 3/3 | Complete | 2026-01-30 |
-| 46. Preview, Edit, and Trust UI | v3.7 | 0/2 | Planned | - |
+| 46. Preview, Edit, and Trust UI | v3.7 | 2/2 | Complete | 2026-01-30 |
 | 47. Export and Persistence | v3.7 | 0/TBD | Not started | - |
 
 ## Coverage Validation
@@ -208,4 +208,4 @@ Plans:
 
 ---
 *Roadmap created: 2026-01-27*
-*Last updated: 2026-01-30 - Phase 46 planned (2 plans)*
+*Last updated: 2026-01-30 - Phase 46 complete (2 plans, trust UI verified)*

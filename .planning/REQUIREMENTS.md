@@ -21,19 +21,19 @@
 
 ### AI Enhancement
 
-- [ ] **ENHANCE-01**: AI enhances resource while preserving original content/facts (preserve mode default)
-- [ ] **ENHANCE-02**: AI generates differentiated versions (simple/standard/detailed)
-- [ ] **ENHANCE-03**: AI uses lesson context to align enhanced resources with slides
-- [ ] **ENHANCE-04**: AI generates answer key for worksheet exercises
-- [ ] **ENHANCE-05**: User can cancel enhancement in progress
-- [ ] **ENHANCE-06**: User can regenerate enhancement if unhappy with result
+- [x] **ENHANCE-01**: AI enhances resource while preserving original content/facts (preserve mode default)
+- [x] **ENHANCE-02**: AI generates differentiated versions (simple/standard/detailed)
+- [x] **ENHANCE-03**: AI uses lesson context to align enhanced resources with slides
+- [x] **ENHANCE-04**: AI generates answer key for worksheet exercises
+- [x] **ENHANCE-05**: User can cancel enhancement in progress
+- [x] **ENHANCE-06**: User can regenerate enhancement if unhappy with result
 
 ### Preview & Editing
 
-- [ ] **PREVIEW-01**: User sees enhanced resource preview before export
-- [ ] **PREVIEW-02**: User can edit enhanced content inline before export
-- [ ] **PREVIEW-03**: User sees visual diff showing what AI changed from original
-- [ ] **PREVIEW-04**: User can regenerate individual sections
+- [x] **PREVIEW-01**: User sees enhanced resource preview before export
+- [x] **PREVIEW-02**: User can edit enhanced content inline before export
+- [x] **PREVIEW-03**: User sees visual diff showing what AI changed from original
+- [x] **PREVIEW-04**: User can regenerate individual sections
 
 ### Export & Persistence
 
@@ -77,16 +77,16 @@
 | UPLOAD-03 | Phase 43 | Complete |
 | UPLOAD-04 | Phase 43 | Complete |
 | UPLOAD-05 | Phase 43 | Complete |
-| ENHANCE-01 | Phase 45 | Pending |
-| ENHANCE-02 | Phase 45 | Pending |
-| ENHANCE-03 | Phase 45 | Pending |
-| ENHANCE-04 | Phase 45 | Pending |
-| ENHANCE-05 | Phase 45 | Pending |
-| ENHANCE-06 | Phase 45 | Pending |
-| PREVIEW-01 | Phase 46 | Pending |
-| PREVIEW-02 | Phase 46 | Pending |
-| PREVIEW-03 | Phase 46 | Pending |
-| PREVIEW-04 | Phase 46 | Pending |
+| ENHANCE-01 | Phase 45 | Complete |
+| ENHANCE-02 | Phase 45 | Complete |
+| ENHANCE-03 | Phase 45 | Complete |
+| ENHANCE-04 | Phase 45 | Complete |
+| ENHANCE-05 | Phase 45 | Complete |
+| ENHANCE-06 | Phase 45 | Complete |
+| PREVIEW-01 | Phase 46 | Complete |
+| PREVIEW-02 | Phase 46 | Complete |
+| PREVIEW-03 | Phase 46 | Complete |
+| PREVIEW-04 | Phase 46 | Complete |
 | EXPORT-01 | Phase 47 | Pending |
 | EXPORT-02 | Phase 47 | Pending |
 | EXPORT-03 | Phase 47 | Pending |
@@ -98,4 +98,4 @@
 
 ---
 *Requirements defined: 2026-01-29*
-*Last updated: 2026-01-29 — Phase 43 requirements complete (UPLOAD-01 through UPLOAD-05)*
+*Last updated: 2026-01-30 — Phase 46 requirements complete (PREVIEW-01 through PREVIEW-04)*
