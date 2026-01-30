@@ -110,6 +110,12 @@ const EnhancementPanel: React.FC<EnhancementPanelProps> = ({
     setResult(null);
   };
 
+  const hasAnyEdits = () => {
+    return editState.edits.simple.size > 0 ||
+           editState.edits.standard.size > 0 ||
+           editState.edits.detailed.size > 0;
+  };
+
   // Render relevance badge
   const renderRelevanceBadge = (relevance: 'high' | 'medium' | 'low') => {
     const colors = {
@@ -127,13 +133,77 @@ const EnhancementPanel: React.FC<EnhancementPanelProps> = ({
   // Render a single enhanced element
   const renderElement = (element: EnhancedElement, index: number) => {
     const baseClasses = 'mb-4';
+    const editedContent = editState.edits[selectedLevel].get(element.position);
+    const displayContent = editedContent ?? element.enhancedContent;
+    const isEdited = editedContent !== undefined;
+
+    // Editable wrapper for text elements
+    const editableContent = (content: string, className: string = '') => {
+      if (!isEditMode) {
+        return <span>{content}</span>;
+      }
+      return (
+        <div
+          role="textbox"
+          contentEditable="plaintext-only"
+          suppressContentEditableWarning
+          aria-label={`Edit ${element.type}`}
+          className={`outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 rounded px-1 -mx-1 ${
+            isEdited ? 'bg-amber-50 dark:bg-amber-900/20' : ''
+          }`}
+          onBlur={(e) => {
+            const newContent = e.currentTarget.textContent || '';
+            if (newContent !== element.enhancedContent) {
+              dispatch({
+                type: 'EDIT_ELEMENT',
+                level: selectedLevel,
+                position: element.position,
+                content: newContent
+              });
+            }
+          }}
+          onKeyDown={(e) => {
+            // Prevent Enter from creating new elements
+            if (e.key === 'Enter' && !e.shiftKey) {
+              e.preventDefault();
+              e.currentTarget.blur();
+            }
+          }}
+          onPaste={(e) => {
+            // Strip formatting, paste plain text only
+            e.preventDefault();
+            const text = e.clipboardData.getData('text/plain');
+            document.execCommand('insertText', false, text);
+          }}
+        >
+          {content}
+        </div>
+      );
+    };
+
+    // Revert button for edited elements
+    const renderRevertButton = () => {
+      if (!isEditMode || !isEdited) return null;
+      return (
+        <button
+          onClick={() => dispatch({ type: 'REVERT_ELEMENT', level: selectedLevel, position: element.position })}
+          className="ml-2 text-xs text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
+          title="Revert to AI version"
+        >
+          <svg className="w-4 h-4 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6" />
+          </svg>
+        </button>
+      );
+    };
 
     switch (element.type) {
       case 'header':
         return (
           <h2 key={index} className={`${baseClasses} text-xl font-bold text-slate-800 dark:text-white font-fredoka`}>
-            {element.enhancedContent}
-            {element.slideReference && (
+            {editableContent(displayContent)}
+            {renderRevertButton()}
+            {element.slideReference && !isEditMode && (
               <span className="ml-2 text-sm font-normal text-indigo-500 dark:text-indigo-400">
                 ({element.slideReference})
               </span>
@@ -144,7 +214,8 @@ const EnhancementPanel: React.FC<EnhancementPanelProps> = ({
       case 'subheader':
         return (
           <h3 key={index} className={`${baseClasses} text-lg font-semibold text-slate-700 dark:text-slate-200`}>
-            {element.enhancedContent}
+            {editableContent(displayContent)}
+            {renderRevertButton()}
           </h3>
         );
 
@@ -152,8 +223,9 @@ const EnhancementPanel: React.FC<EnhancementPanelProps> = ({
       case 'instruction':
         return (
           <p key={index} className={`${baseClasses} text-slate-600 dark:text-slate-300 leading-relaxed`}>
-            {element.enhancedContent}
-            {element.slideReference && (
+            {editableContent(displayContent)}
+            {renderRevertButton()}
+            {element.slideReference && !isEditMode && (
               <span className="ml-1 text-indigo-500 dark:text-indigo-400 text-sm">
                 ({element.slideReference})
               </span>
@@ -164,8 +236,11 @@ const EnhancementPanel: React.FC<EnhancementPanelProps> = ({
       case 'question':
         return (
           <div key={index} className={`${baseClasses} pl-4 border-l-4 border-pink-400 dark:border-pink-600 bg-pink-50 dark:bg-pink-900/20 p-3 rounded-r-lg`}>
-            <p className="text-slate-700 dark:text-slate-200 font-medium">{element.enhancedContent}</p>
-            {element.slideReference && (
+            <p className="text-slate-700 dark:text-slate-200 font-medium">
+              {editableContent(displayContent)}
+              {renderRevertButton()}
+            </p>
+            {element.slideReference && !isEditMode && (
               <p className="text-xs text-indigo-500 dark:text-indigo-400 mt-1">{element.slideReference}</p>
             )}
           </div>
@@ -238,14 +313,18 @@ const EnhancementPanel: React.FC<EnhancementPanelProps> = ({
       case 'answer':
         return (
           <div key={index} className={`${baseClasses} pl-4 border-l-4 border-green-400 dark:border-green-600 bg-green-50 dark:bg-green-900/20 p-3 rounded-r-lg`}>
-            <p className="text-slate-700 dark:text-slate-200">{element.enhancedContent}</p>
+            <p className="text-slate-700 dark:text-slate-200">
+              {editableContent(displayContent)}
+              {renderRevertButton()}
+            </p>
           </div>
         );
 
       default:
         return (
           <p key={index} className={`${baseClasses} text-slate-600 dark:text-slate-300`}>
-            {element.enhancedContent}
+            {editableContent(displayContent)}
+            {renderRevertButton()}
           </p>
         );
     }
@@ -456,6 +535,35 @@ const EnhancementPanel: React.FC<EnhancementPanelProps> = ({
                 {level.charAt(0).toUpperCase() + level.slice(1)}
               </button>
             ))}
+          </div>
+
+          {/* Edit Mode Toggle */}
+          <div className="flex items-center justify-between mt-4 pt-3 border-t border-slate-200 dark:border-slate-700">
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => setIsEditMode(!isEditMode)}
+                className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+                  isEditMode
+                    ? 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400'
+                    : 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700'
+                }`}
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                </svg>
+                {isEditMode ? 'Editing' : 'Edit'}
+              </button>
+            </div>
+
+            {/* Show Discard button when edits exist */}
+            {isEditMode && hasAnyEdits() && (
+              <button
+                onClick={() => dispatch({ type: 'DISCARD_ALL' })}
+                className="text-sm text-red-500 hover:text-red-600 dark:text-red-400 dark:hover:text-red-300"
+              >
+                Discard all changes
+              </button>
+            )}
           </div>
 
           {/* Slide alignment note for selected level */}
