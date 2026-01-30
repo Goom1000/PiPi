@@ -1,4 +1,5 @@
-import React, { useState, useRef, useReducer } from 'react';
+import React, { useState, useRef, useReducer, useEffect } from 'react';
+import ReactDiffViewer, { DiffMethod } from 'react-diff-viewer-continued';
 import {
   UploadedResource,
   DocumentAnalysis,
@@ -71,8 +72,17 @@ const EnhancementPanel: React.FC<EnhancementPanelProps> = ({
   const [selectedLevel, setSelectedLevel] = useState<DifferentiationLevel>('standard');
   const [showAnswerKey, setShowAnswerKey] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
+  const [showDiff, setShowDiff] = useState(false);
+  const [regeneratingPosition, setRegeneratingPosition] = useState<number | null>(null);
   const [editState, dispatch] = useReducer(editReducer, initialEditState);
   const abortControllerRef = useRef<AbortController | null>(null);
+
+  // When entering diff mode, exit edit mode (mutually exclusive)
+  useEffect(() => {
+    if (showDiff && isEditMode) {
+      setIsEditMode(false);
+    }
+  }, [showDiff, isEditMode]);
 
   const handleEnhance = async () => {
     abortControllerRef.current = new AbortController();
@@ -116,6 +126,79 @@ const EnhancementPanel: React.FC<EnhancementPanelProps> = ({
            editState.edits.detailed.size > 0;
   };
 
+  const regenerateElement = async (element: EnhancedElement) => {
+    if (regeneratingPosition !== null) return; // Already regenerating
+
+    setRegeneratingPosition(element.position);
+
+    try {
+      // Build a focused prompt for single element regeneration
+      const elementPrompt = `Regenerate ONLY this single ${element.type} element for the ${selectedLevel.toUpperCase()} differentiation level.
+
+ORIGINAL CONTENT:
+${element.originalContent}
+
+CURRENT ENHANCED CONTENT:
+${element.enhancedContent}
+
+CONTEXT: This is from a ${analysis.documentType} at grade level ${slides.length > 0 ? 'aligned to lesson slides' : 'standalone'}.
+
+DIFFERENTIATION LEVEL: ${selectedLevel}
+${selectedLevel === 'simple' ? '- Shorter sentences (max 15 words)\n- Year 4 vocabulary (ages 8-9)\n- Clear, concrete language' : ''}
+${selectedLevel === 'standard' ? '- Clear formatting\n- Year 6 vocabulary (ages 10-11)\n- Echo slide terminology' : ''}
+${selectedLevel === 'detailed' ? '- Add depth and reasoning prompts\n- Year 7-8 vocabulary (ages 11-13)\n- Include scaffolding hints' : ''}
+
+RULES:
+- Preserve all factual information
+- Keep the same element type (${element.type})
+- Return ONLY the regenerated content text, nothing else
+- Do NOT include element type labels or formatting markers
+
+Regenerate the content now:`;
+
+      // Use the provider directly for a quick single-element call
+      const response = await provider.generateSlides(
+        elementPrompt,
+        undefined, // No abort signal for quick calls
+        undefined  // No progress callback
+      );
+
+      // Extract the regenerated content from response
+      // The response will be raw text since we asked for just the content
+      const regeneratedContent = response.slides?.[0]?.content?.[0] ||
+                                response.slides?.[0]?.speakerNotes ||
+                                element.enhancedContent;
+
+      // Clean up the response (remove any accidental markers)
+      const cleanContent = regeneratedContent
+        .replace(/^(HEADER|PARAGRAPH|QUESTION|INSTRUCTION|SUBHEADER|ANSWER|LIST):?\s*/i, '')
+        .trim();
+
+      // Update the result with regenerated content
+      if (result) {
+        const updatedResult = { ...result };
+        const levelVersion = updatedResult.versions[selectedLevel];
+        const elementIndex = levelVersion.elements.findIndex(e => e.position === element.position);
+
+        if (elementIndex !== -1) {
+          levelVersion.elements[elementIndex] = {
+            ...levelVersion.elements[elementIndex],
+            enhancedContent: cleanContent
+          };
+          setResult(updatedResult);
+        }
+      }
+
+      // Clear any edit for this element since we have fresh AI content
+      dispatch({ type: 'REVERT_ELEMENT', level: selectedLevel, position: element.position });
+
+    } catch (error) {
+      onError('Regeneration Failed', `Could not regenerate element: ${(error as Error).message}`);
+    } finally {
+      setRegeneratingPosition(null);
+    }
+  };
+
   // Render relevance badge
   const renderRelevanceBadge = (relevance: 'high' | 'medium' | 'low') => {
     const colors = {
@@ -127,6 +210,102 @@ const EnhancementPanel: React.FC<EnhancementPanelProps> = ({
       <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium uppercase tracking-wider ${colors[relevance]}`}>
         {relevance}
       </span>
+    );
+  };
+
+  // Render element with diff view (showing original vs enhanced)
+  const renderElementWithDiff = (element: EnhancedElement, index: number) => {
+    const baseClasses = 'mb-4';
+
+    // Non-text elements don't need diff view
+    if (['diagram', 'image', 'blank-space'].includes(element.type)) {
+      return renderElement(element, index);
+    }
+
+    // Tables - show simple text comparison for now
+    if (element.type === 'table') {
+      return renderElement(element, index);
+    }
+
+    // Get content to compare
+    const originalContent = element.originalContent;
+    const enhancedContent = editState.edits[selectedLevel].get(element.position) ?? element.enhancedContent;
+
+    // If no changes, show normal element
+    if (originalContent === enhancedContent) {
+      return (
+        <div key={index} className={`${baseClasses} text-slate-500 dark:text-slate-400 italic`}>
+          <span className="text-xs bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded mr-2">Unchanged</span>
+          {enhancedContent}
+        </div>
+      );
+    }
+
+    // For lists, join children for comparison
+    const originalText = element.type === 'list' && element.children
+      ? element.children.join('\n')
+      : originalContent;
+    const enhancedText = element.type === 'list'
+      ? (editState.edits[selectedLevel].get(element.position) ?? element.children?.join('\n') ?? element.enhancedContent)
+      : enhancedContent;
+
+    return (
+      <div key={index} className={`${baseClasses} rounded-lg overflow-hidden border border-slate-200 dark:border-slate-700`}>
+        <div className="text-xs bg-slate-100 dark:bg-slate-800 px-3 py-1 font-medium text-slate-600 dark:text-slate-400 capitalize">
+          {element.type}
+          {element.slideReference && (
+            <span className="ml-2 text-indigo-500 dark:text-indigo-400">({element.slideReference})</span>
+          )}
+        </div>
+        <ReactDiffViewer
+          oldValue={originalText}
+          newValue={enhancedText}
+          splitView={false}
+          compareMethod={DiffMethod.WORDS}
+          hideLineNumbers={true}
+          showDiffOnly={false}
+          useDarkTheme={document.documentElement.classList.contains('dark')}
+          styles={{
+            variables: {
+              light: {
+                diffViewerBackground: '#ffffff',
+                addedBackground: '#dcfce7',
+                addedColor: '#166534',
+                removedBackground: '#fee2e2',
+                removedColor: '#991b1b',
+                wordAddedBackground: '#bbf7d0',
+                wordRemovedBackground: '#fecaca',
+                addedGutterBackground: '#dcfce7',
+                removedGutterBackground: '#fee2e2',
+                gutterBackground: '#f8fafc',
+                gutterBackgroundDark: '#f1f5f9',
+                codeFoldBackground: '#f8fafc',
+                codeFoldGutterBackground: '#f1f5f9',
+              },
+              dark: {
+                diffViewerBackground: '#1e293b',
+                addedBackground: '#14532d40',
+                addedColor: '#86efac',
+                removedBackground: '#7f1d1d40',
+                removedColor: '#fca5a5',
+                wordAddedBackground: '#16a34a40',
+                wordRemovedBackground: '#dc262640',
+                addedGutterBackground: '#14532d40',
+                removedGutterBackground: '#7f1d1d40',
+                gutterBackground: '#0f172a',
+                gutterBackgroundDark: '#1e293b',
+                codeFoldBackground: '#0f172a',
+                codeFoldGutterBackground: '#1e293b',
+              },
+            },
+            contentText: {
+              fontFamily: 'inherit',
+              fontSize: '0.875rem',
+              lineHeight: '1.5',
+            },
+          }}
+        />
+      </div>
     );
   };
 
@@ -181,68 +360,103 @@ const EnhancementPanel: React.FC<EnhancementPanelProps> = ({
       );
     };
 
-    // Revert button for edited elements
-    const renderRevertButton = () => {
-      if (!isEditMode || !isEdited) return null;
+    // Revert and regenerate buttons for edit mode
+    const renderEditControls = () => {
+      if (!isEditMode || ['diagram', 'image', 'blank-space', 'table'].includes(element.type)) return null;
+
       return (
-        <button
-          onClick={() => dispatch({ type: 'REVERT_ELEMENT', level: selectedLevel, position: element.position })}
-          className="ml-2 text-xs text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
-          title="Revert to AI version"
-        >
-          <svg className="w-4 h-4 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6" />
-          </svg>
-        </button>
+        <div className="flex items-center gap-2 mt-1">
+          {isEdited && (
+            <button
+              onClick={() => dispatch({ type: 'REVERT_ELEMENT', level: selectedLevel, position: element.position })}
+              className="text-xs text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
+              title="Revert to AI version"
+            >
+              <svg className="w-4 h-4 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6" />
+              </svg>
+              <span className="ml-1">Revert</span>
+            </button>
+          )}
+          <button
+            onClick={() => regenerateElement(element)}
+            disabled={regeneratingPosition !== null}
+            className={`text-xs flex items-center gap-1 ${
+              regeneratingPosition === element.position
+                ? 'text-indigo-500 dark:text-indigo-400'
+                : 'text-slate-400 hover:text-indigo-500 dark:hover:text-indigo-400'
+            }`}
+            title="Regenerate this element with AI"
+          >
+            {regeneratingPosition === element.position ? (
+              <svg className="w-4 h-4 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+              </svg>
+            ) : (
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+              </svg>
+            )}
+            <span>{regeneratingPosition === element.position ? 'Regenerating...' : 'Regenerate'}</span>
+          </button>
+        </div>
       );
     };
 
     switch (element.type) {
       case 'header':
         return (
-          <h2 key={index} className={`${baseClasses} text-xl font-bold text-slate-800 dark:text-white font-fredoka`}>
-            {editableContent(displayContent)}
-            {renderRevertButton()}
-            {element.slideReference && !isEditMode && (
-              <span className="ml-2 text-sm font-normal text-indigo-500 dark:text-indigo-400">
-                ({element.slideReference})
-              </span>
-            )}
-          </h2>
+          <div key={index} className={baseClasses}>
+            <h2 className="text-xl font-bold text-slate-800 dark:text-white font-fredoka">
+              {editableContent(displayContent)}
+              {element.slideReference && !isEditMode && (
+                <span className="ml-2 text-sm font-normal text-indigo-500 dark:text-indigo-400">
+                  ({element.slideReference})
+                </span>
+              )}
+            </h2>
+            {renderEditControls()}
+          </div>
         );
 
       case 'subheader':
         return (
-          <h3 key={index} className={`${baseClasses} text-lg font-semibold text-slate-700 dark:text-slate-200`}>
-            {editableContent(displayContent)}
-            {renderRevertButton()}
-          </h3>
+          <div key={index} className={baseClasses}>
+            <h3 className="text-lg font-semibold text-slate-700 dark:text-slate-200">
+              {editableContent(displayContent)}
+            </h3>
+            {renderEditControls()}
+          </div>
         );
 
       case 'paragraph':
       case 'instruction':
         return (
-          <p key={index} className={`${baseClasses} text-slate-600 dark:text-slate-300 leading-relaxed`}>
-            {editableContent(displayContent)}
-            {renderRevertButton()}
-            {element.slideReference && !isEditMode && (
-              <span className="ml-1 text-indigo-500 dark:text-indigo-400 text-sm">
-                ({element.slideReference})
-              </span>
-            )}
-          </p>
+          <div key={index} className={baseClasses}>
+            <p className="text-slate-600 dark:text-slate-300 leading-relaxed">
+              {editableContent(displayContent)}
+              {element.slideReference && !isEditMode && (
+                <span className="ml-1 text-indigo-500 dark:text-indigo-400 text-sm">
+                  ({element.slideReference})
+                </span>
+              )}
+            </p>
+            {renderEditControls()}
+          </div>
         );
 
       case 'question':
         return (
-          <div key={index} className={`${baseClasses} pl-4 border-l-4 border-pink-400 dark:border-pink-600 bg-pink-50 dark:bg-pink-900/20 p-3 rounded-r-lg`}>
-            <p className="text-slate-700 dark:text-slate-200 font-medium">
-              {editableContent(displayContent)}
-              {renderRevertButton()}
-            </p>
-            {element.slideReference && !isEditMode && (
-              <p className="text-xs text-indigo-500 dark:text-indigo-400 mt-1">{element.slideReference}</p>
-            )}
+          <div key={index} className={baseClasses}>
+            <div className="pl-4 border-l-4 border-pink-400 dark:border-pink-600 bg-pink-50 dark:bg-pink-900/20 p-3 rounded-r-lg">
+              <p className="text-slate-700 dark:text-slate-200 font-medium">
+                {editableContent(displayContent)}
+              </p>
+              {element.slideReference && !isEditMode && (
+                <p className="text-xs text-indigo-500 dark:text-indigo-400 mt-1">{element.slideReference}</p>
+              )}
+            </div>
+            {renderEditControls()}
           </div>
         );
 
@@ -290,16 +504,8 @@ const EnhancementPanel: React.FC<EnhancementPanelProps> = ({
             >
               {listContent}
             </div>
-            {isEdited && (
-              <button
-                onClick={() => dispatch({ type: 'REVERT_ELEMENT', level: selectedLevel, position: element.position })}
-                className="mt-1 text-xs text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
-                title="Revert to AI version"
-              >
-                Revert list
-              </button>
-            )}
             <p className="text-xs text-slate-400 mt-1">One item per line</p>
+            {renderEditControls()}
           </div>
         );
 
@@ -360,20 +566,24 @@ const EnhancementPanel: React.FC<EnhancementPanelProps> = ({
 
       case 'answer':
         return (
-          <div key={index} className={`${baseClasses} pl-4 border-l-4 border-green-400 dark:border-green-600 bg-green-50 dark:bg-green-900/20 p-3 rounded-r-lg`}>
-            <p className="text-slate-700 dark:text-slate-200">
-              {editableContent(displayContent)}
-              {renderRevertButton()}
-            </p>
+          <div key={index} className={baseClasses}>
+            <div className="pl-4 border-l-4 border-green-400 dark:border-green-600 bg-green-50 dark:bg-green-900/20 p-3 rounded-r-lg">
+              <p className="text-slate-700 dark:text-slate-200">
+                {editableContent(displayContent)}
+              </p>
+            </div>
+            {renderEditControls()}
           </div>
         );
 
       default:
         return (
-          <p key={index} className={`${baseClasses} text-slate-600 dark:text-slate-300`}>
-            {editableContent(displayContent)}
-            {renderRevertButton()}
-          </p>
+          <div key={index} className={baseClasses}>
+            <p className="text-slate-600 dark:text-slate-300">
+              {editableContent(displayContent)}
+            </p>
+            {renderEditControls()}
+          </div>
         );
     }
   };
@@ -585,7 +795,7 @@ const EnhancementPanel: React.FC<EnhancementPanelProps> = ({
             ))}
           </div>
 
-          {/* Edit Mode Toggle */}
+          {/* Edit Mode Toggle and Show Changes */}
           <div className="flex items-center justify-between mt-4 pt-3 border-t border-slate-200 dark:border-slate-700">
             <div className="flex items-center gap-3">
               <button
@@ -600,6 +810,20 @@ const EnhancementPanel: React.FC<EnhancementPanelProps> = ({
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                 </svg>
                 {isEditMode ? 'Editing' : 'Edit'}
+              </button>
+
+              <button
+                onClick={() => setShowDiff(!showDiff)}
+                className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+                  showDiff
+                    ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
+                    : 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700'
+                }`}
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                </svg>
+                {showDiff ? 'Showing Changes' : 'Show Changes'}
               </button>
             </div>
 
@@ -628,10 +852,21 @@ const EnhancementPanel: React.FC<EnhancementPanelProps> = ({
               {selectedVersion.title}
             </h1>
 
+            {/* Diff explanation */}
+            {showDiff && (
+              <div className="mb-4 p-3 bg-slate-100 dark:bg-slate-800 rounded-lg text-sm text-slate-600 dark:text-slate-400">
+                <span className="font-medium">Reading the diff:</span>{' '}
+                <span className="bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 px-1 rounded">Red/strikethrough</span> = original text removed,{' '}
+                <span className="bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 px-1 rounded">Green</span> = new text added
+              </div>
+            )}
+
             {/* Elements */}
             <div className="space-y-2">
               {selectedVersion.elements.map((element, index) =>
-                renderElement(element, index)
+                showDiff
+                  ? renderElementWithDiff(element, index)
+                  : renderElement(element, index)
               )}
             </div>
 
@@ -675,8 +910,8 @@ const EnhancementPanel: React.FC<EnhancementPanelProps> = ({
 
         {/* Footer with Regenerate button */}
         <div className="p-4 border-t border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/50">
-          <Button variant="secondary" onClick={handleEnhance} className="w-full">
-            Regenerate Enhancement
+          <Button variant="secondary" onClick={handleEnhance} className="w-full" disabled={regeneratingPosition !== null}>
+            {regeneratingPosition !== null ? 'Regenerating element...' : 'Regenerate Enhancement'}
           </Button>
         </div>
       </div>
