@@ -247,12 +247,60 @@ const EnhancementPanel: React.FC<EnhancementPanelProps> = ({
         );
 
       case 'list':
+        if (!isEditMode) {
+          return (
+            <ul key={index} className={`${baseClasses} list-disc pl-6 space-y-1 text-slate-600 dark:text-slate-300`}>
+              {element.children?.map((item, i) => (
+                <li key={i}>{item}</li>
+              )) || <li>{element.enhancedContent}</li>}
+            </ul>
+          );
+        }
+
+        // In edit mode, show as editable text block (one item per line)
+        const listContent = editedContent ?? (element.children?.join('\n') || element.enhancedContent);
         return (
-          <ul key={index} className={`${baseClasses} list-disc pl-6 space-y-1 text-slate-600 dark:text-slate-300`}>
-            {element.children?.map((item, i) => (
-              <li key={i}>{item}</li>
-            )) || <li>{element.enhancedContent}</li>}
-          </ul>
+          <div key={index} className={baseClasses}>
+            <div
+              role="textbox"
+              contentEditable="plaintext-only"
+              suppressContentEditableWarning
+              aria-label="Edit list items (one per line)"
+              aria-multiline="true"
+              className={`list-disc pl-6 space-y-1 text-slate-600 dark:text-slate-300 outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 rounded px-1 -mx-1 whitespace-pre-wrap ${
+                isEdited ? 'bg-amber-50 dark:bg-amber-900/20' : ''
+              }`}
+              onBlur={(e) => {
+                const newContent = e.currentTarget.textContent || '';
+                const originalContent = element.children?.join('\n') || element.enhancedContent;
+                if (newContent !== originalContent) {
+                  dispatch({
+                    type: 'EDIT_ELEMENT',
+                    level: selectedLevel,
+                    position: element.position,
+                    content: newContent
+                  });
+                }
+              }}
+              onPaste={(e) => {
+                e.preventDefault();
+                const text = e.clipboardData.getData('text/plain');
+                document.execCommand('insertText', false, text);
+              }}
+            >
+              {listContent}
+            </div>
+            {isEdited && (
+              <button
+                onClick={() => dispatch({ type: 'REVERT_ELEMENT', level: selectedLevel, position: element.position })}
+                className="mt-1 text-xs text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
+                title="Revert to AI version"
+              >
+                Revert list
+              </button>
+            )}
+            <p className="text-xs text-slate-400 mt-1">One item per line</p>
+          </div>
         );
 
       case 'table':
