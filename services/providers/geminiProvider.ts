@@ -465,12 +465,58 @@ export class GeminiProvider implements AIProviderInterface {
       });
 
       const text = response.text || '{}';
-      return JSON.parse(text) as EnhancementResult;
+
+      // Parse the response
+      let result: EnhancementResult;
+      try {
+        result = JSON.parse(text) as EnhancementResult;
+      } catch (parseError) {
+        console.error('[GeminiProvider] Failed to parse enhancement response:', parseError);
+        console.error('[GeminiProvider] Raw response (first 500 chars):', text.substring(0, 500));
+        throw new AIProviderError(
+          'Failed to process enhancement response. Please try again.',
+          'PARSE_ERROR',
+          parseError
+        );
+      }
+
+      // Validate required fields exist
+      if (!result.versions || !result.slideMatches || !result.answerKeys) {
+        console.error('[GeminiProvider] Enhancement response missing required fields:', text.substring(0, 500));
+        throw new AIProviderError(
+          'Enhancement response was incomplete. Please try again.',
+          'PARSE_ERROR',
+          'Missing required fields in response'
+        );
+      }
+
+      return result;
     } catch (error) {
       // Let AbortError propagate for cancellation handling
       if ((error as Error).name === 'AbortError') {
         throw error;
       }
+
+      // If already an AIProviderError, re-throw as-is
+      if (error instanceof AIProviderError) {
+        throw error;
+      }
+
+      // Log the actual error for debugging
+      console.error('[GeminiProvider] Enhancement error:', error);
+
+      // Try to extract more specific error information
+      const err = error as any;
+      if (err.message?.includes('429') || err.status === 429) {
+        throw new AIProviderError(USER_ERROR_MESSAGES.RATE_LIMIT, 'RATE_LIMIT', error);
+      }
+      if (err.message?.includes('401') || err.message?.includes('403') || err.status === 401 || err.status === 403) {
+        throw new AIProviderError(USER_ERROR_MESSAGES.AUTH_ERROR, 'AUTH_ERROR', error);
+      }
+      if (err.message?.includes('500') || err.message?.includes('503') || err.status >= 500) {
+        throw new AIProviderError(USER_ERROR_MESSAGES.SERVER_ERROR, 'SERVER_ERROR', error);
+      }
+
       throw this.wrapError(error);
     }
   }

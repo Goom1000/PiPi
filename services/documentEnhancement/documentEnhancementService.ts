@@ -51,12 +51,16 @@ export async function enhanceUploadedDocument(
 
     // Build slide context (limited to 15 slides per research decision)
     const slideContext = buildSlideContextForEnhancement(slides);
+    console.log('[EnhancementService] Slide context length:', slideContext.length);
+    console.log('[EnhancementService] Analysis elements:', analysis.elements?.length);
 
     // Progress update before AI call
     onProgress?.({ status: 'enhancing', progress: 50 });
 
     // Call AI provider for enhancement
+    console.log('[EnhancementService] Calling provider.enhanceDocument...');
     const result = await provider.enhanceDocument(analysis, slideContext, options, signal);
+    console.log('[EnhancementService] Enhancement complete, result keys:', Object.keys(result));
 
     // Report completion
     onProgress?.({ status: 'complete', result });
@@ -68,8 +72,16 @@ export async function enhanceUploadedDocument(
       throw error;  // Re-throw for caller to handle
     }
 
-    // Report error state
-    const errorMessage = error instanceof Error ? error.message : 'Enhancement failed';
+    // Log the actual error for debugging
+    console.error('[EnhancementService] Enhancement failed:', error);
+
+    // Report error state - extract user message if available
+    let errorMessage = 'Enhancement failed';
+    if (error instanceof Error) {
+      // Check for AIProviderError with userMessage
+      const anyError = error as any;
+      errorMessage = anyError.userMessage || error.message;
+    }
     onProgress?.({ status: 'error', error: errorMessage });
     throw error;
   }

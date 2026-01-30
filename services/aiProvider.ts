@@ -106,13 +106,18 @@ export function buildChatContext(
  * @returns Formatted string with slide titles and content
  */
 export function buildSlideContextForEnhancement(slides: Slide[]): string {
+  // Handle empty or undefined slides
+  if (!slides || slides.length === 0) {
+    return '[No slides available - enhance document without slide alignment]';
+  }
+
   const MAX_SLIDES = 15;
   const slidesToInclude = slides.slice(0, MAX_SLIDES);
   const truncated = slides.length > MAX_SLIDES;
 
   const formatted = slidesToInclude.map((slide, index) => {
-    const bullets = slide.content.slice(0, 5).join('; ');
-    return `Slide ${index + 1}: '${slide.title}'\nContent: ${bullets}`;
+    const bullets = slide.content?.slice(0, 5).join('; ') || '';
+    return `Slide ${index + 1}: '${slide.title || 'Untitled'}'\nContent: ${bullets}`;
   }).join('\n\n---\n\n');
 
   if (truncated) {
