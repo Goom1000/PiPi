@@ -106,7 +106,9 @@ const UploadPanel: React.FC<UploadPanelProps> = ({
     }
   }, [processFiles]);
 
-  const handleBrowseClick = useCallback(() => {
+  const handleBrowseClick = useCallback((e?: React.MouseEvent) => {
+    // Stop propagation to prevent parent onClick from also triggering
+    e?.stopPropagation();
     fileInputRef.current?.click();
   }, []);
 
@@ -155,7 +157,7 @@ const UploadPanel: React.FC<UploadPanelProps> = ({
         <p className="text-xs text-slate-400 dark:text-slate-500">PDF, images, or Word docs</p>
         <button
           type="button"
-          onClick={handleBrowseClick}
+          onClick={(e) => handleBrowseClick(e)}
           className="mt-3 px-4 py-1.5 text-xs font-medium text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-900/30 rounded-lg hover:bg-indigo-100 dark:hover:bg-indigo-900/50 transition-colors"
         >
           Browse Files

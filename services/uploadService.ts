@@ -91,6 +91,7 @@ export async function processUploadedFile(file: File): Promise<UploadedResource>
     type: 'pdf' | 'image' | 'docx';
     text?: string;
     base64?: string;
+    images?: string[];  // For PDF page images
   };
 
   try {
@@ -128,13 +129,18 @@ export async function processUploadedFile(file: File): Promise<UploadedResource>
     uploadedAt: new Date().toISOString()
   };
 
-  // Attach extracted content if available (for AI processing in later phases)
+  // Attach extracted content if available (for AI processing)
   if (result.type === 'docx' && 'text' in result) {
     resource.content = { text: result.text };
   } else if (result.type === 'image' && 'base64' in result) {
     resource.content = { images: [result.base64] };
+  } else if (result.type === 'pdf') {
+    // PDF: store both page images and extracted text
+    resource.content = {
+      images: result.images,
+      text: result.text
+    };
   }
-  // Note: PDF content (text + page images) will be extracted in Phase 44 (AI Analysis)
 
   return resource;
 }

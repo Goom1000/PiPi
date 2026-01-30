@@ -97,11 +97,18 @@ async function getImagesForAnalysis(
       return resource.content?.images || [];
 
     case 'pdf':
-      // PDF needs page rendering - requires original file
-      if (!originalFile) {
-        throw new Error('Original file required for PDF analysis');
+      // PDF page images are now extracted during upload (in pdfProcessor)
+      // They're stored in content.images as raw base64 (no data URL prefix)
+      if (resource.content?.images && resource.content.images.length > 0) {
+        return resource.content.images;
       }
-      return extractPdfImages(originalFile);
+      // Fallback: extract from original file if available (legacy resources)
+      if (originalFile) {
+        return extractPdfImages(originalFile);
+      }
+      // No images available - AI will rely on text only
+      console.warn('PDF analysis: no page images available, using text only');
+      return [];
 
     case 'docx':
       // DOCX has no visual rendering - AI relies on extracted text
@@ -119,12 +126,12 @@ async function getTextForAnalysis(
   resource: UploadedResource,
   originalFile?: File
 ): Promise<string> {
-  // DOCX and image resources have text in content.text (from processors)
+  // All document types now have text in content.text (from processors)
   if (resource.content?.text) {
     return resource.content.text;
   }
 
-  // PDF needs text extraction - requires original file
+  // Fallback: extract from original file if available (legacy PDF resources)
   if (resource.type === 'pdf' && originalFile) {
     return extractPdfText(originalFile);
   }
