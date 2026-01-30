@@ -20,6 +20,8 @@ interface ExportModalProps {
   onUpdateSelection: (ids: Set<string>) => void;
   /** Callback when modal closes */
   onClose: () => void;
+  /** Toast notification function */
+  addToast: (message: string, duration?: number, type?: 'info' | 'success' | 'error' | 'warning') => void;
 }
 
 type ExportMode = 'quick' | 'ai-poster';
@@ -49,6 +51,7 @@ const ExportModal: React.FC<ExportModalProps> = ({
   selectedSlideIds,
   onUpdateSelection,
   onClose,
+  addToast,
 }) => {
   const [exportMode, setExportMode] = useState<ExportMode>('quick');
   const [isGenerating, setIsGenerating] = useState(false);
@@ -101,6 +104,7 @@ const ExportModal: React.FC<ExportModalProps> = ({
     const apiKey = getApiKey();
     if (!apiKey) {
       console.error('No API key configured');
+      addToast('API key required for AI Poster generation. Please configure your Anthropic API key in Settings.', 5000, 'error');
       return;
     }
 
@@ -121,7 +125,7 @@ const ExportModal: React.FC<ExportModalProps> = ({
       setPosterLayouts(layouts);
     } catch (error) {
       console.error('Poster generation error:', error);
-      // Could show toast here
+      addToast('Failed to generate AI posters. Please try again.', 5000, 'error');
     } finally {
       setIsGeneratingPosters(false);
       setPosterProgress(null);
@@ -131,7 +135,10 @@ const ExportModal: React.FC<ExportModalProps> = ({
   // Regenerate a single poster
   const regeneratePoster = async (layoutIndex: number) => {
     const apiKey = getApiKey();
-    if (!apiKey) return;
+    if (!apiKey) {
+      addToast('API key required for poster regeneration. Please configure your Anthropic API key in Settings.', 5000, 'error');
+      return;
+    }
 
     setRegeneratingIndex(layoutIndex);
 
@@ -152,6 +159,7 @@ const ExportModal: React.FC<ExportModalProps> = ({
       });
     } catch (error) {
       console.error('Poster regeneration error:', error);
+      addToast('Failed to regenerate poster. Please try again.', 5000, 'error');
     } finally {
       setRegeneratingIndex(null);
     }
@@ -222,6 +230,7 @@ const ExportModal: React.FC<ExportModalProps> = ({
       onClose();
     } catch (error) {
       console.error('PDF generation error:', error);
+      addToast('Failed to generate PDF. Please try again.', 5000, 'error');
     } finally {
       setIsGenerating(false);
       setGenerationProgress(null);
@@ -299,7 +308,7 @@ const ExportModal: React.FC<ExportModalProps> = ({
       onClose();
     } catch (error) {
       console.error('PDF generation error:', error);
-      // Could show toast here, but for now just log
+      addToast('Failed to generate PDF. Please try again.', 5000, 'error');
     } finally {
       setIsGenerating(false);
       setGenerationProgress(null);

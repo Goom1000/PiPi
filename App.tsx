@@ -1914,6 +1914,7 @@ function App() {
           selectedSlideIds={selectedSlideIds}
           onUpdateSelection={setSelectedSlideIds}
           onClose={() => setShowExportModal(false)}
+          addToast={addToast}
         />
       )}
 
