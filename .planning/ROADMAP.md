@@ -119,9 +119,9 @@ Plans:
 **Plans:** 3 plans
 
 Plans:
-- [ ] 45-01-PLAN.md — Types, prompts, and AIProviderInterface extension
-- [ ] 45-02-PLAN.md — Provider implementations and enhancement service
-- [ ] 45-03-PLAN.md — UI: EnhancementPanel with progress, cancel, and results
+- [x] 45-01-PLAN.md — Types, prompts, and AIProviderInterface extension
+- [x] 45-02-PLAN.md — Provider implementations and enhancement service
+- [x] 45-03-PLAN.md — UI: EnhancementPanel with progress, cancel, and results
 
 ---
 
@@ -139,7 +139,11 @@ Plans:
 3. User sees visual diff highlighting what AI changed from original
 4. User can regenerate individual sections that need improvement
 
-**Plans:** TBD
+**Plans:** 2 plans
+
+Plans:
+- [ ] 46-01-PLAN.md — Edit mode and inline editing with state management
+- [ ] 46-02-PLAN.md — Diff view and per-element regeneration
 
 ---
 
@@ -170,8 +174,8 @@ Plans:
 | 42. Student-Friendly Slides | v3.7 | 2/2 | Complete | 2026-01-29 |
 | 43. Types and File Upload | v3.7 | 2/2 | Complete | 2026-01-29 |
 | 44. AI Document Analysis | v3.7 | 1/1 | Complete | 2026-01-30 |
-| 45. Enhancement with Lesson Context | v3.7 | 0/3 | Planned | - |
-| 46. Preview, Edit, and Trust UI | v3.7 | 0/TBD | Not started | - |
+| 45. Enhancement with Lesson Context | v3.7 | 3/3 | Complete | 2026-01-30 |
+| 46. Preview, Edit, and Trust UI | v3.7 | 0/2 | Planned | - |
 | 47. Export and Persistence | v3.7 | 0/TBD | Not started | - |
 
 ## Coverage Validation
@@ -204,4 +208,4 @@ Plans:
 
 ---
 *Roadmap created: 2026-01-27*
-*Last updated: 2026-01-30 - Phase 45 planned (3 plans)*
+*Last updated: 2026-01-30 - Phase 46 planned (2 plans)*
