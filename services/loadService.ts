@@ -1,4 +1,22 @@
-import { CueFile, CURRENT_FILE_VERSION } from '../types';
+import {
+  CueFile,
+  CURRENT_FILE_VERSION,
+  SerializedEditState,
+  EditState
+} from '../types';
+
+/**
+ * Deserialize JSON edit state back to Maps.
+ */
+export function deserializeEditState(serialized: SerializedEditState): EditState {
+  return {
+    edits: {
+      simple: new Map(serialized.simple),
+      standard: new Map(serialized.standard),
+      detailed: new Map(serialized.detailed)
+    }
+  };
+}
 
 /**
  * Type guard to validate that parsed data has the expected CueFile shape.
@@ -36,31 +54,36 @@ export function isValidCueFile(data: unknown): data is CueFile {
 
 /**
  * Migrate file data from older versions to current version.
- * Currently a no-op since version 1 is current; kept as future-proofing.
  *
  * @param data - CueFile with potentially older version
  * @returns Migrated CueFile at CURRENT_FILE_VERSION
  */
 function migrateFile(data: CueFile): CueFile {
-  const fromVersion = data.version;
+  let migrated = data;
 
-  if (fromVersion < CURRENT_FILE_VERSION) {
-    console.log(`Migrating file from version ${fromVersion} to ${CURRENT_FILE_VERSION}`);
+  if (data.version < CURRENT_FILE_VERSION) {
+    console.log(`Migrating file from version ${data.version} to ${CURRENT_FILE_VERSION}`);
+
     // v1 -> v2: Added verbosityCache to Slide interface
     // No action needed - optional field defaults to undefined
-    if (fromVersion === 1) {
-      // Slides without verbosityCache will have it as undefined
-      // This is correct behavior - cache is populated on-demand
-    }
+
     // v2 -> v3: Added deckVerbosity to CueFile root
-    if (fromVersion === 2) {
-      // No action needed - deckVerbosity is optional
-      // App.tsx defaults to 'standard' when undefined
+    // No action needed - deckVerbosity is optional
+
+    // v3 -> v4: Added enhancedResources to CueFileContent
+    if (data.version < 4) {
+      migrated = {
+        ...migrated,
+        content: {
+          ...migrated.content,
+          enhancedResources: []  // Default empty array for older files
+        }
+      };
     }
   }
 
   return {
-    ...data,
+    ...migrated,
     version: CURRENT_FILE_VERSION,
   };
 }
