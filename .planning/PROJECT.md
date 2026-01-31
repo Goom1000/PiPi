@@ -4,25 +4,11 @@
 
 A presentation tool for teachers that transforms PDF lesson plans into interactive slideshows with AI-generated content, a teleprompter script for the teacher, and progressive bullet reveal. Teachers upload their existing lesson plans, select student age/grade level, and the AI creates an engaging presentation with speaker notes that guide the teacher through natural, conversational delivery.
 
-**v3.5 shipped:** Working Wall Export — Teachers can export selected slides as printable A4 PDFs for classroom "Working Wall" displays, with optional AI poster enhancement. Deployed at https://goom1000.github.io/Cue/
-
-## Current Milestone: v3.7 AI Resource Enhancement
-
-**Goal:** Enable teachers to upload existing worksheets and handouts, then have AI enhance them while preserving intent and aligning with the Cue lesson.
-
-**Target features:**
-- Upload existing resources (images, PDF, Word/Docs) in Resources section
-- AI-powered enhancement with lesson context awareness
-- Visual clarity improvements (graphics, layout)
-- Content alignment with adapted lesson
-- Differentiation (simple/standard/detailed versions)
-- Preview and edit in-app before export
-- Export as print-ready PDF
-- Persist enhanced resources in .cue file
+**v3.7 shipped:** AI Resource Enhancement — Teachers can upload existing worksheets (PDF, images, Word), enhance with AI using lesson context and 3 differentiation levels, preview with visual diff and inline editing, and export as print-ready PDFs. Deployed at https://goom1000.github.io/Cue/
 
 ## Current State
 
-Shipped v3.5 with ~20,083 LOC TypeScript. v3.5 delivered slide selection UI with multi-select, Quick Export PDF generation (A4 landscape, exact content preservation), and AI Poster Mode with Claude structured outputs for educational poster layouts.
+Shipped v3.7 with ~24,747 LOC TypeScript. v3.7 delivered AI Resource Enhancement: teachers can upload existing worksheets (PDF, images, Word), enhance with AI using lesson context and 3 differentiation levels, preview with visual diff and inline editing, and export as print-ready PDFs.
 
 ## Core Value
 
@@ -132,19 +118,22 @@ Students see only the presentation; teachers see the presentation plus a telepro
 - ✓ AI Poster Mode transforms selected slides into classroom wall posters — v3.5
 - ✓ Poster aesthetic with larger text, clearer hierarchy, subject-aware colors — v3.5
 - ✓ AI uses slide context (current + surrounding slides) for coherent poster content — v3.5
+- ✓ Student-friendly slide content with grade-level language adaptation — v3.7
+- ✓ Upload existing resources (images, PDF, Word/Docs) for AI enhancement — v3.7
+- ✓ AI document analysis with multimodal vision for structure detection — v3.7
+- ✓ AI enhancement with lesson context awareness — v3.7
+- ✓ Differentiation output (simple/standard/detailed versions) — v3.7
+- ✓ Visual diff showing what AI changed from original — v3.7
+- ✓ In-app preview and inline edit before export — v3.7
+- ✓ Per-element AI regeneration for targeted improvements — v3.7
+- ✓ Export enhanced resources as print-ready PDF with zip bundling — v3.7
+- ✓ Persist enhanced resources in .cue save file (v4 format) — v3.7
 
 ### Active
 
-- [ ] Upload existing resources (images, PDF, Word/Docs) for AI enhancement
-- [ ] AI enhancement with lesson context awareness
-- [ ] Visual clarity improvements (better graphics, cleaner layout)
-- [ ] Content alignment with adapted lesson content
-- [ ] Differentiation output (simple/standard/detailed versions)
-- [ ] In-app preview and edit before export
-- [ ] Export enhanced resources as print-ready PDF
-- [ ] Persist enhanced resources in .cue save file
+(None — ready for next milestone planning)
 
-### Deferred (v3.7+)
+### Deferred (v3.8+)
 
 - [ ] Tooltips and onboarding walkthrough (v3.6 deferred — Phase 41 infrastructure complete)
 - [ ] Elapsed time display showing presentation duration
@@ -171,18 +160,18 @@ Students see only the presentation; teachers see the presentation plus a telepro
 
 ### Current State
 
-Shipped v3.5 with ~20,083 LOC TypeScript.
-Tech stack: React 19, Vite, Gemini/Claude API, Tailwind CSS, react-rnd, jsPDF, html2canvas.
+Shipped v3.7 with ~24,747 LOC TypeScript.
+Tech stack: React 19, Vite, Gemini/Claude API, Tailwind CSS, react-rnd, jsPDF, html2canvas, mammoth.js, react-diff-viewer-continued, JSZip.
 Client-side only (no backend).
 Deployed at: https://goom1000.github.io/Cue/
 
-v3.5 delivered Working Wall Export:
-- Multi-select slide UI with Set-based selection (Shift+click range, Cmd/Ctrl+click toggle)
-- Export modal with preview grid and mode selection (Quick Export vs AI Poster)
-- Quick Export PDF generation (A4 landscape, 150+ DPI print quality)
-- AI Poster Mode using Claude structured outputs for educational poster layouts
-- Subject-aware color schemes and Year 6 content transformation
-- Per-poster regenerate button for individual refinement
+v3.7 delivered AI Resource Enhancement:
+- Resource upload supporting PDF, images (PNG/JPG), and Word documents with drag-drop UI
+- AI document analysis using multimodal vision for structure detection
+- AI enhancement pipeline with lesson context awareness and 3 differentiation levels
+- Trust UI with visual diff highlighting, inline editing, and per-element regeneration
+- Export to print-ready PDF with zip bundling
+- Full .cue file persistence (v4 format) with enhanced resource state
 
 ### Technical Environment
 
@@ -286,6 +275,20 @@ v3.5 delivered Working Wall Export:
 | Arrow keys blur input | Preserves slide navigation while Ask AI panel open | ✓ Good — v3.4 |
 | History saved after stream completes | Only successful responses saved to history | ✓ Good — v3.4 |
 | Timestamp as React key | Guaranteed unique for history entries | ✓ Good — v3.4 |
+| Multimodal AI for document analysis | Gemini/Claude vision superior to OCR, avoids Tesseract.js bloat | ✓ Good — v3.7 |
+| mammoth.js for Word support | Lightweight DOCX parsing, only new dependency needed | ✓ Good — v3.7 |
+| Preserve mode as enhancement default | Prevents AI from hallucinating or removing original content | ✓ Good — v3.7 |
+| Gemini responseSchema vs Claude tool_choice | Each provider's native structured output mechanism | ✓ Good — v3.7 |
+| 15-slide context limit for enhancement | Prevents token overflow while maintaining lesson alignment | ✓ Good — v3.7 |
+| contenteditable="plaintext-only" for editing | Security best practice, prevents XSS in inline editing | ✓ Good — v3.7 |
+| Map-based edit state with tuple serialization | O(1) lookup, JSON-compatible via [number, string][] | ✓ Good — v3.7 |
+| react-diff-viewer-continued | Word-level diff highlighting with dark mode support | ✓ Good — v3.7 |
+| Diff and edit modes mutually exclusive | Prevents UI confusion, clear mental model | ✓ Good — v3.7 |
+| jsPDF text API for export | Vector PDF output sharper than html2canvas rasterization | ✓ Good — v3.7 |
+| A4 portrait with 25mm left margin | Print-ready with space for binding/hole-punching | ✓ Good — v3.7 |
+| JSZip for multi-PDF bundling | Single download for teacher convenience | ✓ Good — v3.7 |
+| CueFile v4 with enhancedResources | Full resource state persistence including edits | ✓ Good — v3.7 |
+| v3→v4 migration defaults empty array | Backward compatible, no breaking changes | ✓ Good — v3.7 |
 
 ---
-*Last updated: 2026-01-29 after v3.7 milestone started (v3.6 deferred)*
+*Last updated: 2026-01-31 after v3.7 milestone shipped*

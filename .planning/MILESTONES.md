@@ -1,5 +1,33 @@
 # Project Milestones: Cue
 
+## v3.7 AI Resource Enhancement (Shipped: 2026-01-31)
+
+**Delivered:** Teachers can upload existing worksheets and handouts (PDF, images, Word), have AI enhance them with lesson context awareness and 3 differentiation levels, preview changes with visual diff, edit inline, and export as print-ready PDFs—all persisting in .cue files.
+
+**Phases completed:** 42-47 (12 plans total)
+
+**Key accomplishments:**
+
+- Student-friendly slide content across all AI providers with grade-level language adaptation
+- Resource upload supporting PDF, images (PNG/JPG), and Word documents with drag-drop UI
+- AI document analysis using multimodal vision for structure detection
+- AI enhancement pipeline with lesson context awareness and 3 differentiation levels (simple/standard/detailed)
+- Trust UI with visual diff highlighting, inline editing, and per-element regeneration
+- Export to print-ready PDF with zip bundling and full .cue file persistence (v4 format)
+
+**Stats:**
+
+- 30 feat commits
+- ~24,747 lines of TypeScript (project total)
+- 6 phases, 12 plans, 21 requirements
+- 3 days (2026-01-29 → 2026-01-31)
+
+**Git range:** `feat(42-01)` → `feat(47-02)`
+
+**What's next:** TBD with /gsd:new-milestone
+
+---
+
 ## v3.5 Working Wall Export (Shipped: 2026-01-27)
 
 **Delivered:** Teachers can export selected slides as printable A4 PDFs for classroom "Working Wall" displays, with optional AI poster enhancement that transforms raw class notes into polished educational reference materials.
